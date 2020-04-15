@@ -475,7 +475,6 @@
             this.txtProductTemp_Room.Name = "txtProductTemp_Room";
             this.txtProductTemp_Room.Size = new System.Drawing.Size(64, 21);
             this.txtProductTemp_Room.TabIndex = 19;
-            this.txtProductTemp_Room.TextChanged += new System.EventHandler(this.txtProductTemp1_TextChanged);
             // 
             // label4
             // 

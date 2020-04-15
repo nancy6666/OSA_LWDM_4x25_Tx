@@ -54,7 +54,7 @@ namespace LWDM_Tx_4x25
 
         private double Temp_Environment;
         private CTestDataCommon TestDataCommon;
-      
+
         public List<double> lstVcpa;
         public List<double> lstVeq;
         public List<double> lstVmod;
@@ -70,9 +70,9 @@ namespace LWDM_Tx_4x25
         private Task MonitorProductTempTask = null;
         private double ProductTemp;
 
-/// <summary>
-/// 子窗体对象，全局使用
-/// </summary>
+        /// <summary>
+        /// 子窗体对象，全局使用
+        /// </summary>
         private GY7501_I2C gY7501_I2C;
 
         private int[] iFail = new Int32[5];
@@ -283,7 +283,7 @@ namespace LWDM_Tx_4x25
             lstTecTempNote = new List<string>();
             strMsg = "正在获取test plan 的内容,请稍等...";
             ShowMsg(strMsg, true);
-            
+
             var task1 = new Task(() =>
             {
                 string TestPlanFile = $"{ Directory.GetCurrentDirectory()}\\config\\LWDM 4x25 TEST PLAN.xlsx";
@@ -297,7 +297,7 @@ namespace LWDM_Tx_4x25
                 try
                 {
                     //Bert paras
-                   var com = excelCell[4, 2].value;
+                    var com = excelCell[4, 2].value;
                     Inst_Bert = new Bert(com);
                     Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
                     Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
@@ -335,8 +335,8 @@ namespace LWDM_Tx_4x25
                     //N1092 paras
                     kesight_N1902D.Channel = Convert.ToString(excelCell[35, 2].value);
                     kesight_N1902D.Channel_bandWidth = Convert.ToString(excelCell[36, 2].value);
-                    kesight_N1902D.Filter_rate = Convert.ToString(excelCell[37, 2].value);
-                    
+                    kesight_N1902D.AOP_Offset = Convert.ToString(excelCell[37, 2].value);
+
                     //T720
                     com = excelCell[40, 2].value;
                     TC720 = new TC720(com);
@@ -350,33 +350,36 @@ namespace LWDM_Tx_4x25
                     TC720.TempSpan = excelCell[44, 2].value;
                     TC720.StablizaitonTime = Convert.ToInt32(excelCell[45, 2].value);
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
-                  
+
                     //LDT5525B
                     com = excelCell[49, 2].value;
                     L5525B = new LDT5525B(com);
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TimeOut = Convert.ToInt32(excelCell[51, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[52, 2].value);
+                    L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-                    gpibAddr = Convert.ToUInt16(excelCell[55, 2].value);
+                    gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
                     aQ6370 = new AQ6370(gpibAddr);
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[56, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[58, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[60, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[62, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[57, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[59, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[61, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[63, 2].value));
-                    
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[59, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[61, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[63, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[58, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[60, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[62, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
+
                     //PM212
-                    com = excelCell[66, 2].value;
+                    com = excelCell[67, 2].value;
                     pm212 = new PM212(com);
+                    pm212.Power_Offset = Convert.ToDouble(excelCell[68, 2].value);
+
                     //JW8402
-                    com = excelCell[69, 2].value;
+                    com = excelCell[71, 2].value;
                     jw8402 = new JW8402(com);
                 }
                 catch (Exception ex)
@@ -461,18 +464,18 @@ namespace LWDM_Tx_4x25
             //GYI2C
             if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
             {
-               ShowMsg("GYI2C设备打开失败！",false);
+                ShowMsg("GYI2C设备打开失败！", false);
                 return;
             }
             //设置I2C Adapter 模式和时钟
             if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
             {
-                ShowMsg("设置I2C 适配器的Mode出错！",false);
+                ShowMsg("设置I2C 适配器的Mode出错！", false);
                 return;
             }
             if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
             {
-                ShowMsg("设置I2C 适配器的时钟出错！",false);
+                ShowMsg("设置I2C 适配器的时钟出错！", false);
                 return;
             }
         }
@@ -611,7 +614,7 @@ namespace LWDM_Tx_4x25
                     });
                     task1.Start();
                 }
-               
+
                 var task = new Task(() =>
                 {
                     while (!TemperatureIsTimeOut)
@@ -631,9 +634,9 @@ namespace LWDM_Tx_4x25
                 });
                 task.Start();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                ShowMsg(ex.Message,false);
+                ShowMsg(ex.Message, false);
             }
         }
 
@@ -645,7 +648,6 @@ namespace LWDM_Tx_4x25
         private void GetTestData_Channel(int chl)
         {
             //GY7501
-
             TestData_Channel.Vcpa = lstVcpa[chl];
             TestData_Channel.Veq = lstVeq[chl];
             TestData_Channel.Vmod = lstVmod[chl];
@@ -666,7 +668,7 @@ namespace LWDM_Tx_4x25
 
             //PM212
             ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
-            TestData_Channel.Power = pm212.ReadPower();
+            TestData_Channel.Power = pm212.ReadPower() + pm212.Power_Offset;
         }
 
         /// <summary>
@@ -674,11 +676,11 @@ namespace LWDM_Tx_4x25
         /// </summary>
         /// <param name="TestData"></param>
         /// <param name="tec_temp_out"></param>
-        private void GetPfAndShowTestData(CTestData_Channel TestData,double tec_temp_out)
+        private void GetPfAndShowTestData(CTestData_Channel TestData, double tec_temp_out)
         {
             testResult = new string[] { tec_temp_out.ToString(), TestData.Channel.ToString(), TestData.Cwl.ToString(), TestData.SMSR.ToString(), TestData.Power.ToString(), TestData.Impd.ToString(), TestData.Idark.ToString(), TestData.Jitter_pp.ToString(), TestData.Jitter_rms.ToString(), TestData.Crossing.ToString(), TestData.Fall_time.ToString(), TestData.Rise_time.ToString(), TestData.Er.ToString(), TestData.Mask_Margin.ToString() };
             iFail = new Int32[14];
-      
+
             if (TestData.Cwl >= TestSpec.Cwl_min && TestData.Cwl <= TestSpec.Cwl_max)
             {
                 if (TestData.SMSR >= TestSpec.SMSR_min && TestData.SMSR <= TestSpec.SMSR_max)
@@ -806,7 +808,7 @@ namespace LWDM_Tx_4x25
         /// 保存眼图
         /// </summary>
         /// <returns></returns>
-        private bool SaveEyeImage(int temp_index,int channel)
+        private bool SaveEyeImage(int temp_index, int channel)
         {
             string temp_note = "";
             switch (temp_index)
@@ -914,7 +916,7 @@ namespace LWDM_Tx_4x25
             {
                 ListViewItem lvi = null;
                 lvi = new ListViewItem(strResult);
-               
+
                 lstViewTestData.Items.Add(lvi);
                 lvi.UseItemStyleForSubItems = false;
                 for (int i = 0; i < strResult.Length - 1; i++)
@@ -963,7 +965,7 @@ namespace LWDM_Tx_4x25
 
         private void LWDM_Tx_FormClosed(object sender, FormClosedEventArgs e)
         {
-           // Deinit();
+            // Deinit();
         }
         private void LoadTestSpec(object sender, EventArgs e)
         {
@@ -1035,8 +1037,10 @@ namespace LWDM_Tx_4x25
                         TickCountTotal = 0;
                         TecTimer.Start();
 
-                        ShowMsg($"将产品温度设置为{lstTecTemp_Product[TecTempIndex]}，请稍等...", true);
                         L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
+                        this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
+                        ShowMsg($"将产品温度设置为{this.ProductTemp}，请稍等...", true);
+
                         TickCountTotal_Product = 0;
                         ProductTempTimer.Start();
                         //等待环境温度和产品温度达到设定值并稳定
@@ -1067,7 +1071,7 @@ namespace LWDM_Tx_4x25
                             GetTestData_Channel(channel);
 
                             ShowMsg("Save Eye Diagram...", true);
-                            SaveEyeImage(TecTempIndex,channel);
+                            SaveEyeImage(TecTempIndex, channel);
                             progHandle.Report(100);
                             //添加一条测试数据到TestData_Temp
                             TestData_Temp.lstTestData_Channel.Add(TestData_Channel);
@@ -1104,7 +1108,7 @@ namespace LWDM_Tx_4x25
                             TestData_Temp.Pf = true & TestData_Temp.lstTestData_Channel[ch].Pf;
                         }
                         //获取只与温度有关的测试参数的pf
-                        if(TestData_Temp.Itec>=TestSpec.Itec_min & TestData_Temp.Itec<=TestSpec.Itec_max)
+                        if (TestData_Temp.Itec >= TestSpec.Itec_min & TestData_Temp.Itec <= TestSpec.Itec_max)
                         {
                             TestData_Temp.Pf &= true;
                         }
@@ -1171,7 +1175,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 ShowMsg("正在绘制眼图，请稍后...", true);
-                
+
                 var task = new Task(() =>
                 {
                     kesight_N1902D.Run();
@@ -1187,31 +1191,27 @@ namespace LWDM_Tx_4x25
         private void btnOpenGY1202Interface_Click(object sender, EventArgs e)
         {
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
-            { 
+            {
                 strMsg = $"请注意温度还未达到设定值,不能进行测试！";
                 ShowMsg(strMsg, false);
             }
-                gY7501_I2C = new GY7501_I2C();
-                gY7501_I2C.Show();
+            gY7501_I2C = new GY7501_I2C();
+            gY7501_I2C.Show();
         }
 
         private void cbxChlIndex_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex))
+            if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex))
             {
                 ShowMsg($"切换光通道到CH{this.cbxChlIndex.SelectedIndex + 1}时出错", false);
             }
-        }
-
-        private void txtProductTemp1_TextChanged(object sender, EventArgs e)
-        {
-            this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
         }
 
         private void btnSetProductTemp1_Click(object sender, EventArgs e)
         {
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
+            this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
             ReadRealTECTemp_Product();
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
@@ -1320,7 +1320,5 @@ namespace LWDM_Tx_4x25
             this.lstViewTestData.Clear();
         }
         #endregion
-
-
     }
 }

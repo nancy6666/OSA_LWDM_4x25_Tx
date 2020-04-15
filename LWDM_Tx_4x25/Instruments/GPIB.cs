@@ -47,30 +47,26 @@ namespace LWDM_Tx_4x25.Instruments
                 throw new Exception(ex.Message);
 			}
 		}
-		//wirte to device
-		public void GPIBwr(string Commands)
-		{
-			try
-			{
-				int BuffSize;
-				BuffSize=Commands.Length;
-				li.ibwrt(Dev,Commands,BuffSize);
-				if((li.ibsta&c.ERR)!=0)
-					throw new System.Exception("Unable to write to device!\nibsta:"+li.ibsta+"\nERR:"+c.ERR);
-			}
-			catch(System.Exception Ex)
-			{
-//				MessageBox.Show("Error: " + Ex.Message +  //error Name
-//					"ibsta = " + li.ibsta +       //ibsta
-//					"iberr = " + li.iberr +       //iberr
-//					ErrorMnemonic[li.iberr]);     //error code
-				string str = Ex.Message +  //error Name
-					"ibsta = " + li.ibsta +       //ibsta
-					"iberr = " + li.iberr +       //iberr
-					ErrorMnemonic[li.iberr];     //error code
-				throw new Exception(str);
-			}
-		}
+        //wirte to device
+        public void GPIBwr(string Commands)
+        {
+            try
+            {
+                int BuffSize;
+                BuffSize = Commands.Length;
+                li.ibwrt(Dev, Commands, BuffSize);
+                if ((li.ibsta & c.ERR) != 0)
+                    throw new System.Exception("Unable to write to device!\nibsta:" + li.ibsta + "\nERR:" + c.ERR);
+            }
+            catch (System.Exception Ex)
+            {
+                string str = Ex.Message +  //error Name
+                    "ibsta = " + li.ibsta +       //ibsta
+                    "iberr = " + li.iberr +       //iberr
+                    ErrorMnemonic[li.iberr];     //error code
+                throw new Exception(str);
+            }
+        }
 		//read data form device
 		public string GPIBrd(int buffersize)
 		{

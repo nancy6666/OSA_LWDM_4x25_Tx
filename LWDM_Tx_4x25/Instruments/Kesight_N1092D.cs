@@ -42,7 +42,7 @@ namespace LWDM_Tx_4x25.Instruments
                 this.channel_bandWidth = value + "E+9";
             }
         }
-        public double DCA_Offset
+        public double AOP_Offset
         {
             get;
             set;
@@ -90,6 +90,7 @@ namespace LWDM_Tx_4x25.Instruments
         private string[] inst_err;
         private int inst_code;
         #endregion
+
         public void Init()
         {
             try
@@ -140,7 +141,7 @@ namespace LWDM_Tx_4x25.Instruments
                 //myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FRATe?", true);
                 //var a = myN1010A.ReadString();
                 myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FBANdwidth {this.Channel_bandWidth}", true);
-               // myN1010A.WriteString($":MEASure:THReshold:METHod P205080", true);//设置测量Threshold 为20%，50%，80%
+                myN1010A.WriteString($":CHAN{this.Channel}:ATTenuator:DECibels {this.AOP_Offset}", true);//设置AOP offset
                 //Set mask margin
                 myN1010A.WriteString($":MTESt1:LOAD:FNAMe  \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE - LR4_Tx_Optical_D31.mskx\""); //set mask 100G LR
                 myN1010A.WriteString(":MTESt1:LOAD", true);
@@ -190,27 +191,29 @@ namespace LWDM_Tx_4x25.Instruments
                 myN1010A.WriteString(":MEASure:EYE:FALLtime?", true);
                 this.FallTime = Convert.ToDouble(myN1010A.ReadString());
 
-                //// Mask Margin
+                // Mask Margin
                 myN1010A.WriteString(":MEASure:MTESt1:MARgin?", true);
                 this.MaskMargin = Convert.ToDouble(myN1010A.ReadString());
-               
-                  //query err information
-                  inst_code = -1;
-                do
+
+                //AOP 只需在眼图上显示
+                myN1010A.WriteString(":MEASure:EYE:APOWer:UNITs DBM", true);
+                myN1010A.WriteString(":MEASure:EYE:APOWer", true);
+
+                //query err information
+                inst_code = -1;
+
+                myN1010A.WriteString(":SYSTem:ERRor?", true);
+                inst_err = myN1010A.ReadString().Split(',');
+                inst_code = Convert.ToInt32(inst_err[0].ToString());
+                if (inst_code != 0)
                 {
-                    myN1010A.WriteString(":SYSTem:ERRor?", true);
-                    inst_err = myN1010A.ReadString().Split(',');
-                    inst_code = Convert.ToInt32(inst_err[0].ToString());
                     errorMessages = errorMessages.ToString() + inst_err[0].ToString() + ": " + inst_err[1].ToString() + "\r\n";
-
-                } while (inst_code != 0);
-
-                Application.DoEvents();
-
+                    throw new Exception($"从眼图仪获取测试数据出错,{errorMessages}");
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"获取测试数据出错！{ex.Message}");
+                throw new Exception($"从眼图仪获取测试数据出错！{ex.Message}");
             }
         }
        

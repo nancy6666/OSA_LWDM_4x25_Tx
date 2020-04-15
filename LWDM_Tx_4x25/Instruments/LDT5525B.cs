@@ -15,7 +15,7 @@ namespace LWDM_Tx_4x25.Instruments
         public int StablizationTime;
         public int TimeOut;
         public double TempSpan;
-
+        public double TempOffset;
         enum gainValue
         {
             g1 = 1,

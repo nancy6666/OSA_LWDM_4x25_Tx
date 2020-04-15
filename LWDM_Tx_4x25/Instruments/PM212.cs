@@ -12,6 +12,7 @@ namespace LWDM_Tx_4x25.Instruments
     {
         protected SerialPort comPort;
 
+        public double Power_Offset;
         public PM212(string com)
         {
             try
