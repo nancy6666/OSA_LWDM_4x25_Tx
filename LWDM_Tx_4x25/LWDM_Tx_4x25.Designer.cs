@@ -64,8 +64,11 @@
             this.环境温度 = new System.Windows.Forms.Label();
             this.lblRealTemp_Case = new System.Windows.Forms.Label();
             this.TEC = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
             this.btnSetProductTemp1 = new System.Windows.Forms.Button();
-            this.lblProductTemp = new System.Windows.Forms.Label();
+            this.lblRealTemp_Product = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
@@ -77,9 +80,6 @@
             this.label4 = new System.Windows.Forms.Label();
             this.btnRestTemp = new System.Windows.Forms.Button();
             this.ProductTempTimer = new System.Windows.Forms.Timer(this.components);
-            this.label10 = new System.Windows.Forms.Label();
-            this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
             this.N1092D.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
@@ -371,7 +371,7 @@
             this.TEC.Controls.Add(this.label11);
             this.TEC.Controls.Add(this.label10);
             this.TEC.Controls.Add(this.btnSetProductTemp1);
-            this.TEC.Controls.Add(this.lblProductTemp);
+            this.TEC.Controls.Add(this.lblRealTemp_Product);
             this.TEC.Controls.Add(this.label9);
             this.TEC.Controls.Add(this.label8);
             this.TEC.Controls.Add(this.label7);
@@ -391,6 +391,33 @@
             this.TEC.TabStop = false;
             this.TEC.Text = "TEC";
             // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(176, 127);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(65, 12);
+            this.label12.TabIndex = 31;
+            this.label12.Text = "产品温度：";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(289, 127);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(17, 12);
+            this.label11.TabIndex = 30;
+            this.label11.Text = "℃";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(143, 35);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(17, 12);
+            this.label10.TabIndex = 29;
+            this.label10.Text = "℃";
+            // 
             // btnSetProductTemp1
             // 
             this.btnSetProductTemp1.Location = new System.Drawing.Point(187, 76);
@@ -401,14 +428,14 @@
             this.btnSetProductTemp1.UseVisualStyleBackColor = true;
             this.btnSetProductTemp1.Click += new System.EventHandler(this.btnSetProductTemp1_Click);
             // 
-            // lblProductTemp
+            // lblRealTemp_Product
             // 
-            this.lblProductTemp.AutoSize = true;
-            this.lblProductTemp.Location = new System.Drawing.Point(241, 127);
-            this.lblProductTemp.Name = "lblProductTemp";
-            this.lblProductTemp.Size = new System.Drawing.Size(47, 12);
-            this.lblProductTemp.TabIndex = 27;
-            this.lblProductTemp.Text = "label10";
+            this.lblRealTemp_Product.AutoSize = true;
+            this.lblRealTemp_Product.Location = new System.Drawing.Point(241, 127);
+            this.lblRealTemp_Product.Name = "lblRealTemp_Product";
+            this.lblRealTemp_Product.Size = new System.Drawing.Size(47, 12);
+            this.lblRealTemp_Product.TabIndex = 27;
+            this.lblRealTemp_Product.Text = "label10";
             // 
             // label9
             // 
@@ -500,38 +527,11 @@
             // 
             this.ProductTempTimer.Tick += new System.EventHandler(this.ProductTempTimer_Tick);
             // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(143, 35);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(17, 12);
-            this.label10.TabIndex = 29;
-            this.label10.Text = "℃";
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(289, 127);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(17, 12);
-            this.label11.TabIndex = 30;
-            this.label11.Text = "℃";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(176, 127);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(65, 12);
-            this.label12.TabIndex = 31;
-            this.label12.Text = "产品温度：";
-            // 
             // LWDM_Tx_4x25
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1003, 962);
+            this.ClientSize = new System.Drawing.Size(1003, 881);
             this.Controls.Add(this.TEC);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.N1092D);
@@ -592,7 +592,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtProductTemp_Cold;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label lblProductTemp;
+        private System.Windows.Forms.Label lblRealTemp_Product;
         private System.Windows.Forms.Button btnSetProductTemp1;
         private System.Windows.Forms.Button btnRestTemp;
         private System.Windows.Forms.Timer ProductTempTimer;

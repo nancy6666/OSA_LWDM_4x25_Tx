@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace LWDM_Tx_4x25.Instruments
 {
-   //确认设备地址是什么 01么？
+   //确认设备地址是什么 01
    public class JW8402
     {
         protected SerialPort comPort;
@@ -18,6 +18,8 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 comPort = new SerialPort(com, 9600, Parity.None, 8, StopBits.One);
+                comPort.ReadTimeout = 3000;
+                comPort.WriteTimeout = 3000;
                 try
                 {
                     if (comPort.IsOpen)
@@ -40,7 +42,7 @@ namespace LWDM_Tx_4x25.Instruments
         /// <summary>
         /// 设置通道（小于 100 路时）
         /// </summary>
-        /// <param name="nChannel">00～99（表示切换到第几通道）</param>
+        /// <param name="nChannel">00～99（表示切换到第几通道）1表示通道1</param>
         /// <param name="devAddr">00～99（表示设备地址）</param>
         /// <returns>true:成功</returns>
         public bool SetChannel(int nChannel,int devAddr=01)

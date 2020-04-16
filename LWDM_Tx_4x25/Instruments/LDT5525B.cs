@@ -11,7 +11,6 @@ namespace LWDM_Tx_4x25.Instruments
    public class LDT5525B
     {
         protected SerialPort comPort;
-
         public int StablizationTime;
         public int TimeOut;
         public double TempSpan;
@@ -37,6 +36,8 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 comPort = new SerialPort(com, 115200, Parity.None, 8, StopBits.One);
+                comPort.ReadTimeout = 1000;
+                comPort.WriteTimeout = 1000;
                 try
                 {
                     if (comPort.IsOpen)

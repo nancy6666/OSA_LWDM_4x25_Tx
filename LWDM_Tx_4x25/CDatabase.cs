@@ -109,7 +109,7 @@ namespace LWDM_Tx_4x25
             testSpec.PN = pn;
             try
             {
-                string sql = string.Format($"select * from dbo.tx_lwdm_4x25_spec where pn='{pn}' and temp=25 and version=(select Max(version) from dbo.spec_tx_rftest_pam4 where pn='{pn}'and temp=25)");
+                string sql = string.Format($"select * from dbo.tx_lwdm_4x25_spec where pn='{pn}' and temp=25 and version=(select Max(version) from dbo.tx_lwdm_4x25_spec where pn='{pn}'and temp=25)");
 
                 DataSet ds = ReadRawSQL(sql);
                 DataTable dt = ds.Tables[0];

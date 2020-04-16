@@ -12,12 +12,14 @@ namespace LWDM_Tx_4x25.Instruments
     {
         protected SerialPort comPort;
 
-        public double Power_Offset;
+        public List<double> lstPower_Offset = new List<double>();
         public PM212(string com)
         {
             try
             {
                 comPort = new SerialPort(com, 115200, Parity.None, 8, StopBits.One);
+                comPort.ReadTimeout = 3000;
+                comPort.WriteTimeout = 3000;
                 try
                 {
                     if (comPort.IsOpen)
@@ -33,7 +35,7 @@ namespace LWDM_Tx_4x25.Instruments
             {
                 throw new Exception($"PM212 初始化出错，{ex.Message}");
             }
-            SetWavelength(1.31E-6);
+           
         }
 
         public double ReadPower()
@@ -46,7 +48,7 @@ namespace LWDM_Tx_4x25.Instruments
         /// 设置功率计波长
         /// </summary>
         /// <param name="waveMeter">单位为m</param>
-        private void SetWavelength(double waveMeter)
+        public void SetWavelength(double waveMeter)
         {
             string strCmd = "";
             strCmd = $"WAVELENGTH {waveMeter}";
@@ -74,7 +76,8 @@ namespace LWDM_Tx_4x25.Instruments
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Write PM212 Error,{ex.Message}");
+
             }
         }
         private object Query(object objCmd)
@@ -91,7 +94,7 @@ namespace LWDM_Tx_4x25.Instruments
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception($"Read PM212 Error,{ex.Message}");
             }
         }
 

@@ -19,12 +19,13 @@ namespace LWDM_Tx_4x25
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             ConfigManagement config = new ConfigManagement();
+            LWDM_Tx_4x25 mainFrame = new LWDM_Tx_4x25();
             Process m_Process = null;
             m_Process = new Process();
             m_Process.StartInfo.FileName = config.DCAN1092Path;
             m_Process.Start();
             Thread.Sleep(4000);
-            Application.Run(new LWDM_Tx_4x25());
+            Application.Run(mainFrame);
         }
     }
 }

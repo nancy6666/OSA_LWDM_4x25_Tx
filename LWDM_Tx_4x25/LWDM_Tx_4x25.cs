@@ -196,6 +196,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 this.cbxPN.SelectedIndexChanged -= new System.EventHandler(this.LoadTestSpec);
+                ShowMsg("Getting PN numbers from database...", true);
                 this.cbxPN.DataSource = db.GetAllPN();
                 this.cbxPN.SelectedIndex = -1;
                 this.cbxPN.SelectedIndexChanged += new System.EventHandler(this.LoadTestSpec);
@@ -206,6 +207,7 @@ namespace LWDM_Tx_4x25
             }
 
             ReadRealTECTemp_Out();
+            ReadRealTECTemp_Product();
         }
 
         #region Interface Display Methods
@@ -268,7 +270,7 @@ namespace LWDM_Tx_4x25
         }
         private void ShowTemp_Product(double temp)
         {
-            this.lblProductTemp.Text = RealTimeTemperature_Product.ToString();
+            this.lblRealTemp_Product.Text = RealTimeTemperature_Product.ToString();
         }
         #endregion
 
@@ -298,10 +300,10 @@ namespace LWDM_Tx_4x25
                 {
                     //Bert paras
                     var com = excelCell[4, 2].value;
-                    Inst_Bert = new Bert(com);
-                    Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
-                    Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
-                    Inst_Bert.Clock = excelCell[7, 2].value;
+                   // Inst_Bert = new Bert(com);
+                    //Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
+                    //Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
+                    //Inst_Bert.Clock = excelCell[7, 2].value;
 
                     //K2400
                     var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
@@ -335,7 +337,7 @@ namespace LWDM_Tx_4x25
                     //N1092 paras
                     kesight_N1902D.Channel = Convert.ToString(excelCell[35, 2].value);
                     kesight_N1902D.Channel_bandWidth = Convert.ToString(excelCell[36, 2].value);
-                    kesight_N1902D.AOP_Offset = Convert.ToString(excelCell[37, 2].value);
+                    kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[37, 2].value);
 
                     //T720
                     com = excelCell[40, 2].value;
@@ -376,10 +378,13 @@ namespace LWDM_Tx_4x25
                     //PM212
                     com = excelCell[67, 2].value;
                     pm212 = new PM212(com);
-                    pm212.Power_Offset = Convert.ToDouble(excelCell[68, 2].value);
+                    pm212.lstPower_Offset.Add( Convert.ToDouble(excelCell[68, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
 
                     //JW8402
-                    com = excelCell[71, 2].value;
+                    com = excelCell[74, 2].value;
                     jw8402 = new JW8402(com);
                 }
                 catch (Exception ex)
@@ -421,7 +426,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 ShowMsg("根据test plan对Bert进行初始设置", true);
-                Inst_Bert.SetBert();
+              //  Inst_Bert.SetBert();
             }
             catch (Exception ex)
             {
@@ -460,6 +465,15 @@ namespace LWDM_Tx_4x25
             catch (Exception ex)
             {
                 ShowMsg($"根据test plan对K2400进行初始设置时出错，{ex.Message}", false);
+            }
+            //pm212
+            try
+            {
+                pm212.SetWavelength(1.31E-6);
+            }
+            catch(Exception ex)
+            {
+                ShowMsg($"对PM212进行初始设置时出错，{ex.Message}", false);
             }
             //GYI2C
             if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
@@ -668,7 +682,7 @@ namespace LWDM_Tx_4x25
 
             //PM212
             ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
-            TestData_Channel.Power = pm212.ReadPower() + pm212.Power_Offset;
+            TestData_Channel.Power = pm212.ReadPower() + pm212.lstPower_Offset[chl];
         }
 
         /// <summary>
@@ -1053,7 +1067,7 @@ namespace LWDM_Tx_4x25
                             TestData_Channel = new CTestData_Channel();
                             TestData_Channel.Channel = channel + 1;
                             ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
-                            if (!jw8402.SetChannel(channel))
+                            if (!jw8402.SetChannel(TestData_Channel.Channel))
                             {
                                 ShowMsg($"Error happened when switching Optical Channel to channel{channel + 1}", false);
                             }
@@ -1201,7 +1215,7 @@ namespace LWDM_Tx_4x25
 
         private void cbxChlIndex_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex))
+            if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex+1))
             {
                 ShowMsg($"切换光通道到CH{this.cbxChlIndex.SelectedIndex + 1}时出错", false);
             }
@@ -1212,7 +1226,6 @@ namespace LWDM_Tx_4x25
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
-            ReadRealTECTemp_Product();
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
             ShowMsg($"将产品温度设置为{this.ProductTemp}℃...", true);
