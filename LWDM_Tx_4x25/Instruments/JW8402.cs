@@ -18,8 +18,8 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 comPort = new SerialPort(com, 9600, Parity.None, 8, StopBits.One);
-                comPort.ReadTimeout = 3000;
-                comPort.WriteTimeout = 3000;
+                //comPort.ReadTimeout = 3000;
+                //comPort.WriteTimeout = 3000;
                 try
                 {
                     if (comPort.IsOpen)
@@ -46,22 +46,30 @@ namespace LWDM_Tx_4x25.Instruments
         /// <returns>true:成功</returns>
         public bool SetChannel(int nChannel,int devAddr=01)
         {
-            string strCmd = "";
-            strCmd = string.Format("<AD{1}_S_{0}>", nChannel.ToString(), devAddr.ToString());
-            string rt=Excute(strCmd);
-            if(rt.Contains("OK"))
+            try
             {
-                return true;
+                string strCmd = "";
+                strCmd = string.Format("<AD{1}_S_{0}>", nChannel.ToString().PadLeft(2, '0'), devAddr.ToString().PadLeft(2, '0'));
+                Excute(strCmd);
             }
-            else
+            catch(Exception ex)
             {
-                return false;
+                throw new Exception(ex.Message);
             }
+            return true;
+            //if(rt.Contains("OK"))
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
 
         #region private Methods
 
-        private string Excute(object objCmd)
+        private void Excute(object objCmd)
         {
             try
             {
@@ -69,8 +77,8 @@ namespace LWDM_Tx_4x25.Instruments
                 {
                     comPort.WriteLine(objCmd.ToString());
                     Thread.Sleep(50);
-                    string strReturn = comPort.ReadLine();
-                    return strReturn;
+                    //string strReturn = comPort.ReadLine();
+                    //return strReturn;
                 }
             }
             catch (Exception ex)

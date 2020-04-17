@@ -488,6 +488,7 @@ namespace LWDM_Tx_4x25
                 ShowMsg("设置I2C 适配器的时钟出错！", false);
                 return;
             }
+            ShowMsg("初始设置已完成", true);
         }
 
         /// <summary>
@@ -538,6 +539,7 @@ namespace LWDM_Tx_4x25
                             Thread.Sleep(100);
                             if (L5525B != null)
                             {
+
                                 RealTimeTemperature_Product = L5525B.ReadTemperature();
                                 ShowRealTemp_Product(RealTimeTemperature);
                             }

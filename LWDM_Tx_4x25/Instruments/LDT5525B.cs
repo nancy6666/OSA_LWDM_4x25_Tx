@@ -36,8 +36,8 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 comPort = new SerialPort(com, 115200, Parity.None, 8, StopBits.One);
-                comPort.ReadTimeout = 1000;
-                comPort.WriteTimeout = 1000;
+                //comPort.ReadTimeout = 1000;
+                //comPort.WriteTimeout = 1000;
                 try
                 {
                     if (comPort.IsOpen)
@@ -62,8 +62,13 @@ namespace LWDM_Tx_4x25.Instruments
             double temp = 0;
             lock (comPort)
             {
-                string cmd = "TEC:T?";
-               temp= Convert.ToDouble( Query(cmd));
+                
+                    string cmd = "TEC:T?";
+                if (!double.TryParse(Query(cmd), out temp))
+                {
+                    temp = 0.00f;
+                    throw new InvalidCastException("the Product temperature read from LDT5525B is invalid");
+                }
             }
             return temp;
         }
@@ -91,7 +96,6 @@ namespace LWDM_Tx_4x25.Instruments
                 comPort.WriteLine(cmd);
             }
         }
-
         public double ReadCurrent()
         {
             double current = 0;
@@ -99,7 +103,11 @@ namespace LWDM_Tx_4x25.Instruments
             lock (comPort)
             {
                 string cmd = "TEC:ITE?";
-                current = Convert.ToDouble(Query(cmd));
+                if (!double.TryParse(Query(cmd), out current))
+                   {
+                    current = 0.00f;
+                    throw new InvalidCastException("LDT5525B current is invalid");
+                }
             }
             return current;
         }
