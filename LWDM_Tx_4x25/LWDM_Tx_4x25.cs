@@ -467,13 +467,9 @@ namespace LWDM_Tx_4x25
                 ShowMsg($"根据test plan对K2400进行初始设置时出错，{ex.Message}", false);
             }
             //pm212
-            try
+           if(!pm212.SetWavelength(PM212.EnumWave.w1310))
             {
-                pm212.SetWavelength(1.31E-6);
-            }
-            catch(Exception ex)
-            {
-                ShowMsg($"对PM212进行初始设置时出错，{ex.Message}", false);
+                ShowMsg("PM212设置波长时出错", false);
             }
             //GYI2C
             if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)

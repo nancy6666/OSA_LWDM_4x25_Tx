@@ -36,7 +36,6 @@ namespace LWDM_Tx_4x25.Instruments
             {
                 throw new Exception($"JW8402 初始化出错，{ex.Message}");
             }
-
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace LWDM_Tx_4x25.Instruments
         public bool SetChannel(int nChannel,int devAddr=01)
         {
             string strCmd = "";
-            strCmd = string.Format("AD{1}_S_{0}", nChannel.ToString(), devAddr.ToString());
+            strCmd = string.Format("<AD{1}_S_{0}>", nChannel.ToString(), devAddr.ToString());
             string rt=Excute(strCmd);
             if(rt.Contains("OK"))
             {
