@@ -207,7 +207,7 @@ namespace LWDM_Tx_4x25
             }
 
             ReadRealTECTemp_Out();
-          //  ReadRealTECTemp_Product();
+            ReadRealTECTemp_Product();
         }
 
         #region Interface Display Methods
@@ -357,8 +357,8 @@ namespace LWDM_Tx_4x25
                     com = excelCell[49, 2].value;
                     L5525B = new LDT5525B(com);
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
-                    L5525B.TimeOut = Convert.ToInt32(excelCell[51, 2].value);
-                    L5525B.TempSpan = Convert.ToDouble(excelCell[52, 2].value);
+                    L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
+                    L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
@@ -460,6 +460,7 @@ namespace LWDM_Tx_4x25
                 K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
 
                 K2400_3.SetToVoltageSource();
+                K2400_3.SetTerminalPanel(KEITHLEY2400.TeminalPanel.FRONT);
                 K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
                 K2400_3.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_3.I_limit);
             }
@@ -1085,6 +1086,7 @@ namespace LWDM_Tx_4x25
                         TecTimer.Start();
 
                         L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
+                        L5525B.SetOutputStatus(true);
                         this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
                         ShowMsg($"将产品温度设置为{this.ProductTemp}，请稍等...", true);
 
@@ -1093,11 +1095,15 @@ namespace LWDM_Tx_4x25
                         //等待环境温度和产品温度达到设定值并稳定
                         while (!TemperatureIsOk | !TemperatureIsOk_Product)
                         {
-                            if(TickCountTotal>TC720.TimeOut|TickCountTotal_Product>L5525B.TimeOut)
+                            if(TemperatureIsTimeOut_Product|TemperatureIsTimeOut)
                             {
-                                ShowMsg("Time is out for setting Temperature!", false);
                                 break;
                             }
+                        }
+                        if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
+                        {
+                            ShowMsg("Time is out for setting Temperature!", false);
+                            return;
                         }
                         for (int channel = 0; channel < MaxChannel; channel++)
                         {
@@ -1262,27 +1268,41 @@ namespace LWDM_Tx_4x25
         {
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
+            L5525B.SetOutputStatus(true);
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
-           
+
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
            
             ShowMsg($"将产品温度设置为{this.ProductTemp}℃...", true);
             //直到产品温度达到要求，开始给产品加电
-            while (!TemperatureIsOk_Product)
+            while (!TemperatureIsTimeOut_Product)
             {
-                if (TickCountTotal_Product > L5525B.TimeOut)
+                if(TemperatureIsOk_Product)
                 {
-                    ShowMsg("Time is out to set product temperature", false);
+                    ShowMsg($"给产品加电...", true);
+                    K2400_3.OUTPUT(true);
+                    K2400_1.OUTPUT(true);
+                    K2400_2.OUTPUT(true);
                     break;
                 }
             }
-            if (TemperatureIsOk_Product)
+            if (TemperatureIsTimeOut_Product)
             {
-                ShowMsg($"给产品加电...", true);
-                K2400_3.OUTPUT(true);
-                K2400_1.OUTPUT(true);
-                K2400_2.OUTPUT(true);
+                if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{this.ProductTemp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                {
+                    TemperatureIsOk_Product = true;
+                    ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，但可以继续进行测试！", true);
+                    ShowMsg($"给产品加电...", true);
+                    K2400_3.OUTPUT(true);
+                    K2400_1.OUTPUT(true);
+                    K2400_2.OUTPUT(true);
+                }
+                else
+                {
+                    ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，不可以继续进行测试！", false);
+                }
+                
             }
         }
 
@@ -1340,6 +1360,7 @@ namespace LWDM_Tx_4x25
         private void ProductTempTimer_Tick(object sender, EventArgs e)
         {
             TickCountTotal_Product++;
+            TemperatureIsOk_Product = false;
             if (RealTimeTemperature_Product >= this.ProductTemp - L5525B.TempSpan && RealTimeTemperature_Product <= this.ProductTemp + L5525B.TempSpan)
             {
                 if (++TickCount_Product > L5525B.StablizationTime)
@@ -1359,15 +1380,6 @@ namespace LWDM_Tx_4x25
                 {
                     ProductTempTimer.Stop();
                     TemperatureIsTimeOut_Product = true;
-                    if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{this.ProductTemp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                    {
-                        TemperatureIsOk_Product = true;
-                        ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，但可以继续进行测试！", true);
-                    }
-                    else
-                    {
-                        ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，不可以继续进行测试！", false);
-                    }
                 }
             }
         }

@@ -63,10 +63,13 @@ namespace LWDM_Tx_4x25.Instruments
             lock (comPort)
             {
                 string cmd = "TEC:T?";
-                if (!double.TryParse(Query(cmd), out temp))
+                var ret = Query(cmd);
+                while (!double.TryParse(ret, out temp))
                 {
-                    temp = 0.00f;
-                    throw new InvalidCastException("the Product temperature read from LDT5525B is invalid");
+                    Thread.Sleep(100);
+                    ret = Query(cmd);
+                    //temp = 0.00f;
+                    // throw new InvalidCastException("the Product temperature read from LDT5525B is invalid");
                 }
             }
             return temp;
@@ -74,13 +77,14 @@ namespace LWDM_Tx_4x25.Instruments
 
         public void SetTemperature(double temp)
         {
+            SetLIMI_T(70);
             SetMode(EnumTECMode.Temperature);
             lock (comPort)
             {
                 string cmd = $"TEC:T {temp}";
                 comPort.WriteLine(cmd);
             }
-            SetOutputStatus(true);
+          SetOutputStatus(true);
         }
 
         /// <summary>
