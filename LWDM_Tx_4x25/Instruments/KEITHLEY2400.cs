@@ -46,6 +46,7 @@ namespace LWDM_Tx_4x25.Instruments
         /// </summary>
         public enum READcategory { VOLT, CURR }
 
+        public enum TeminalPanel { FRONT,REAR}
 
         /// <summary>
         /// Elements contained in the data string for commands :FETCh/:READ/:MEAS/:TRAC:DATA
@@ -92,7 +93,8 @@ namespace LWDM_Tx_4x25.Instruments
             OUTPUT(false);
             SetMEASCategory(MEAScategory.ONCURR);
             SetSOURCEMODE(SOURCEMODE.VOLT);
-            SetMEASRangeofVOLT(MEASRANGE.AUTO);
+            SetSOURCEingMODEofVOLT(SOURCEingMODE.FIX);
+            SetMEASRangeofCURR(MEASRANGE.AUTO);
 
             // only return current measurement value under V-Source
             SetDataElement(EnumDataStringElements.CURR | EnumDataStringElements.STAT);
@@ -106,7 +108,8 @@ namespace LWDM_Tx_4x25.Instruments
             OUTPUT(false);
             SetMEASCategory(MEAScategory.ONVOLT);
             SetSOURCEMODE(SOURCEMODE.CURR);
-            SetMEASRangeofCURR(MEASRANGE.AUTO);
+            SetSOURCEingMODEofCURR(SOURCEingMODE.FIX);
+            SetMEASRangeofVOLT(MEASRANGE.AUTO);
 
             // only return voltage measurement value under I-Source
             SetDataElement(EnumDataStringElements.VOLT | EnumDataStringElements.STAT);
@@ -131,6 +134,23 @@ namespace LWDM_Tx_4x25.Instruments
         {
             if (on) { GPIBDevice.GPIBwr("OUTP ON"); }
             else { GPIBDevice.GPIBwr("OUTP OFF"); }
+        }
+
+        /// <summary>
+        /// 设置前/后面板
+        /// </summary>
+        /// <param name="panel"></param>
+        public void SetTerminalPanel(TeminalPanel panel)
+        {
+            switch(panel)
+            {
+                case TeminalPanel.FRONT:
+                    GPIBDevice.GPIBwr(":ROUTe:TERMinals FRONt");
+                    break;
+                case TeminalPanel.REAR:
+                    GPIBDevice.GPIBwr(":ROUTe:TERMinals REAR");
+                    break;
+            }
         }
 
         /// <summary>
@@ -236,8 +256,10 @@ namespace LWDM_Tx_4x25.Instruments
 
         }
 
+        #region 测量源操作
+
         /// <summary>
-        /// 分析源设置
+        /// 测量源设置
         /// </summary>
         /// <param name="mc"></param>
         public void SetMEASCategory(MEAScategory mc)
@@ -302,7 +324,7 @@ namespace LWDM_Tx_4x25.Instruments
         }
 
         /// <summary>
-        /// 设置电压分析源的RANGE
+        /// 设置电压测量源的RANGE
         /// </summary>
         /// <param name="range"></param>
         /// <param name="real"></param>
@@ -399,7 +421,9 @@ namespace LWDM_Tx_4x25.Instruments
                     break;
             }
         }
+        #endregion
 
+        #region 源操作
         /// <summary>
         /// 设置源类型
         /// </summary>
@@ -573,13 +597,14 @@ namespace LWDM_Tx_4x25.Instruments
         {
             GPIBDevice.GPIBwr(":SOUR:CURR:LEV " + lev.ToString());
         }
+        #endregion
 
         /// <summary>
         /// 读取数据
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public string Fetch()
+        private string Fetch()
         {
             try
             {
