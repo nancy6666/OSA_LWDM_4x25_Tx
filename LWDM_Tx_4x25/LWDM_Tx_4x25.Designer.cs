@@ -79,7 +79,7 @@
             this.txtProductTemp_Room = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnRestTemp = new System.Windows.Forms.Button();
-            this.ProductTempTimer = new System.Windows.Forms.Timer(this.components);
+            this.ProductTempTimer =  new System.Timers.Timer(1000);
             this.N1092D.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
@@ -525,7 +525,8 @@
             // 
             // ProductTempTimer
             // 
-            this.ProductTempTimer.Tick += new System.EventHandler(this.ProductTempTimer_Tick);
+            // this.ProductTempTimer.Interval = 1000;
+            this.ProductTempTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProductTempTimer_Tick);
             // 
             // LWDM_Tx_4x25
             // 
@@ -595,7 +596,7 @@
         private System.Windows.Forms.Label lblRealTemp_Product;
         private System.Windows.Forms.Button btnSetProductTemp1;
         private System.Windows.Forms.Button btnRestTemp;
-        private System.Windows.Forms.Timer ProductTempTimer;
+        private  System.Timers.Timer ProductTempTimer;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
         private System.Windows.Forms.ColumnHeader columnHeader12;

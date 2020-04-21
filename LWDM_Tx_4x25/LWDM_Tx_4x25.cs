@@ -207,7 +207,7 @@ namespace LWDM_Tx_4x25
             }
 
             ReadRealTECTemp_Out();
-            ReadRealTECTemp_Product();
+          //  ReadRealTECTemp_Product();
         }
 
         #region Interface Display Methods
@@ -300,7 +300,7 @@ namespace LWDM_Tx_4x25
                 {
                     //Bert paras
                     var com = excelCell[4, 2].value;
-                   // Inst_Bert = new Bert(com);
+                    // Inst_Bert = new Bert(com);
                     //Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
                     //Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
                     //Inst_Bert.Clock = excelCell[7, 2].value;
@@ -378,7 +378,7 @@ namespace LWDM_Tx_4x25
                     //PM212
                     com = excelCell[67, 2].value;
                     pm212 = new PM212(com);
-                    pm212.lstPower_Offset.Add( Convert.ToDouble(excelCell[68, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
@@ -426,7 +426,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 ShowMsg("根据test plan对Bert进行初始设置", true);
-              //  Inst_Bert.SetBert();
+                //  Inst_Bert.SetBert();
             }
             catch (Exception ex)
             {
@@ -444,6 +444,7 @@ namespace LWDM_Tx_4x25
             catch (Exception ex)
             {
                 ShowMsg($"根据test plan对N1092A进行初始设置时出错，{ex.Message}", false);
+                return;
             }
             //K2400的设置
             try
@@ -452,24 +453,48 @@ namespace LWDM_Tx_4x25
 
                 K2400_1.SetToVoltageSource();
                 K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
-                K2400_1.SetSOURCERANGEofCURR(KEITHLEY2400.SOURCERANGE.REAL, K2400_1.I_limit);
+                K2400_1.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_1.I_limit);
 
                 K2400_2.SetToVoltageSource();
                 K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
-                K2400_2.SetSOURCERANGEofCURR(KEITHLEY2400.SOURCERANGE.REAL, K2400_2.I_limit);
+                K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
 
                 K2400_3.SetToVoltageSource();
                 K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
-                K2400_3.SetSOURCERANGEofCURR(KEITHLEY2400.SOURCERANGE.REAL, K2400_3.I_limit);
+                K2400_3.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_3.I_limit);
             }
             catch (Exception ex)
             {
                 ShowMsg($"根据test plan对K2400进行初始设置时出错，{ex.Message}", false);
+                return;
             }
+            //K2000
+            try
+            {
+                K2000.SetMeasureCurrentMode(Keithley2000.EnumDACType.DC);
+            }
+
+            catch (Exception ex)
+            {
+                ShowMsg($"Init K2000 error,{ex.Message}", false);
+            } 
+            //LDT5525B
+            try
+            {
+                //LIMII set to 1A； LIMIT set to 70℃
+                L5525B.SetLIMI_I(1);
+                L5525B.SetLIMI_T(70);
+            }
+            catch(Exception ex)
+            {
+                ShowMsg($"Init LDT5525B error,{ex.Message}", false);
+            }
+
             //pm212
            if(!pm212.SetWavelength(PM212.EnumWave.w1310))
             {
                 ShowMsg("PM212设置波长时出错", false);
+                return;
             }
             //GYI2C
             if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
@@ -536,12 +561,22 @@ namespace LWDM_Tx_4x25
                     {
                         while (!cts.Token.IsCancellationRequested)
                         {
-                            Thread.Sleep(100);
-                            if (L5525B != null)
+                            try
                             {
+                                Thread.Sleep(100);
+                                if (L5525B != null)
+                                {
+                                    Thread.Sleep(1000);
 
-                                RealTimeTemperature_Product = L5525B.ReadTemperature();
-                                ShowRealTemp_Product(RealTimeTemperature);
+                                    RealTimeTemperature_Product = L5525B.ReadTemperature();
+                                    ShowRealTemp_Product(RealTimeTemperature);
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                string err = $" 实时监控产品温度时出错，{ ex.Message}";
+                                ShowMsg(err, false);
+                                throw new Exception(err);
                             }
                         }
                     }, cts.Token);
@@ -1058,7 +1093,11 @@ namespace LWDM_Tx_4x25
                         //等待环境温度和产品温度达到设定值并稳定
                         while (!TemperatureIsOk | !TemperatureIsOk_Product)
                         {
-
+                            if(TickCountTotal>TC720.TimeOut|TickCountTotal_Product>L5525B.TimeOut)
+                            {
+                                ShowMsg("Time is out for setting Temperature!", false);
+                                break;
+                            }
                         }
                         for (int channel = 0; channel < MaxChannel; channel++)
                         {
@@ -1224,18 +1263,27 @@ namespace LWDM_Tx_4x25
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
+           
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
+           
             ShowMsg($"将产品温度设置为{this.ProductTemp}℃...", true);
             //直到产品温度达到要求，开始给产品加电
-            while (!TemperatureIsOk)
+            while (!TemperatureIsOk_Product)
             {
-
+                if (TickCountTotal_Product > L5525B.TimeOut)
+                {
+                    ShowMsg("Time is out to set product temperature", false);
+                    break;
+                }
             }
-            ShowMsg($"给产品加电...", true);
-            K2400_3.OUTPUT(true);
-            K2400_1.OUTPUT(true);
-            K2400_2.OUTPUT(true);
+            if (TemperatureIsOk_Product)
+            {
+                ShowMsg($"给产品加电...", true);
+                K2400_3.OUTPUT(true);
+                K2400_1.OUTPUT(true);
+                K2400_2.OUTPUT(true);
+            }
         }
 
         private void btnRestTemp_Click(object sender, EventArgs e)
@@ -1283,7 +1331,6 @@ namespace LWDM_Tx_4x25
                     }
                     else
                     {
-                        TickCountTotal = 0;
                         ShowMsg($"温度设置未达到设定值{TC720.TimeOut}℃，不可以继续进行测试！", false);
                     }
                 }
@@ -1319,7 +1366,6 @@ namespace LWDM_Tx_4x25
                     }
                     else
                     {
-                        TickCountTotal = 0;
                         ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，不可以继续进行测试！", false);
                     }
                 }

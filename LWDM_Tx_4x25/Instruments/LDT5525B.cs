@@ -62,8 +62,7 @@ namespace LWDM_Tx_4x25.Instruments
             double temp = 0;
             lock (comPort)
             {
-                
-                    string cmd = "TEC:T?";
+                string cmd = "TEC:T?";
                 if (!double.TryParse(Query(cmd), out temp))
                 {
                     temp = 0.00f;
@@ -92,7 +91,31 @@ namespace LWDM_Tx_4x25.Instruments
         {
             lock (comPort)
             {
-                string cmd = $"TEC:OUT {on}";
+                string cmd = $"TEC:OUT {Convert.ToInt32(on)}";
+                comPort.WriteLine(cmd);
+            }
+        }
+        /// <summary>
+        /// set Temperature limit
+        /// </summary>
+        /// <param name="limiT"></param>
+        public void SetLIMI_T(double limiT)
+        {
+            lock (comPort)
+            {
+                string cmd = $"TEC:LIM:THI {limiT}";
+                comPort.WriteLine(cmd);
+            }
+        }
+        /// <summary>
+        /// set current limit
+        /// </summary>
+        /// <param name="limiI"></param>
+        public void SetLIMI_I(double limiI)
+        {
+            lock (comPort)
+            {
+                string cmd = $"TEC:LIM:ITE {limiI}";
                 comPort.WriteLine(cmd);
             }
         }

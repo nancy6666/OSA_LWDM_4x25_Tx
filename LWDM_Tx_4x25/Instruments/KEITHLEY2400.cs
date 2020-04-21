@@ -92,7 +92,7 @@ namespace LWDM_Tx_4x25.Instruments
             OUTPUT(false);
             SetMEASCategory(MEAScategory.ONCURR);
             SetSOURCEMODE(SOURCEMODE.VOLT);
-            SetMEASRangeofVOLT(MEASRANGE.AUTO);
+            SetMEASRangeofCURR(MEASRANGE.AUTO);
 
             // only return current measurement value under V-Source
             SetDataElement(EnumDataStringElements.CURR | EnumDataStringElements.STAT);
@@ -106,7 +106,7 @@ namespace LWDM_Tx_4x25.Instruments
             OUTPUT(false);
             SetMEASCategory(MEAScategory.ONVOLT);
             SetSOURCEMODE(SOURCEMODE.CURR);
-            SetMEASRangeofCURR(MEASRANGE.AUTO);
+            SetMEASRangeofVOLT(MEASRANGE.AUTO);
 
             // only return voltage measurement value under I-Source
             SetDataElement(EnumDataStringElements.VOLT | EnumDataStringElements.STAT);
