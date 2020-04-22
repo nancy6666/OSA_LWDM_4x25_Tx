@@ -363,7 +363,7 @@ namespace LWDM_Tx_4x25
 
                     //AQ6730
                     gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
-                    aQ6370 = new AQ6370(gpibAddr);
+                  //  aQ6370 = new AQ6370(gpibAddr);
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
                     this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
@@ -485,6 +485,7 @@ namespace LWDM_Tx_4x25
                 //LIMII set to 1A； LIMIT set to 70℃
                 L5525B.SetLIMI_I(1);
                 L5525B.SetLIMI_T(70);
+                L5525B.SetMode(LDT5525B.EnumTECMode.Temperature);
             }
             catch(Exception ex)
             {
@@ -567,8 +568,6 @@ namespace LWDM_Tx_4x25
                                 Thread.Sleep(100);
                                 if (L5525B != null)
                                 {
-                                    Thread.Sleep(1000);
-
                                     RealTimeTemperature_Product = L5525B.ReadTemperature();
                                     ShowRealTemp_Product(RealTimeTemperature);
                                 }
@@ -1086,7 +1085,7 @@ namespace LWDM_Tx_4x25
                         TecTimer.Start();
 
                         L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
-                        L5525B.SetOutputStatus(true);
+                       // L5525B.SetOutputStatus(true);
                         this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
                         ShowMsg($"将产品温度设置为{this.ProductTemp}，请稍等...", true);
 
@@ -1268,7 +1267,7 @@ namespace LWDM_Tx_4x25
         {
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
-            L5525B.SetOutputStatus(true);
+           // L5525B.SetOutputStatus(true);
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
 
             TickCountTotal_Product = 0;
@@ -1280,10 +1279,10 @@ namespace LWDM_Tx_4x25
             {
                 if(TemperatureIsOk_Product)
                 {
-                    ShowMsg($"给产品加电...", true);
                     K2400_3.OUTPUT(true);
                     K2400_1.OUTPUT(true);
                     K2400_2.OUTPUT(true);
+                    ShowMsg($"产品加电已完成.", true);
                     break;
                 }
             }

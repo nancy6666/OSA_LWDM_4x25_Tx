@@ -24,7 +24,7 @@ namespace LWDM_Tx_4x25.Instruments
             g100 = 100,
             g300 = 300
         }
-        enum EnumTECMode
+     public   enum EnumTECMode
         {
             Current,
             Temperature,
@@ -43,7 +43,6 @@ namespace LWDM_Tx_4x25.Instruments
                     if (comPort.IsOpen)
                         comPort.Close();
                     comPort.Open();
-                    comPort.WriteLine("*RST");
                 }
                 catch (Exception ex)
                 {
@@ -58,7 +57,6 @@ namespace LWDM_Tx_4x25.Instruments
 
         public double ReadTemperature()
         {
-            SetMode(EnumTECMode.Temperature);
             double temp = 0;
             lock (comPort)
             {
@@ -77,14 +75,12 @@ namespace LWDM_Tx_4x25.Instruments
 
         public void SetTemperature(double temp)
         {
-            SetLIMI_T(70);
-            SetMode(EnumTECMode.Temperature);
             lock (comPort)
             {
                 string cmd = $"TEC:T {temp}";
-                comPort.WriteLine(cmd);
+                Excute(cmd);
             }
-          SetOutputStatus(true);
+            SetOutputStatus(true);
         }
 
         /// <summary>
@@ -93,11 +89,8 @@ namespace LWDM_Tx_4x25.Instruments
         /// <param name="on"></param>
         public void SetOutputStatus(bool on)
         {
-            lock (comPort)
-            {
-                string cmd = $"TEC:OUT {Convert.ToInt32(on)}";
-                comPort.WriteLine(cmd);
-            }
+            string cmd = $"TEC:OUT {Convert.ToInt32(on)}";
+            Excute(cmd);
         }
         /// <summary>
         /// set Temperature limit
@@ -108,7 +101,7 @@ namespace LWDM_Tx_4x25.Instruments
             lock (comPort)
             {
                 string cmd = $"TEC:LIM:THI {limiT}";
-                comPort.WriteLine(cmd);
+                Excute(cmd);
             }
         }
         /// <summary>
@@ -120,13 +113,12 @@ namespace LWDM_Tx_4x25.Instruments
             lock (comPort)
             {
                 string cmd = $"TEC:LIM:ITE {limiI}";
-                comPort.WriteLine(cmd);
+               Excute(cmd);
             }
         }
         public double ReadCurrent()
         {
             double current = 0;
-            SetMode(EnumTECMode.Current);
             lock (comPort)
             {
                 string cmd = "TEC:ITE?";
@@ -145,7 +137,7 @@ namespace LWDM_Tx_4x25.Instruments
         /// Sets TEC mode.
         /// </summary>
         /// <param name="mode">three mode type </param>
-        private void SetMode(EnumTECMode mode)
+        public void SetMode(EnumTECMode mode)
         {
             string cmd = "";
             lock (comPort)
@@ -163,7 +155,7 @@ namespace LWDM_Tx_4x25.Instruments
                         break;
 
                 }
-                comPort.WriteLine(cmd);
+                Excute(cmd);
             }
         }
 
@@ -172,7 +164,7 @@ namespace LWDM_Tx_4x25.Instruments
             lock (comPort)
             {
                 string cmd = $"TEC:GAIN {gain}";
-                comPort.WriteLine(cmd);
+                Excute(cmd);
             }
         }
 
@@ -194,6 +186,21 @@ namespace LWDM_Tx_4x25.Instruments
             }
         }
 
+        private void Excute(object objCmd)
+        {
+            try
+            {
+                lock (comPort)
+                {
+                    comPort.WriteLine(objCmd.ToString());
+                    Thread.Sleep(200);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         #endregion
     }
 }
