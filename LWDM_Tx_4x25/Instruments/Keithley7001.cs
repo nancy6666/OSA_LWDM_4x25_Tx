@@ -13,14 +13,20 @@ namespace LWDM_Tx_4x25.Instruments
 
         public Keithley7001(int GPIBaddr)
         {
-            GPIBDevice = new GPIB(GPIBaddr);
+            try
+            {
+                GPIBDevice = new GPIB(GPIBaddr);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Open K7001 error!{ex.Message}");
+            }
         }
 
         public  object Query(string objCmd)
         {
             try
             {
-
                 GPIBDevice.GPIBwr(objCmd);
                 string res = GPIBDevice.GPIBrd(200);
 

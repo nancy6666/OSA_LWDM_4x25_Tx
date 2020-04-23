@@ -82,7 +82,14 @@ namespace LWDM_Tx_4x25.Instruments
 
         public KEITHLEY2400(int GPIBaddr)
         {
+            try
+            {
                 GPIBDevice = new GPIB(GPIBaddr);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Open K2400 Error!{ex.Message}");
+            }
         }
 
         /// <summary>

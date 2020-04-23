@@ -36,8 +36,15 @@ namespace LWDM_Tx_4x25.Instruments
 
         public Bert(string com)
         {
-            Inst_PAM4_Bert.remoteControl();
-            Inst_PAM4_Bert = new Inst_PAM4_Bert(com);
+            try
+            {
+                Inst_PAM4_Bert.remoteControl();
+                Inst_PAM4_Bert = new Inst_PAM4_Bert(com);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Open Bert error!{ex.Message}");
+            }
         }
         //Bert的初始设置
         public void SetBert()

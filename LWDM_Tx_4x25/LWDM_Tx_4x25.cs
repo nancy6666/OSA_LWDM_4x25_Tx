@@ -40,7 +40,7 @@ namespace LWDM_Tx_4x25
         public List<double> lstAQ6370_StartWave;
         public List<double> lstAQ6370_StopWave;
 
-        public Kesight_N1092D kesight_N1902D = new Kesight_N1092D();
+        public Kesight_N1092D kesight_N1902D;
         delegate void ThreedShowMsgDelegate(string Message, bool bPass);
         delegate void ThreedShowTempDelegate(double Temp);
         private string strMsg;
@@ -193,10 +193,32 @@ namespace LWDM_Tx_4x25
 
         private void LWDM_Tx_Load(object sender, EventArgs e)
         {
+            ShowMsg("Open All Devices...", true);
+            try
+            {
+                Inst_Bert = new Bert(cfg.BertCom);
+                K2400_1 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_1_GPIB)); 
+                K2400_2 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_2_GPIB)); 
+                K2400_3 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_3_GPIB));
+                K2000 = new Keithley2000(Convert.ToInt16(cfg.K2000_GPIB));
+                K7001 = new Keithley7001(Convert.ToInt16(cfg.K7001_GPIB));
+                kesight_N1902D = new Kesight_N1092D();
+                TC720 = new TC720(cfg.T720Com);
+                L5525B = new LDT5525B(cfg.LDT5525BCom);
+                aQ6370 = new AQ6370(Convert.ToInt16(cfg.AQ6370_GPIB));
+                pm212 = new PM212(cfg.PM212Com);
+                jw8402 = new JW8402(cfg.JW8402Com);
+            }
+            catch (Exception ex)
+            {
+                ShowMsg($"{ex.Message}",false);
+                return;
+            }
+
+            ShowMsg("Getting PN numbers from database...", true);
             try
             {
                 this.cbxPN.SelectedIndexChanged -= new System.EventHandler(this.LoadTestSpec);
-                ShowMsg("Getting PN numbers from database...", true);
                 this.cbxPN.DataSource = db.GetAllPN();
                 this.cbxPN.SelectedIndex = -1;
                 this.cbxPN.SelectedIndexChanged += new System.EventHandler(this.LoadTestSpec);
@@ -204,6 +226,7 @@ namespace LWDM_Tx_4x25
             catch (Exception ex)
             {
                 ShowMsg(ex.Message, false);
+                return;
             }
 
             ReadRealTECTemp_Out();
@@ -300,34 +323,34 @@ namespace LWDM_Tx_4x25
                 {
                     //Bert paras
                     var com = excelCell[4, 2].value;
-                    // Inst_Bert = new Bert(com);
+                    //// Inst_Bert = new Bert(com);
                     //Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
                     //Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
                     //Inst_Bert.Clock = excelCell[7, 2].value;
 
                     //K2400
-                    var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
-                    K2400_1 = new KEITHLEY2400(gpibAddr);
+                  //  var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
+                    //K2400_1 = new KEITHLEY2400(gpibAddr);
                     K2400_1.Vcc = Convert.ToDecimal(excelCell[11, 2].value);
                     K2400_1.I_limit = Convert.ToDecimal(excelCell[12, 2].value);
 
-                    gpibAddr = Convert.ToUInt16(excelCell[15, 2].value);
-                    K2400_2 = new KEITHLEY2400(gpibAddr);
+                   // gpibAddr = Convert.ToUInt16(excelCell[15, 2].value);
+                   // K2400_2 = new KEITHLEY2400(gpibAddr);
                     K2400_2.Vcc = Convert.ToDecimal(excelCell[16, 2].value);
                     K2400_2.I_limit = Convert.ToDecimal(excelCell[17, 2].value);
 
-                    gpibAddr = Convert.ToUInt16(excelCell[20, 2].value);
-                    K2400_3 = new KEITHLEY2400(gpibAddr);
+                   // gpibAddr = Convert.ToUInt16(excelCell[20, 2].value);
+                    //K2400_3 = new KEITHLEY2400(gpibAddr);
                     K2400_3.Vcc = Convert.ToDecimal(excelCell[21, 2].value);
                     K2400_3.I_limit = Convert.ToDecimal(excelCell[22, 2].value);
 
                     //K2000
-                    gpibAddr = Convert.ToUInt16(excelCell[25, 2].value);
-                    K2000 = new Keithley2000(gpibAddr);
+                   // gpibAddr = Convert.ToUInt16(excelCell[25, 2].value);
+                   // K2000 = new Keithley2000(gpibAddr);
 
                     //K7001
-                    gpibAddr = Convert.ToUInt16(excelCell[28, 2].value);
-                    K7001 = new Keithley7001(gpibAddr);
+                   //gpibAddr = Convert.ToUInt16(excelCell[28, 2].value);
+                   // K7001 = new Keithley7001(gpibAddr);
                     lstK7001Pin = new List<string>();
                     lstK7001Pin.Add(excelCell[29, 2].value);
                     lstK7001Pin.Add(excelCell[30, 2].value);
@@ -340,8 +363,8 @@ namespace LWDM_Tx_4x25
                     kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[37, 2].value);
 
                     //T720
-                    com = excelCell[40, 2].value;
-                    TC720 = new TC720(com);
+                   // com = excelCell[40, 2].value;
+                   // TC720 = new TC720(com);
                     lstTecTemp = new List<double>();
                     lstTecTemp.Add(excelCell[41, 2].value);
                     lstTecTemp.Add(excelCell[42, 2].value);
@@ -354,16 +377,16 @@ namespace LWDM_Tx_4x25
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
 
                     //LDT5525B
-                    com = excelCell[49, 2].value;
-                    L5525B = new LDT5525B(com);
+                   // com = excelCell[49, 2].value;
+                    //L5525B = new LDT5525B(com);
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
                     L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-                    gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
-                  //  aQ6370 = new AQ6370(gpibAddr);
+                   // gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
+                    //aQ6370 = new AQ6370(gpibAddr);
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
                     this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
@@ -376,16 +399,16 @@ namespace LWDM_Tx_4x25
                     this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
 
                     //PM212
-                    com = excelCell[67, 2].value;
-                    pm212 = new PM212(com);
+                   // com = excelCell[67, 2].value;
+                   // pm212 = new PM212(com);
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
 
                     //JW8402
-                    com = excelCell[74, 2].value;
-                    jw8402 = new JW8402(com);
+                   // com = excelCell[74, 2].value;
+                    //jw8402 = new JW8402(com);
                 }
                 catch (Exception ex)
                 {

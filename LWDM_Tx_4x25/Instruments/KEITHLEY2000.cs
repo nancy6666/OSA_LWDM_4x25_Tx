@@ -15,7 +15,14 @@ namespace LWDM_Tx_4x25.Instruments
 
         public Keithley2000(int GPIBaddr)
         {
-            K2000 = new GPIB(GPIBaddr);
+            try
+            {
+                K2000 = new GPIB(GPIBaddr);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Open K2000 error!{ex.Message}");
+            }
         }
         public enum EnumMeasFunc
         {

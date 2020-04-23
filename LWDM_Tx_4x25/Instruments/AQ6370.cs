@@ -32,9 +32,16 @@ namespace LWDM_Tx_4x25.Instruments
 
         public AQ6370(int addr)
         {
-            gb = new GPIB(addr);
-            gb.GPIBwr("*RST");//setting init
-            gb.GPIBwr("CFORM1");//set(AQ637X mode)
+            try
+            {
+                gb = new GPIB(addr);
+                //  gb.GPIBwr("*RST");//setting init
+                gb.GPIBwr("CFORM1");//set(AQ637X mode)
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Open AQ6370 error,{ex.Message}");
+            }
         }
 
         public void SetAQ6370(double startWave,double stopWave)

@@ -51,7 +51,7 @@ namespace LWDM_Tx_4x25.Instruments
             }
             catch (Exception ex)
             {
-                throw new Exception($"LDT5525B 初始化出错，{ex.Message}");
+                throw new Exception($"Open LDT5525B error,{ex.Message}");
             }
         }
 
