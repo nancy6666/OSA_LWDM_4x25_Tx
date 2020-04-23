@@ -38,10 +38,10 @@ namespace LWDM_Tx_4x25.Instruments
         {
             try
             {
-                Inst_PAM4_Bert.remoteControl();
                 Inst_PAM4_Bert = new Inst_PAM4_Bert(com);
+                Inst_PAM4_Bert.remoteControl();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception($"Open Bert error!{ex.Message}");
             }
@@ -57,9 +57,9 @@ namespace LWDM_Tx_4x25.Instruments
 
                     Inst_PAM4_Bert.ppgOutputControl(BertChannel, true);//Enable PPG CH1
                     Inst_PAM4_Bert.setPPGSignalType(BertChannel, "NRZ");//设置 PPG 的信号为 PMA4 或者 NRZ，字符串 msg 为 NRZ 或者 PAM
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                     Inst_PAM4_Bert.setEDSignalType(BertChannel, "NRZ");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(200);
                     Inst_PAM4_Bert.setPPGpatternType(BertChannel, "PBRS"); //设置patternType 为[PRBS| SSPRQ |JP03A|JP03B|SQWV|LINEAR|FIXED|CJT
 
                     Inst_PAM4_Bert.setPPGPRBSpattern(BertChannel, this.Ppg_PRBS_pattern);

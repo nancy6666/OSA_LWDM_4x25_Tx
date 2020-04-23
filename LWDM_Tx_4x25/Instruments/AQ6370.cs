@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LWDM_Tx_4x25.Instruments
@@ -40,7 +41,7 @@ namespace LWDM_Tx_4x25.Instruments
             }
             catch(Exception ex)
             {
-                throw new Exception($"Open AQ6370 error,{ex.Message}");
+                throw new Exception($"Open AQ6370 error,pls make sure the Remote Interface has been set to GPIB Mode,{ex.Message}");
             }
         }
 
@@ -62,18 +63,24 @@ namespace LWDM_Tx_4x25.Instruments
                 gb.GPIBwr("* CLS");
                 gb.GPIBwr(":INITIATE");
                 //get sweep status, the last bit of status is 1 when a sweep ends
-                gb.GPIBwr(":stat:oper:even?");
-                byte status = Convert.ToByte(gb.GPIBrd(100));
+                Thread.Sleep(500);
+                byte status=0;
                 while ((status & 1) != 1)
                 {
+                    gb.GPIBwr(":stat:oper:even?");
+                    Byte.TryParse(gb.GPIBrd(100), out status);
                 }
-                ExcuteAnalysis();
-                ReadAnalysisData();
             }
             catch (Exception ex)
             {
                 throw new Exception($"AQ6370D执行扫描出错{ex.Message}");
             }
+        }
+
+        public void ReadTestData()
+        {
+            ExcuteAnalysis();
+            ReadAnalysisData();
         }
        
         #region Private Methods

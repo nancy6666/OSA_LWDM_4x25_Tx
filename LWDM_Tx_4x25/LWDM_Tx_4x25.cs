@@ -286,7 +286,6 @@ namespace LWDM_Tx_4x25
             }
         }
 
-
         private void ShowTemp(double Temp)
         {
             this.lblRealTemp_Case.Text = RealTimeTemperature.ToString();
@@ -324,12 +323,12 @@ namespace LWDM_Tx_4x25
                     //Bert paras
                     var com = excelCell[4, 2].value;
                     //// Inst_Bert = new Bert(com);
-                    //Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
-                    //Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
-                    //Inst_Bert.Clock = excelCell[7, 2].value;
+                    Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
+                    Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
+                    Inst_Bert.Clock = excelCell[7, 2].value;
 
                     //K2400
-                  //  var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
+                    //  var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
                     //K2400_1 = new KEITHLEY2400(gpibAddr);
                     K2400_1.Vcc = Convert.ToDecimal(excelCell[11, 2].value);
                     K2400_1.I_limit = Convert.ToDecimal(excelCell[12, 2].value);
@@ -449,7 +448,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 ShowMsg("根据test plan对Bert进行初始设置", true);
-                //  Inst_Bert.SetBert();
+                Inst_Bert.SetBert();
             }
             catch (Exception ex)
             {
@@ -717,28 +716,37 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private void GetTestData_Channel(int chl)
         {
+            try
             //GY7501
-            TestData_Channel.Vcpa = lstVcpa[chl];
-            TestData_Channel.Veq = lstVeq[chl];
-            TestData_Channel.Vmod = lstVmod[chl];
-            TestData_Channel.Isink = lstIsink[chl];
-            TestData_Channel.Ldd = lstLdd[chl];
+            {
+                TestData_Channel.Vcpa = lstVcpa[chl];
+                TestData_Channel.Veq = lstVeq[chl];
+                TestData_Channel.Vmod = lstVmod[chl];
+                TestData_Channel.Isink = lstIsink[chl];
+                TestData_Channel.Ldd = lstLdd[chl];
 
-            //N1092D 数据读取
-            TestData_Channel.Er = kesight_N1902D.ER;
-            TestData_Channel.Mask_Margin = kesight_N1902D.MaskMargin;
-            TestData_Channel.Fall_time = kesight_N1902D.FallTime;
-            TestData_Channel.Rise_time = kesight_N1902D.RiseTime;
-            TestData_Channel.Jitter_pp = kesight_N1902D.Jitter_pp;
-            TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
+                //N1092D 数据读取
+                kesight_N1902D.QueryMeasurementResults();
+                TestData_Channel.Er = kesight_N1902D.ER;
+                TestData_Channel.Mask_Margin = kesight_N1902D.MaskMargin;
+                TestData_Channel.Fall_time = kesight_N1902D.FallTime;
+                TestData_Channel.Rise_time = kesight_N1902D.RiseTime;
+                TestData_Channel.Jitter_pp = kesight_N1902D.Jitter_pp;
+                TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
 
-            //AQ6370
-            TestData_Channel.SMSR = aQ6370.SMSR;
-            TestData_Channel.Cwl = aQ6370.PeakWL;
+                //AQ6370
+                aQ6370.ReadTestData();
+                TestData_Channel.SMSR = aQ6370.SMSR;
+                TestData_Channel.Cwl = aQ6370.PeakWL;
 
-            //PM212
-            ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
-            TestData_Channel.Power = pm212.ReadPower() + pm212.lstPower_Offset[chl];
+                //PM212
+                ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
+                TestData_Channel.Power = pm212.ReadPower() + pm212.lstPower_Offset[chl];
+            }
+            catch(Exception ex)
+            {
+                ShowMsg($"{ex.Message}", false);
+            }
         }
 
         /// <summary>
@@ -931,46 +939,50 @@ namespace LWDM_Tx_4x25
         /// <summary>
         /// 获取GY7501调试界面的的调试结果值
         /// </summary>
-        private bool GetDriverGY7501Data()
+        private void GetDriverGY7501Data()
         {
-            if (gY7501_I2C != null)
+            try
             {
-                ShowMsg("Read driver data from Interface GY7501_I2C", true);
-                lstVcpa = new List<double>();
-                lstVeq = new List<double>();
-                lstVmod = new List<double>();
-                lstIsink = new List<double>();
-                lstLdd = new List<double>();
-                lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx0Vcpa.Value));
-                lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx1Vcpa.Value));
-                lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx2Vcpa.Value));
-                lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx3Vcpa.Value));
+                if (gY7501_I2C != null)
+                {
+                    lstVcpa = new List<double>();
+                    lstVeq = new List<double>();
+                    lstVmod = new List<double>();
+                    lstIsink = new List<double>();
+                    lstLdd = new List<double>();
+                    lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx0Vcpa.Value));
+                    lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx1Vcpa.Value));
+                    lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx2Vcpa.Value));
+                    lstVcpa.Add(Convert.ToDouble(gY7501_I2C.NumTx3Vcpa.Value));
 
-                lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx0Veq.Value));
-                lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx1Veq.Value));
-                lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx2Veq.Value));
-                lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx3Veq.Value));
+                    lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx0Veq.Value));
+                    lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx1Veq.Value));
+                    lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx2Veq.Value));
+                    lstVeq.Add(Convert.ToDouble(gY7501_I2C.NumTx3Veq.Value));
 
-                lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx0Mod.Value));
-                lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx1Mod.Value));
-                lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx2Mod.Value));
-                lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx3Mod.Value));
+                    lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx0Mod.Value));
+                    lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx1Mod.Value));
+                    lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx2Mod.Value));
+                    lstVmod.Add(Convert.ToDouble(gY7501_I2C.NumTx3Mod.Value));
 
-                lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx0ISNK.Value));
-                lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx1ISNK.Value));
-                lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx2ISNK.Value));
-                lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx3ISNK.Value));
+                    lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx0ISNK.Value));
+                    lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx1ISNK.Value));
+                    lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx2ISNK.Value));
+                    lstIsink.Add(Convert.ToDouble(gY7501_I2C.NumTx3ISNK.Value));
 
-                lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx0Ldd.Value));
-                lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx1Ldd.Value));
-                lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx2Ldd.Value));
-                lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx3Ldd.Value));
-                return true;
+                    lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx0Ldd.Value));
+                    lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx1Ldd.Value));
+                    lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx2Ldd.Value));
+                    lstLdd.Add(Convert.ToDouble(gY7501_I2C.NumTx3Ldd.Value));
+                }
+                else
+                {
+                    throw new Exception("Pls open GY7501 interface and set driver data!");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                ShowMsg("Please instantiate GY7501_I2C at first!", false);
-                return false;
+                throw new Exception($"Read driver data from Interface GY7501_I2C error!{ex.Message}");
             }
         }
 
@@ -1040,8 +1052,8 @@ namespace LWDM_Tx_4x25
         private void LoadTestSpec(object sender, EventArgs e)
         {
             TestSpec = new CTestSpec();
-            this.lstViewTestData.Items.Clear();
-            this.lstViewLog.Items.Clear();
+          //  this.lstViewTestData.Items.Clear();
+           // this.lstViewLog.Items.Clear();
             if (this.cbxPN.SelectedIndex != -1)
             {
                 PN = this.cbxPN.SelectedItem.ToString();
@@ -1059,7 +1071,7 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private void btnTestProcess_Click(object sender, EventArgs e)
         {
-            this.lstViewTestData.Clear();
+          //this.lstViewTestData.Clear();
             TestDataCommon = new CTestDataCommon();
 
             TestDataCommon.SN = txtSN.Text;
@@ -1070,7 +1082,7 @@ namespace LWDM_Tx_4x25
             {
                 return;
             }
-            ShowMsg("开启一次完整的测试流程...", true);
+            ShowMsg("Start Test Process...", true);
             TestDataCommon.Test_Start_Time = DateTime.Now.ToLongTimeString();
 
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
@@ -1078,20 +1090,27 @@ namespace LWDM_Tx_4x25
                 ShowMsg("温度设定未达到常温，不能开启测试流程", false);
                 return;
             }
-            if (!GetDriverGY7501Data())
+          
+            ShowMsg("Read driver data from Interface GY7501_I2C...", true);
+            try
             {
+                GetDriverGY7501Data();
+            }
+            catch(Exception ex)
+            {
+                ShowMsg(ex.Message, false);
                 return;
             }
             try
             {
-                IProgress<int> progHandle = new Progress<int>(prog =>
-                {
-                    if (prog == 100)
-                    {
-                        EnableControls();
-                        this.btnTestProcess.Enabled = true;
-                    }
-                });
+                //IProgress<int> progHandle = new Progress<int>(prog =>
+                //{
+                //    if (prog == 100)
+                //    {
+                //        EnableControls();
+                //        this.btnTestProcess.Enabled = true;
+                //    }
+                //});
 
                 var task = new Task(() =>
                 {
@@ -1151,7 +1170,7 @@ namespace LWDM_Tx_4x25
 
                             ShowMsg("Save Eye Diagram...", true);
                             SaveEyeImage(TecTempIndex, channel);
-                            progHandle.Report(100);
+                           // progHandle.Report(100);
                             //添加一条测试数据到TestData_Temp
                             TestData_Temp.lstTestData_Channel.Add(TestData_Channel);
                         }
@@ -1213,7 +1232,7 @@ namespace LWDM_Tx_4x25
                     }
                 });
                 task.Start();
-                DisableContols();
+              //  DisableContols();
                 task.Wait();
             }
             catch (Exception ex)
@@ -1271,8 +1290,9 @@ namespace LWDM_Tx_4x25
         {
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
             {
-                strMsg = $"请注意温度还未达到设定值,不能进行测试！";
+                strMsg = $"请注意温度还未达到设定值,不能设置driver data！";
                 ShowMsg(strMsg, false);
+                return;
             }
             gY7501_I2C = new GY7501_I2C();
             gY7501_I2C.Show();
@@ -1288,6 +1308,11 @@ namespace LWDM_Tx_4x25
 
         private void btnSetProductTemp1_Click(object sender, EventArgs e)
         {
+            if(cbxPN.SelectedIndex==-1)
+            {
+                ShowMsg("Pls choose PN at first!", false);
+                return;
+            }
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
            // L5525B.SetOutputStatus(true);
@@ -1407,8 +1432,8 @@ namespace LWDM_Tx_4x25
         }
         private void txtSN_TextChanged(object sender, EventArgs e)
         {
-            this.lstViewLog.Clear();
-            this.lstViewTestData.Clear();
+            this.lstViewLog.Items.Clear();
+            this.lstViewTestData.Items.Clear();
         }
         #endregion
     }

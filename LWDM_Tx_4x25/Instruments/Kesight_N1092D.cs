@@ -126,7 +126,7 @@ namespace LWDM_Tx_4x25.Instruments
                 myN1010A.WriteString(":SYSTem:MODE EYE", true);//choose eye/mask mode
 
                 myN1010A.WriteString($":CHANnel{this.Channel}:DISPlay ON", true);//enable channel
-                myN1010A.WriteString($":TRIGger:PLOCk  ON", true);//pattern lock on
+               // myN1010A.WriteString($":TRIGger:PLOCk  ON", true);//pattern lock on
 
                 myN1010A.WriteString(":ACQuire:CDISplay", true);//clear the dispaly
                 ////set acquisition limit
@@ -142,8 +142,11 @@ namespace LWDM_Tx_4x25.Instruments
                 //var a = myN1010A.ReadString();
                 myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FBANdwidth {this.Channel_bandWidth}", true);
                 myN1010A.WriteString($":CHAN{this.Channel}:ATTenuator:DECibels {this.AOP_Offset}", true);//设置AOP offset
+
                 //Set mask margin
-                myN1010A.WriteString($":MTESt1:LOAD:FNAMe  \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE - LR4_Tx_Optical_D31.mskx\""); //set mask 100G LR
+                myN1010A.WriteString(":MTESt1:DISPlay OFF");
+                Thread.Sleep(100);
+                myN1010A.WriteString($":MTESt1:LOAD:FNAMe \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx\""); //set mask 100G LR
                 myN1010A.WriteString(":MTESt1:LOAD", true);
                 myN1010A.WriteString(":MTESt:MARGin:STATe ON", true);
                 myN1010A.WriteString(":MTESt:MARGin:METHod AUTO", true);
@@ -192,8 +195,11 @@ namespace LWDM_Tx_4x25.Instruments
                 this.FallTime = Convert.ToDouble(myN1010A.ReadString());
 
                 // Mask Margin
+
                 myN1010A.WriteString(":MEASure:MTESt1:MARgin?", true);
-                this.MaskMargin = Convert.ToDouble(myN1010A.ReadString());
+                double ret = 0;
+                double.TryParse(myN1010A.ReadString(), out ret);
+                this.MaskMargin = ret;
 
                 //AOP 只需在眼图上显示
                 myN1010A.WriteString(":MEASure:EYE:APOWer:UNITs DBM", true);

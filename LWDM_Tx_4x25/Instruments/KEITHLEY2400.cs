@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace LWDM_Tx_4x25.Instruments
 {
@@ -141,6 +142,7 @@ namespace LWDM_Tx_4x25.Instruments
         {
             if (on) { GPIBDevice.GPIBwr("OUTP ON"); }
             else { GPIBDevice.GPIBwr("OUTP OFF"); }
+            Thread.Sleep(100);
         }
 
         /// <summary>
