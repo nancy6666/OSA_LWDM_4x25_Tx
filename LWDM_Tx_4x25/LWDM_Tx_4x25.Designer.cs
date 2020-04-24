@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.lstViewLog = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnAutoScale = new System.Windows.Forms.Button();
@@ -53,7 +52,7 @@
             this.columnHeader13 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader14 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.TecTimer = new System.Windows.Forms.Timer(this.components);
+            this.TecTimer = new System.Timers.Timer();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.cbxPN = new System.Windows.Forms.ComboBox();
             this.txtOperator = new System.Windows.Forms.TextBox();
@@ -79,10 +78,12 @@
             this.txtProductTemp_Room = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnRestTemp = new System.Windows.Forms.Button();
-            this.ProductTempTimer =  new System.Timers.Timer(1000);
+            this.ProductTempTimer = new System.Timers.Timer();
             this.N1092D.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).BeginInit();
             this.SuspendLayout();
             // 
             // lstViewLog
@@ -278,8 +279,9 @@
             // 
             // TecTimer
             // 
-            this.TecTimer.Interval = 1000;
-            this.TecTimer.Tick += new System.EventHandler(this.TECTimer_Tick);
+            this.TecTimer.Interval = 1000D;
+            this.TecTimer.SynchronizingObject = this;
+            this.TecTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.TECTimer_Tick);
             // 
             // groupBox6
             // 
@@ -520,13 +522,13 @@
             this.btnRestTemp.TabIndex = 15;
             this.btnRestTemp.Text = "重置环境温度";
             this.btnRestTemp.UseVisualStyleBackColor = true;
-            this.btnRestTemp.Visible = false;
             this.btnRestTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
             // 
             // ProductTempTimer
             // 
-            // this.ProductTempTimer.Interval = 1000;
-            this.ProductTempTimer.Elapsed += new System.Timers.ElapsedEventHandler(ProductTempTimer_Tick);
+            this.ProductTempTimer.Interval = 1000D;
+            this.ProductTempTimer.SynchronizingObject = this;
+            this.ProductTempTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.ProductTempTimer_Tick);
             // 
             // LWDM_Tx_4x25
             // 
@@ -546,10 +548,12 @@
             this.Load += new System.EventHandler(this.LWDM_Tx_Load);
             this.N1092D.ResumeLayout(false);
             this.N1092D.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.TEC.ResumeLayout(false);
             this.TEC.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -562,7 +566,7 @@
         private System.Windows.Forms.GroupBox N1092D;
         private System.Windows.Forms.Button btnTestProcess;
         private System.Windows.Forms.ListView lstViewTestData;
-        private System.Windows.Forms.Timer TecTimer;
+        private System.Timers.Timer TecTimer;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;

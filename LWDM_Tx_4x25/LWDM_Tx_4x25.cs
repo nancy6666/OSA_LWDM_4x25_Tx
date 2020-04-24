@@ -1326,6 +1326,11 @@ namespace LWDM_Tx_4x25
                 ShowMsg("Pls choose PN at first!", false);
                 return;
             }
+            if (this.txtProductTemp_Room.Text == null | this.txtProductTemp_Room.Text == "")
+            {
+                ShowMsg("Pls input the product temperature at first!", false);
+                return;
+            }
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
             // L5525B.SetOutputStatus(true);

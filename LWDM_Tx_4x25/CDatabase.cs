@@ -21,8 +21,7 @@ namespace LWDM_Tx_4x25
 
         public void SaveTestData(CTestDataCommon testData)
         {
-            SqlCommand cmd = new SqlCommand() { Connection = conn, Transaction = conn.BeginTransaction() };
-
+            SqlCommand cmd = new SqlCommand();
             try
             {
                 conn.Open();
@@ -33,7 +32,9 @@ namespace LWDM_Tx_4x25
             }
             try
             {
-                var strSql = $"insert into dbo.tx_lwdm_4x25_test_common (spec_id,sn,operator,test_station,test_start_time,test_stop_time,pf) output inserted.id values({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{testData.Test_Stop_Time}','{testData.pf}')";
+                cmd.Connection = conn;
+                cmd.Transaction = conn.BeginTransaction();
+                var strSql = $"insert into dbo.tx_lwdm_4x25_test_common (spec_id,sn,operator,test_station,test_start_time,test_end_time,pf) output inserted.id values({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{testData.Test_Stop_Time}','{testData.pf}')";
                 cmd.CommandType = CommandType.Text;
                 cmd.CommandText = strSql;
                 testData.ID=(int) cmd.ExecuteScalar();//返回插入行的id

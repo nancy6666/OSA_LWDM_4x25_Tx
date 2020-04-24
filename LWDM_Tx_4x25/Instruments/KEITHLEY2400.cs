@@ -232,14 +232,16 @@ namespace LWDM_Tx_4x25.Instruments
             }
             else if (Elements == EnumDataStringElements.VOLT)
             {
-                // get voltage
-                if (double.TryParse(ret, out double v))
+                var retArray = ret.Split(',');
+                // get Voltage
+                if (double.TryParse(retArray[0], out double v))
                     result.Voltage = v;
             }
             else if (Elements == EnumDataStringElements.CURR)
             {
+                var retArray = ret.Split(',');
                 // get current
-                if (double.TryParse(ret, out double c))
+                if (double.TryParse(retArray[0], out double c))
                     result.Current = c;
             }
             else if (Elements == EnumDataStringElements.RES)
