@@ -63,13 +63,12 @@ namespace LWDM_Tx_4x25.Instruments
                 gb.GPIBwr("* CLS");
                 gb.GPIBwr(":INITIATE");
                 //get sweep status, the last bit of status is 1 when a sweep ends
-                Thread.Sleep(500);
                 byte status=0;
-                while ((status & 1) != 1)
+                do
                 {
                     gb.GPIBwr(":stat:oper:even?");
                     Byte.TryParse(gb.GPIBrd(100), out status);
-                }
+                } while ((status & 1) != 1);
             }
             catch (Exception ex)
             {
@@ -151,7 +150,7 @@ namespace LWDM_Tx_4x25.Instruments
         {
             try
             {
-                gb.GPIBwr(":CALCULATE");
+                gb.GPIBwr("CALCulate");
             }
             catch (Exception ex)
             {
@@ -164,6 +163,7 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 gb.GPIBwr(":CALCulate:DATA:DFBLd?");
+                gb.GPIBwr(":CALCulate:DATA?");
                 /*
                  <peak wl>,<peak lvl>,<center wl>,<spec
                  wd>,<smsr(L)>,<smsr(R)>,<modeofst(L)>,<mode ofst(R)>,<snr>,<power>,<rms>,<Krms>

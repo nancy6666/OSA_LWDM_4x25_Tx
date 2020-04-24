@@ -333,23 +333,23 @@ namespace LWDM_Tx_4x25
                     K2400_1.Vcc = Convert.ToDecimal(excelCell[11, 2].value);
                     K2400_1.I_limit = Convert.ToDecimal(excelCell[12, 2].value);
 
-                   // gpibAddr = Convert.ToUInt16(excelCell[15, 2].value);
-                   // K2400_2 = new KEITHLEY2400(gpibAddr);
+                    // gpibAddr = Convert.ToUInt16(excelCell[15, 2].value);
+                    // K2400_2 = new KEITHLEY2400(gpibAddr);
                     K2400_2.Vcc = Convert.ToDecimal(excelCell[16, 2].value);
                     K2400_2.I_limit = Convert.ToDecimal(excelCell[17, 2].value);
 
-                   // gpibAddr = Convert.ToUInt16(excelCell[20, 2].value);
+                    // gpibAddr = Convert.ToUInt16(excelCell[20, 2].value);
                     //K2400_3 = new KEITHLEY2400(gpibAddr);
                     K2400_3.Vcc = Convert.ToDecimal(excelCell[21, 2].value);
                     K2400_3.I_limit = Convert.ToDecimal(excelCell[22, 2].value);
 
                     //K2000
-                   // gpibAddr = Convert.ToUInt16(excelCell[25, 2].value);
-                   // K2000 = new Keithley2000(gpibAddr);
+                    // gpibAddr = Convert.ToUInt16(excelCell[25, 2].value);
+                    // K2000 = new Keithley2000(gpibAddr);
 
                     //K7001
-                   //gpibAddr = Convert.ToUInt16(excelCell[28, 2].value);
-                   // K7001 = new Keithley7001(gpibAddr);
+                    //gpibAddr = Convert.ToUInt16(excelCell[28, 2].value);
+                    // K7001 = new Keithley7001(gpibAddr);
                     lstK7001Pin = new List<string>();
                     lstK7001Pin.Add(excelCell[29, 2].value);
                     lstK7001Pin.Add(excelCell[30, 2].value);
@@ -362,8 +362,8 @@ namespace LWDM_Tx_4x25
                     kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[37, 2].value);
 
                     //T720
-                   // com = excelCell[40, 2].value;
-                   // TC720 = new TC720(com);
+                    // com = excelCell[40, 2].value;
+                    // TC720 = new TC720(com);
                     lstTecTemp = new List<double>();
                     lstTecTemp.Add(excelCell[41, 2].value);
                     lstTecTemp.Add(excelCell[42, 2].value);
@@ -376,7 +376,7 @@ namespace LWDM_Tx_4x25
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
 
                     //LDT5525B
-                   // com = excelCell[49, 2].value;
+                    // com = excelCell[49, 2].value;
                     //L5525B = new LDT5525B(com);
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
@@ -384,7 +384,7 @@ namespace LWDM_Tx_4x25
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-                   // gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
+                    // gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
                     //aQ6370 = new AQ6370(gpibAddr);
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
@@ -398,15 +398,15 @@ namespace LWDM_Tx_4x25
                     this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
 
                     //PM212
-                   // com = excelCell[67, 2].value;
-                   // pm212 = new PM212(com);
+                    // com = excelCell[67, 2].value;
+                    // pm212 = new PM212(com);
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
 
                     //JW8402
-                   // com = excelCell[74, 2].value;
+                    // com = excelCell[74, 2].value;
                     //jw8402 = new JW8402(com);
                 }
                 catch (Exception ex)
@@ -424,12 +424,27 @@ namespace LWDM_Tx_4x25
                     System.Diagnostics.Process p = System.Diagnostics.Process.GetProcessById(kill);
                     p.Kill();
                 }
+
+                strMsg = "根据Test Plan对设备进行初始设计...";
+                ShowMsg(strMsg, true);
+                try
+                {
+                    InitInstruments();
+                }
+                catch(Exception ex)
+                {
+                    ShowMsg(ex.Message,false);
+                }
+                ShowMsg("初始设置已完成", true);
             });
             task1.Start();
-            task1.Wait();
+        }
 
-            strMsg = "根据Test Plan对设备进行初始设计...";
-            ShowMsg(strMsg, true);
+        /// <summary>
+        /// init devices
+        /// </summary>
+        private void InitInstruments()
+        {
             //TEC 的初始设置
             try
             {
@@ -500,7 +515,7 @@ namespace LWDM_Tx_4x25
             catch (Exception ex)
             {
                 ShowMsg($"Init K2000 error,{ex.Message}", false);
-            } 
+            }
             //LDT5525B
             try
             {
@@ -509,13 +524,13 @@ namespace LWDM_Tx_4x25
                 L5525B.SetLIMI_T(70);
                 L5525B.SetMode(LDT5525B.EnumTECMode.Temperature);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ShowMsg($"Init LDT5525B error,{ex.Message}", false);
             }
 
             //pm212
-           if(!pm212.SetWavelength(PM212.EnumWave.w1310))
+            if (!pm212.SetWavelength(PM212.EnumWave.w1310))
             {
                 ShowMsg("PM212设置波长时出错", false);
                 return;
@@ -537,9 +552,8 @@ namespace LWDM_Tx_4x25
                 ShowMsg("设置I2C 适配器的时钟出错！", false);
                 return;
             }
-            ShowMsg("初始设置已完成", true);
-        }
 
+        }
         /// <summary>
         /// 实施监控TEC环境温度
         /// </summary>
@@ -1160,6 +1174,7 @@ namespace LWDM_Tx_4x25
                             kesight_N1902D.Run();
                             ShowMsg($"Set AQ6370 start and stop wavelength...", true);
                             aQ6370.SetAQ6370(lstAQ6370_StartWave[channel], lstAQ6370_StopWave[channel]);
+
                             ShowMsg($"AQ6370 Sweeping...", true);
 
                             aQ6370.StartSweep();
@@ -1230,24 +1245,22 @@ namespace LWDM_Tx_4x25
                             }
                         }
                     }
+                    try
+                    {
+                        FinishedTest();
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowMsg($"Error happened when saving test data,{ex.Message}", true);
+                    }
                 });
                 task.Start();
               //  DisableContols();
-                task.Wait();
             }
             catch (Exception ex)
             {
                 ShowMsg(ex.Message, false);
                 EnableControls();
-            }
-
-            try
-            {
-                FinishedTest();
-            }
-            catch (Exception ex)
-            {
-                ShowMsg($"Error happened when saving test data,{ex.Message}", true);
             }
         }
 
@@ -1308,49 +1321,53 @@ namespace LWDM_Tx_4x25
 
         private void btnSetProductTemp1_Click(object sender, EventArgs e)
         {
-            if(cbxPN.SelectedIndex==-1)
+            if (cbxPN.SelectedIndex == -1)
             {
                 ShowMsg("Pls choose PN at first!", false);
                 return;
             }
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
-           // L5525B.SetOutputStatus(true);
+            // L5525B.SetOutputStatus(true);
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
 
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
-           
+
             ShowMsg($"将产品温度设置为{this.ProductTemp}℃...", true);
             //直到产品温度达到要求，开始给产品加电
-            while (!TemperatureIsTimeOut_Product)
+            var task = new Task(() =>
             {
-                if(TemperatureIsOk_Product)
+                while (!TemperatureIsTimeOut_Product)
                 {
-                    K2400_3.OUTPUT(true);
-                    K2400_1.OUTPUT(true);
-                    K2400_2.OUTPUT(true);
-                    ShowMsg($"产品加电已完成.", true);
-                    break;
+                    if (TemperatureIsOk_Product)
+                    {
+                        K2400_3.OUTPUT(true);
+                        K2400_1.OUTPUT(true);
+                        K2400_2.OUTPUT(true);
+                        ShowMsg($"产品加电已完成.", true);
+                        break;
+                    }
                 }
-            }
-            if (TemperatureIsTimeOut_Product)
-            {
-                if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{this.ProductTemp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                if (TemperatureIsTimeOut_Product)
                 {
-                    TemperatureIsOk_Product = true;
-                    ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，但可以继续进行测试！", true);
-                    ShowMsg($"给产品加电...", true);
-                    K2400_3.OUTPUT(true);
-                    K2400_1.OUTPUT(true);
-                    K2400_2.OUTPUT(true);
+                    if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{this.ProductTemp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                    {
+                        TemperatureIsOk_Product = true;
+                        ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，但可以继续进行测试！", true);
+                        ShowMsg($"给产品加电...", true);
+                        K2400_3.OUTPUT(true);
+                        K2400_1.OUTPUT(true);
+                        K2400_2.OUTPUT(true);
+                    }
+                    else
+                    {
+                        ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，不可以继续进行测试！", false);
+                    }
+
                 }
-                else
-                {
-                    ShowMsg($"产品温度设置未达到设定值{this.ProductTemp}℃，不可以继续进行测试！", false);
-                }
-                
-            }
+            });
+            task.Start();
         }
 
         private void btnRestTemp_Click(object sender, EventArgs e)
