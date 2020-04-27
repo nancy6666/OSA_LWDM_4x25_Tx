@@ -36,6 +36,7 @@ namespace LWDM_Tx_4x25.Instruments
 
         public enum EnumVoltUnit { V, DB, DBM }
         public enum EnumDACType { DC, AC }
+      
         #region private
 
         private int DevHandle=-1;

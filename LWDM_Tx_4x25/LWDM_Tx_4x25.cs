@@ -25,6 +25,7 @@ namespace LWDM_Tx_4x25
         public static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
         public CDatabase db = new CDatabase();
         public ConfigManagement cfg = new ConfigManagement();
+        public CLog log = new CLog();
         public Bert Inst_Bert;
         public Keithley7001 K7001;
         public KEITHLEY2400 K2400_1;
@@ -237,7 +238,8 @@ namespace LWDM_Tx_4x25
 
         public void ShowMsg(string msg, bool bPass)
         {
-            this.BeginInvoke(new ThreedShowMsgDelegate(MsgEvent), new object[] { msg, bPass });
+            this.Invoke(new ThreedShowMsgDelegate(MsgEvent), new object[] { msg, bPass });
+           // this.BeginInvoke(new Action(() => { MsgEvent(msg, bPass); }));
         }
         public void ShowResult(string[] Msg, int[] iPass)
         {
@@ -255,7 +257,7 @@ namespace LWDM_Tx_4x25
 
         private void MsgEvent(string msg, bool bPass)
         {
-            //txtLog.AppendText(msg + "\r\n\r\n");
+            log.WriteLog(msg);
             lstViewLog.BeginUpdate();
             try
             {
@@ -1101,7 +1103,7 @@ namespace LWDM_Tx_4x25
 
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
             {
-                ShowMsg("温度设定未达到常温，不能开启测试流程", false);
+                ShowMsg("The temperature haven't reached the set point，can't start test!", false);
                 return;
             }
           
@@ -1134,7 +1136,7 @@ namespace LWDM_Tx_4x25
                         TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
                         TestData_Temp.Temp_in = lstTecTemp_Product[TecTempIndex];
 
-                        ShowMsg($"将环境温度设置为{lstTecTemp[TecTempIndex]},请稍等...", true);
+                        ShowMsg($"Set environment temperature to {lstTecTemp[TecTempIndex]}...", true);
                         TC720.WriteTemperature(Channel.CH1, lstTecTemp[TecTempIndex]);
                         this.Temp_Environment = lstTecTemp[TecTempIndex];
                         TickCountTotal = 0;
@@ -1143,7 +1145,7 @@ namespace LWDM_Tx_4x25
                         L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
                        // L5525B.SetOutputStatus(true);
                         this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
-                        ShowMsg($"将产品温度设置为{this.ProductTemp}，请稍等...", true);
+                        ShowMsg($"Set product temperature to {this.ProductTemp}...", true);
 
                         TickCountTotal_Product = 0;
                         ProductTempTimer.Start();
@@ -1266,7 +1268,7 @@ namespace LWDM_Tx_4x25
 
         private void btnAutoScale_Click(object sender, EventArgs e)
         {
-            ShowMsg("正在绘制眼图，请稍后...", true);
+            ShowMsg("Running Eye diagran，pls wait...", true);
             try
             {
                 var task = new Task(() =>
@@ -1285,7 +1287,7 @@ namespace LWDM_Tx_4x25
         {
             try
             {
-                ShowMsg("正在绘制眼图，请稍后...", true);
+                ShowMsg("Running Eye diagran，pls wait...", true);
 
                 var task = new Task(() =>
                 {
@@ -1303,7 +1305,7 @@ namespace LWDM_Tx_4x25
         {
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
             {
-                strMsg = $"请注意温度还未达到设定值,不能设置driver data！";
+                strMsg = $"The temperature haven't reached the set point,can't set driver data！";
                 ShowMsg(strMsg, false);
                 return;
             }
@@ -1315,7 +1317,7 @@ namespace LWDM_Tx_4x25
         {
             if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex+1))
             {
-                ShowMsg($"切换光通道到CH{this.cbxChlIndex.SelectedIndex + 1}时出错", false);
+                ShowMsg($"Error happened when Switching optical channel to CH{this.cbxChlIndex.SelectedIndex + 1}！", false);
             }
         }
 
@@ -1333,13 +1335,13 @@ namespace LWDM_Tx_4x25
             }
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
-            // L5525B.SetOutputStatus(true);
+
             this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
 
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
 
-            ShowMsg($"将产品温度设置为{this.ProductTemp}℃...", true);
+            ShowMsg($"Set product temperature to {this.ProductTemp}℃...", true);
             //直到产品温度达到要求，开始给产品加电
             var task = new Task(() =>
             {
@@ -1379,15 +1381,15 @@ namespace LWDM_Tx_4x25
         {
             if (lstTecTemp != null)
             {
-                TC720.WriteTemperature(Channel.CH1, lstTecTemp[0]);//测试完成，将TEC设置回常温
+                TC720.WriteTemperature(Channel.CH1, lstTecTemp[0]);//将TEC设置回常温
                 this.Temp_Environment = lstTecTemp[0];
                 TickCountTotal = 0;
                 TecTimer.Start();
-                ShowMsg($"环境温度重置为{lstTecTemp[0]}...", true);
+                ShowMsg($"Reset environment temperature to {lstTecTemp[0]}...", true);
             }
             else
             {
-                ShowMsg("请先选择PN!", false);
+                ShowMsg("Pls choose PN at first!", false);
             }
         }
 

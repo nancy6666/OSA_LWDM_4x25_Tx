@@ -30,7 +30,7 @@ namespace LWDM_Tx_4x25.Instruments
                 GPIBDevice.GPIBwr(objCmd);
                 string res = GPIBDevice.GPIBrd(200);
 
-                return res; ;
+                return res; 
             }
             catch (Exception ex)
             {
