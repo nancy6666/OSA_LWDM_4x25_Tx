@@ -45,23 +45,30 @@ namespace LWDM_Tx_4x25.Instruments
             }
         }
 
-        public void SetAQ6370(double startWave,double stopWave)
-        {
-            gb.GPIBwr(":CALCulate:CATegory DFBLd");//设置算法为DFBLD
-            SetStartWavelength(startWave);
-            SetStopWavelength(stopWave);
-            //SetSpan(span);
-            //SetCWL(cwl);
-        }
-
-        public void StartSweep()
+        private void SetAQ6370(double startWave, double stopWave)
         {
             try
             {
+                SetStartWavelength(startWave);
+                SetStopWavelength(stopWave);
+                gb.GPIBwr(":sens: sens mid");//sens mode=MID
+                gb.GPIBwr(":sens:sweep:points:auto on");//Sampling point=Auto
                 SetSweepMode(EnumSweepMode.SINGle);//设置扫描模式为single
-
                 gb.GPIBwr("* CLS");
                 gb.GPIBwr(":INITIATE");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"Set AQ6370 error,{ ex.Message}");
+            }
+        }
+
+        public void StartSweep(double startWave, double stopWave)
+        {
+            try
+            {
+                SetAQ6370(startWave, stopWave);
+                
                 //get sweep status, the last bit of status is 1 when a sweep ends
                 byte status=0;
                 do
@@ -69,6 +76,10 @@ namespace LWDM_Tx_4x25.Instruments
                     gb.GPIBwr(":stat:oper:even?");
                     Byte.TryParse(gb.GPIBrd(100), out status);
                 } while ((status & 1) != 1);
+
+                gb.GPIBwr(":CALCulate:CATegory DFBLd");//设置算法为DFBLD
+                ExcuteAnalysis();
+                ReadAnalysisData();
             }
             catch (Exception ex)
             {
@@ -76,12 +87,7 @@ namespace LWDM_Tx_4x25.Instruments
             }
         }
 
-        public void ReadTestData()
-        {
-            ExcuteAnalysis();
-            ReadAnalysisData();
-        }
-       
+      
         #region Private Methods
 
         private void SetStartWavelength(double startWave)
@@ -162,7 +168,7 @@ namespace LWDM_Tx_4x25.Instruments
         {
             try
             {
-                gb.GPIBwr(":CALCulate:DATA:DFBLd?");
+               // gb.GPIBwr(":CALCulate:DATA:DFBLd?");
                 gb.GPIBwr(":CALCulate:DATA?");
                 /*
                  <peak wl>,<peak lvl>,<center wl>,<spec
@@ -170,8 +176,10 @@ namespace LWDM_Tx_4x25.Instruments
                */
                 string str = gb.GPIBrd(200);
                 string[] data = str.Split(',');
-                this.SMSR = Convert.ToDouble(data[4]);//smsr(L)
-                this.PeakWL = Convert.ToDouble(data[0]); //unit is m/Hz,need to be nm
+
+                //??????数据索引 PeakWL的单位转换
+                this.SMSR = Convert.ToDouble(data[11]);//smsr(L)
+                this.PeakWL = Convert.ToDouble(data[4]); //unit is m/Hz,need to be nm
             }
             catch (Exception ex)
             {

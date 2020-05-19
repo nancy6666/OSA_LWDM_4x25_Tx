@@ -751,7 +751,6 @@ namespace LWDM_Tx_4x25
                 TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
 
                 //AQ6370
-                aQ6370.ReadTestData();
                 TestData_Channel.SMSR = aQ6370.SMSR;
                 TestData_Channel.Cwl = aQ6370.PeakWL;
 
@@ -1174,12 +1173,10 @@ namespace LWDM_Tx_4x25
                             ShowMsg($" Start testing in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
                             ShowMsg($"Running Eye...", true);
                             kesight_N1902D.Run();
-                            ShowMsg($"Set AQ6370 start and stop wavelength...", true);
-                            aQ6370.SetAQ6370(lstAQ6370_StartWave[channel], lstAQ6370_StopWave[channel]);
-
+                           
                             ShowMsg($"AQ6370 Sweeping...", true);
 
-                            aQ6370.StartSweep();
+                            aQ6370.StartSweep(lstAQ6370_StartWave[channel], lstAQ6370_StopWave[channel]);
 
                             ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
 
