@@ -1235,7 +1235,8 @@ namespace LWDM_Tx_4x25
                             //添加一条测试数据到TestData_Temp
                             TestData_Temp.lstTestData_Channel.Add(TestData_Channel);
                         }
-                        ShowMsg($"Finished {MaxChannel} channels eye diagram test", true);
+
+                        ShowMsg($"Finished eye diagram test under temperature{lstTecTemp[TecTempIndex]}", true);
                         ShowMsg("Read TEC Current with LDT5525B", true);
                         TestData_Temp.Itec = L5525B.ReadCurrent();
                         TestData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);

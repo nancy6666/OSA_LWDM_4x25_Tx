@@ -139,7 +139,7 @@ namespace LWDM_Tx_4x25
                     testSpec.Impd_min=  Convert.ToDouble(row["impd_min"]);
                     testSpec.Impd_max = Convert.ToDouble(row["impd_max"]);
                     testSpec.Idark_min = Convert.ToDouble(row["idark_min"]);
-                    testSpec.Idark_min = Convert.ToDouble(row["idark_max"]);
+                    testSpec.Idark_max = Convert.ToDouble(row["idark_max"]);
                     testSpec.Jitter_pp_min =  Convert.ToDouble(row["jitter_pp_min"]);
                     testSpec.Jitter_pp_max =  Convert.ToDouble(row["jitter_pp_max"]);
                     testSpec.Jitter_rms_min = Convert.ToDouble(row["jitter_rms_min"]);
