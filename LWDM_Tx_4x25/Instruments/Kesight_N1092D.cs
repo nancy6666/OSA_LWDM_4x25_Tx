@@ -172,11 +172,11 @@ namespace LWDM_Tx_4x25.Instruments
                 myN1010A.WriteString(":MEASure:EYE:JITTer:FORMat RMS", true);
                 myN1010A.WriteString(":MEASure:EYE:JITTer", true);
                 myN1010A.WriteString(":MEASure:EYE:JITTer?", true);
-                this.JitterRMS = Convert.ToDouble(myN1010A.ReadString());
+                this.JitterRMS = Convert.ToDouble(myN1010A.ReadString())*Math.Pow(10,12);
                 myN1010A.WriteString(":MEASure:EYE:JITTer:FORMat PP", true);
                 myN1010A.WriteString(":MEASure:EYE:JITTer", true);
                 myN1010A.WriteString(":MEASure:EYE:JITTer?", true);
-                this.Jitter_pp = Convert.ToDouble(myN1010A.ReadString());
+                this.Jitter_pp = Convert.ToDouble(myN1010A.ReadString()) * Math.Pow(10, 12);
 
                 myN1010A.WriteString(":MEASure:EYE:ERATio", true);
                 myN1010A.WriteString(":MEASure:EYE:ERATio?", true);
@@ -184,15 +184,14 @@ namespace LWDM_Tx_4x25.Instruments
 
                 myN1010A.WriteString(":MEASure:EYE:CROSsing", true);
                 myN1010A.WriteString(":MEASure:EYE:CROSsing?", true);
-                this.Crossing = Convert.ToDouble(myN1010A.ReadString());
-
+                this.Crossing = Convert.ToDouble(myN1010A.ReadString())*100;
 
                 myN1010A.WriteString(":MEASure:EYE:RISetime", true);
                 myN1010A.WriteString(":MEASure:EYE:RISetime?", true);
-                this.RiseTime = Convert.ToDouble(myN1010A.ReadString());
+                this.RiseTime = Convert.ToDouble(myN1010A.ReadString()) * Math.Pow(10, 12);
                 myN1010A.WriteString(":MEASure:EYE:FALLtime", true);
                 myN1010A.WriteString(":MEASure:EYE:FALLtime?", true);
-                this.FallTime = Convert.ToDouble(myN1010A.ReadString());
+                this.FallTime = Convert.ToDouble(myN1010A.ReadString()) * Math.Pow(10, 12);
 
                 // Mask Margin
 
@@ -211,11 +210,11 @@ namespace LWDM_Tx_4x25.Instruments
                 myN1010A.WriteString(":SYSTem:ERRor?", true);
                 inst_err = myN1010A.ReadString().Split(',');
                 inst_code = Convert.ToInt32(inst_err[0].ToString());
-                if (inst_code != 0)
-                {
-                    errorMessages = errorMessages.ToString() + inst_err[0].ToString() + ": " + inst_err[1].ToString() + "\r\n";
-                    throw new Exception($"从眼图仪获取测试数据出错,{errorMessages}");
-                }
+                //if (inst_code != 0)
+                //{
+                //    errorMessages = errorMessages.ToString() + inst_err[0].ToString() + ": " + inst_err[1].ToString() + "\r\n";
+                //    throw new Exception($"从眼图仪获取测试数据出错,{errorMessages}");
+                //}
             }
             catch (Exception ex)
             {

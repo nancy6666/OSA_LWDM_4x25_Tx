@@ -7,6 +7,18 @@ namespace LWDM_Tx_4x25.Instruments
 {
   public class KEITHLEY2400
     {
+        private double _current;
+        public double Current
+        {
+            get
+            {
+                return _current;
+            }
+            set
+            {
+                _current = Math.Round(value, 2);
+            }
+        }
         /// <summary>
         /// 分析源
         /// </summary>
@@ -101,8 +113,8 @@ namespace LWDM_Tx_4x25.Instruments
             OUTPUT(false);
             SetMEASCategory(MEAScategory.ONCURR);
             SetSOURCEMODE(SOURCEMODE.VOLT);
-            SetSOURCEingMODEofVOLT(SOURCEingMODE.FIX);
-            SetMEASRangeofCURR(MEASRANGE.AUTO);
+       //   SetSOURCEingMODEofVOLT(SOURCEingMODE.FIX);
+           // SetMEASRangeofCURR(MEASRANGE.AUTO);
 
             // only return current measurement value under V-Source
             SetDataElement(EnumDataStringElements.CURR | EnumDataStringElements.STAT);
@@ -142,7 +154,7 @@ namespace LWDM_Tx_4x25.Instruments
         {
             if (on) { GPIBDevice.GPIBwr("OUTP ON"); }
             else { GPIBDevice.GPIBwr("OUTP OFF"); }
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
         }
 
         /// <summary>

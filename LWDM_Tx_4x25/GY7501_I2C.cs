@@ -87,22 +87,22 @@ namespace GY7501_I2C_Control
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-            //{
-            //    MessageBox.Show("设备打开失败！", "打开设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
-            ////设置I2C Adapter 模式和时钟
-            //if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-            //{
-            //    MessageBox.Show("设置I2C 适配器的Mode出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
-            //if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
-            //{
-            //    MessageBox.Show("设置I2C 适配器的时钟出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //    return;
-            //}
+            if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                MessageBox.Show("设备打开失败！", "打开设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            //设置I2C Adapter 模式和时钟
+            if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                MessageBox.Show("设置I2C 适配器的Mode出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
+            {
+                MessageBox.Show("设置I2C 适配器的时钟出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
         }
 
@@ -219,11 +219,11 @@ namespace GY7501_I2C_Control
             this.upDownVeqValue = value;
 
             //Modulation
-            value = (byte)dataBuff[3] & 0x03 << 8 | dataBuff[4];
+            value = (byte)dataBuff[3] << 8 & 0x03 << 8 | dataBuff[4];
             this.upDownModulationValue = value;
 
             //ISNK
-            value = (byte)dataBuff[5] & 0x03 << 8 | dataBuff[6];
+            value = (byte)dataBuff[5] << 8 & 0x03 << 8 | dataBuff[6];
             this.upDownIsnkValue = value;
 
             //LDD 
@@ -613,6 +613,15 @@ namespace GY7501_I2C_Control
                 MessageBox.Show($"{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
+        }
+
+        private void GY7501_I2C_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            //if (USB_I2C_Adapter.GYI2C_Close(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            //{
+            //    MessageBox.Show("Close GYI2C Error！", "Close GYI2C", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //    return;
+            //}
         }
     }
 }

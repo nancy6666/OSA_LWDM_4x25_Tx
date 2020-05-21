@@ -60,7 +60,8 @@ namespace LWDM_Tx_4x25.Instruments
             var res = Query("v");
             if(res==""||res.Contains("L")||res.Contains("NaN"))
             {
-                return double.NaN;
+               
+                return -9999;
             }
             else
             {

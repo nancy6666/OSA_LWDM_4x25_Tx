@@ -33,6 +33,7 @@
             this.btnAutoScale = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
             this.N1092D = new System.Windows.Forms.GroupBox();
+            this.btnStopTestProcess = new System.Windows.Forms.Button();
             this.cbxChlIndex = new System.Windows.Forms.ComboBox();
             this.btnTestProcess = new System.Windows.Forms.Button();
             this.labChlIndex = new System.Windows.Forms.Label();
@@ -107,9 +108,9 @@
             // 
             // btnAutoScale
             // 
-            this.btnAutoScale.Location = new System.Drawing.Point(46, 79);
+            this.btnAutoScale.Location = new System.Drawing.Point(44, 79);
             this.btnAutoScale.Name = "btnAutoScale";
-            this.btnAutoScale.Size = new System.Drawing.Size(90, 39);
+            this.btnAutoScale.Size = new System.Drawing.Size(93, 39);
             this.btnAutoScale.TabIndex = 10;
             this.btnAutoScale.Text = "Auto Scale";
             this.btnAutoScale.UseVisualStyleBackColor = true;
@@ -127,6 +128,7 @@
             // 
             // N1092D
             // 
+            this.N1092D.Controls.Add(this.btnStopTestProcess);
             this.N1092D.Controls.Add(this.cbxChlIndex);
             this.N1092D.Controls.Add(this.btnTestProcess);
             this.N1092D.Controls.Add(this.labChlIndex);
@@ -139,6 +141,16 @@
             this.N1092D.TabIndex = 12;
             this.N1092D.TabStop = false;
             this.N1092D.Text = "眼图调试";
+            // 
+            // btnStopTestProcess
+            // 
+            this.btnStopTestProcess.Location = new System.Drawing.Point(187, 136);
+            this.btnStopTestProcess.Name = "btnStopTestProcess";
+            this.btnStopTestProcess.Size = new System.Drawing.Size(93, 43);
+            this.btnStopTestProcess.TabIndex = 20;
+            this.btnStopTestProcess.Text = "停止测试";
+            this.btnStopTestProcess.UseVisualStyleBackColor = true;
+            this.btnStopTestProcess.Click += new System.EventHandler(this.btnStopTestProcess_Click);
             // 
             // cbxChlIndex
             // 
@@ -157,9 +169,9 @@
             // 
             // btnTestProcess
             // 
-            this.btnTestProcess.Location = new System.Drawing.Point(109, 135);
+            this.btnTestProcess.Location = new System.Drawing.Point(44, 136);
             this.btnTestProcess.Name = "btnTestProcess";
-            this.btnTestProcess.Size = new System.Drawing.Size(103, 51);
+            this.btnTestProcess.Size = new System.Drawing.Size(93, 43);
             this.btnTestProcess.TabIndex = 12;
             this.btnTestProcess.Text = "开启测试流程";
             this.btnTestProcess.UseVisualStyleBackColor = true;
@@ -176,7 +188,7 @@
             // 
             // btnOpenGY1202Interface
             // 
-            this.btnOpenGY1202Interface.Location = new System.Drawing.Point(187, 29);
+            this.btnOpenGY1202Interface.Location = new System.Drawing.Point(187, 21);
             this.btnOpenGY1202Interface.Name = "btnOpenGY1202Interface";
             this.btnOpenGY1202Interface.Size = new System.Drawing.Size(101, 38);
             this.btnOpenGY1202Interface.TabIndex = 13;
@@ -610,6 +622,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button btnStopTestProcess;
     }
 }
 

@@ -54,8 +54,6 @@ namespace LWDM_Tx_4x25.Instruments
                 gb.GPIBwr(":sens: sens mid");//sens mode=MID
                 gb.GPIBwr(":sens:sweep:points:auto on");//Sampling point=Auto
                 SetSweepMode(EnumSweepMode.SINGle);//设置扫描模式为single
-                gb.GPIBwr("* CLS");
-                gb.GPIBwr(":INITIATE");
             }
             catch(Exception ex)
             {
@@ -68,11 +66,22 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 SetAQ6370(startWave, stopWave);
-                
+                gb.GPIBwr("* CLS");
+                gb.GPIBwr(":INITIATE");//start sweep
                 //get sweep status, the last bit of status is 1 when a sweep ends
                 byte status=0;
+                DateTime t1 = DateTime.Now;
+                
                 do
                 {
+                    DateTime t2 = DateTime.Now;
+                    if ((t2 - t1).TotalSeconds > 10)
+                    {
+                        t1 = DateTime.Now;
+                        // throw new Exception("获取光谱仪AQ6370的扫描状态超时！");
+                        gb.GPIBwr(":INITIATE");//start sweep
+                    }
+                    Thread.Sleep(100);
                     gb.GPIBwr(":stat:oper:even?");
                     Byte.TryParse(gb.GPIBrd(100), out status);
                 } while ((status & 1) != 1);
@@ -177,9 +186,15 @@ namespace LWDM_Tx_4x25.Instruments
                 string str = gb.GPIBrd(200);
                 string[] data = str.Split(',');
 
-                //??????数据索引 PeakWL的单位转换
-                this.SMSR = Convert.ToDouble(data[11]);//smsr(L)
-                this.PeakWL = Convert.ToDouble(data[4]); //unit is m/Hz,need to be nm
+                if (data.Count() != 0)
+                {
+                    this.SMSR = Convert.ToDouble(data[4].Split('\n')[0]);//smsr(L)
+                    this.PeakWL = (Convert.ToDouble(data[1])) * Math.Pow(10, 9); //unit is m,need to be nm
+                }
+                else
+                {
+                    throw new Exception($"读取AQ6370D数据为空！");
+                }
             }
             catch (Exception ex)
             {

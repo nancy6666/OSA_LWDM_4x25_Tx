@@ -17,9 +17,18 @@ namespace GY7501_I2C_Control
         /// 该控件在字节中所占的某一位的索引，从0开始计
         /// </summary>
         public int RegBitIndex { get; set; }
+        public void GetMouseClick(bool disable)
+        {
+            if (disable != this.Checked)//要设置的状态和当下的状态不同
+            {
+                this.Checked = disable;
+                OnMouseClick(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
+            }
+        }
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
+
             List<byte> dataBuff = new List<byte>();
             var valueRead = GlobalVar.uSB_I2C_Adapter.ReadValue(this.RegAddr);
 

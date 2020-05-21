@@ -21,6 +21,8 @@ namespace LWDM_Tx_4x25
     {
         #region Properties
 
+        public CancellationTokenSource ctsTotal;
+
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         public static extern int GetWindowThreadProcessId(IntPtr hwnd, out int ID);
         public CDatabase db = new CDatabase();
@@ -258,6 +260,10 @@ namespace LWDM_Tx_4x25
         private void MsgEvent(string msg, bool bPass)
         {
             log.WriteLog(msg);
+            //if(lstViewLog.Items.Count>=30)
+            //{
+            //    lstViewLog.Items.Clear();
+            //}
             lstViewLog.BeginUpdate();
             try
             {
@@ -493,11 +499,11 @@ namespace LWDM_Tx_4x25
                 K2400_1.SetToVoltageSource();
                 K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
                 K2400_1.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_1.I_limit);
-
+                
                 K2400_2.SetToVoltageSource();
                 K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
                 K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
-
+              
                 K2400_3.SetToVoltageSource();
                 K2400_3.SetTerminalPanel(KEITHLEY2400.TeminalPanel.FRONT);
                 K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
@@ -537,23 +543,23 @@ namespace LWDM_Tx_4x25
                 ShowMsg("PM212设置波长时出错", false);
                 return;
             }
-            //GYI2C
-            if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-            {
-                ShowMsg("GYI2C设备打开失败！", false);
-                return;
-            }
-            //设置I2C Adapter 模式和时钟
-            if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-            {
-                ShowMsg("设置I2C 适配器的Mode出错！", false);
-                return;
-            }
-            if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
-            {
-                ShowMsg("设置I2C 适配器的时钟出错！", false);
-                return;
-            }
+            ////GYI2C
+            //if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            //{
+            //    ShowMsg("GYI2C设备打开失败！", false);
+            //    return;
+            //}
+            ////设置I2C Adapter 模式和时钟
+            //if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            //{
+            //    ShowMsg("设置I2C 适配器的Mode出错！", false);
+            //    return;
+            //}
+            //if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
+            //{
+            //    ShowMsg("设置I2C 适配器的时钟出错！", false);
+            //    return;
+            //}
 
         }
         /// <summary>
@@ -627,15 +633,33 @@ namespace LWDM_Tx_4x25
             }
         }
 
+        public enum CurrentUint { A,mA,uA,nA}
         /// <summary>
         /// K7001切换通道，K2000读取MPD的值,一个通道一次，结果存入list
         /// </summary>
         /// <returns>所有通道的MPD电流值</returns>
-        private List<double> ReadMPDAllChannel()
+        private List<double> ReadMPDAllChannel(CurrentUint unit)
         {
             List<double> lstMpd = new List<double>();
+            double factor = 0;
             try
             {
+                switch(unit)
+                {
+                    case CurrentUint.A:
+                        factor = 1;
+                        break;
+                    case CurrentUint.mA:
+                        factor = Math.Pow(10,3);
+                        break;
+                    case CurrentUint.uA:
+                        factor = Math.Pow(10, 6);
+                        break;
+                    case CurrentUint.nA:
+                        factor = Math.Pow(10, 9);
+                        break;
+
+                }
                 for (int chl = 0; chl < MaxChannel; chl++)
                 {
 
@@ -643,7 +667,7 @@ namespace LWDM_Tx_4x25
                     Thread.Sleep(200);
                     K7001.CloseRelay(lstK7001Pin[chl]);
                     Thread.Sleep(100);
-                    lstMpd.Add(K2000.Fetch());
+                    lstMpd.Add(K2000.Fetch()*factor);
                     Thread.Sleep(100);
                 }
             }
@@ -657,13 +681,14 @@ namespace LWDM_Tx_4x25
         /// <summary>
         /// 控制GY7501所有TxDisable ratio控件的状态
         /// </summary>
-        /// <param name="blSelect">true:选中,false:不选</param>
-        private void ControlGY7501TxDisableRadio(bool blSelect)
+        /// <param name="disable">true:Tx disable,false:Tx enable</param>
+        private void ControlGY7501TxDisableRadio(bool disable)
         {
-            gY7501_I2C.RadioTx0ChlDisable.Checked = blSelect;
-            gY7501_I2C.RadioTx1ChlDisable.Checked = blSelect;
-            gY7501_I2C.RadioTx2ChlDisable.Checked = blSelect;
-            gY7501_I2C.RadioTx3ChlDisable.Checked = blSelect;
+            gY7501_I2C.RadioTx0ChlDisable.GetMouseClick(disable);
+
+            gY7501_I2C.RadioTx1ChlDisable.GetMouseClick(disable);
+            gY7501_I2C.RadioTx2ChlDisable.GetMouseClick(disable);
+            gY7501_I2C.RadioTx3ChlDisable.GetMouseClick(disable);
         }
         /// <summary>
         /// 测试结束的操作，断电，关闭产品温度，环境温度设回常温，保存测试数据到数据库
@@ -686,7 +711,8 @@ namespace LWDM_Tx_4x25
                 this.Temp_Environment = lstTecTemp[0];
                 TickCountTotal = 0;
                 TecTimer.Start();
-
+                if (ctsTotal.Token.IsCancellationRequested)
+                    return;
                 //保存数据
                 if (DialogResult.Yes == MessageBox.Show("Test done，Save the test data to Database？", "Save test data", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
                 {
@@ -699,7 +725,8 @@ namespace LWDM_Tx_4x25
                     });
                     task1.Start();
                 }
-
+                if (ctsTotal.Token.IsCancellationRequested)
+                    return;
                 var task = new Task(() =>
                 {
                     while (!TemperatureIsTimeOut)
@@ -751,8 +778,8 @@ namespace LWDM_Tx_4x25
                 TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
 
                 //AQ6370
-                TestData_Channel.SMSR = aQ6370.SMSR;
-                TestData_Channel.Cwl = aQ6370.PeakWL;
+                TestData_Channel.SMSR =Math.Round( aQ6370.SMSR,2);
+                TestData_Channel.Cwl = Math.Round(aQ6370.PeakWL,2);
 
                 //PM212
                 ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
@@ -1086,7 +1113,11 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private void btnTestProcess_Click(object sender, EventArgs e)
         {
-          //this.lstViewTestData.Clear();
+            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+          
+            this.lstViewTestData.Items.Clear();
             TestDataCommon = new CTestDataCommon();
 
             TestDataCommon.SN = txtSN.Text;
@@ -1118,66 +1149,82 @@ namespace LWDM_Tx_4x25
             }
             try
             {
-                //IProgress<int> progHandle = new Progress<int>(prog =>
-                //{
-                //    if (prog == 100)
-                //    {
-                //        EnableControls();
-                //        this.btnTestProcess.Enabled = true;
-                //    }
-                //});
-
+                ctsTotal = new CancellationTokenSource();
                 var task = new Task(() =>
                 {
-                    for (int TecTempIndex = 0; TecTempIndex < 3; TecTempIndex++)
+                for (int TecTempIndex = 0; TecTempIndex < 3; TecTempIndex++)
+                {
+                    TestData_Temp = new CTestData_Temp();
+                    TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
+                    TestData_Temp.Temp_in = lstTecTemp_Product[TecTempIndex];
+
+                    ShowMsg($"Set environment temperature to {lstTecTemp[TecTempIndex]}...", true);
+                    TC720.WriteTemperature(Channel.CH1, lstTecTemp[TecTempIndex]);
+                    this.Temp_Environment = lstTecTemp[TecTempIndex];
+                    TickCountTotal = 0;
+                    TecTimer.Start();
+
+                    L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
+                    this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
+                    ShowMsg($"Set product temperature to {this.ProductTemp}...", true);
+
+                    TickCountTotal_Product = 0;
+                    ProductTempTimer.Start();
+
+                    //等待环境温度和产品温度达到设定值并稳定
+                    while (!TemperatureIsOk | !TemperatureIsOk_Product)
                     {
-                        TestData_Temp = new CTestData_Temp();
-                        TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
-                        TestData_Temp.Temp_in = lstTecTemp_Product[TecTempIndex];
-
-                        ShowMsg($"Set environment temperature to {lstTecTemp[TecTempIndex]}...", true);
-                        TC720.WriteTemperature(Channel.CH1, lstTecTemp[TecTempIndex]);
-                        this.Temp_Environment = lstTecTemp[TecTempIndex];
-                        TickCountTotal = 0;
-                        TecTimer.Start();
-
-                        L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
-                       // L5525B.SetOutputStatus(true);
-                        this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
-                        ShowMsg($"Set product temperature to {this.ProductTemp}...", true);
-
-                        TickCountTotal_Product = 0;
-                        ProductTempTimer.Start();
-                        //等待环境温度和产品温度达到设定值并稳定
-                        while (!TemperatureIsOk | !TemperatureIsOk_Product)
-                        {
-                            if(TemperatureIsTimeOut_Product|TemperatureIsTimeOut)
-                            {
-                                break;
-                            }
-                        }
                         if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
                         {
-                            ShowMsg("Time is out for setting Temperature!", false);
+                            break;
+                        }
+                    }
+                    if (ctsTotal.Token.IsCancellationRequested)
+                    {
+                        ShowMsg($"Test is stopped!!!", false);
+                        return;
+                    }
+                    if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
+                    {
+                        ShowMsg("Time is out for setting Temperature!", false);
+                        if (DialogResult.No != MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                        {
                             return;
                         }
-                        for (int channel = 0; channel < MaxChannel; channel++)
+                    }
+                    for (int channel = 0; channel < MaxChannel; channel++)
+                    {
+                        TestData_Channel = new CTestData_Channel();
+                        TestData_Channel.Channel = channel + 1;
+                        ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
+                        if (!jw8402.SetChannel(TestData_Channel.Channel))
                         {
-                            TestData_Channel = new CTestData_Channel();
-                            TestData_Channel.Channel = channel + 1;
-                            ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
-                            if (!jw8402.SetChannel(TestData_Channel.Channel))
-                            {
-                                ShowMsg($"Error happened when switching Optical Channel to channel{channel + 1}", false);
-                            }
-                            ShowMsg($" Start testing in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
+                            ShowMsg($"Error happened when switching Optical Channel to channel{channel + 1}", false);
+                        }
+
+                            this.Invoke(new Action(() => { this.cbxChlIndex.SelectedIndex = channel; }));
+
+                            ShowMsg($"Start testing in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
                             ShowMsg($"Running Eye...", true);
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return;
+                            }
                             kesight_N1902D.Run();
-                           
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return ;
+                            }
                             ShowMsg($"AQ6370 Sweeping...", true);
 
                             aQ6370.StartSweep(lstAQ6370_StartWave[channel], lstAQ6370_StopWave[channel]);
-
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return; ;
+                            }
                             ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
 
                             GetTestData_Channel(channel);
@@ -1196,18 +1243,29 @@ namespace LWDM_Tx_4x25
                         TestData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
 
                         ShowMsg("Read Current from K2400", true);
-                        TestData_Temp.Icc1 = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-                        TestData_Temp.Icc2 = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-                        TestData_Temp.Icc3 = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+                        TestData_Temp.Icc1 = K2400_1.Current;
+                        TestData_Temp.Icc2 = K2400_2.Current;
+                        TestData_Temp.Icc3 = K2400_3.Current;
+                       
+                        if (ctsTotal.Token.IsCancellationRequested)
+                        {
+                            ShowMsg($"Test is stopped!!!", false);
+                            return; ;
+                        }
 
                         ShowMsg("Start MPD testing... ", true);
-                        var lstMpd = ReadMPDAllChannel();
+                        var lstMpd = ReadMPDAllChannel(CurrentUint.mA);
                         ShowMsg("Start Idark testing... ", true);
                         ShowMsg("Disable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(true);
-                        var lstIdark = ReadMPDAllChannel();
+                        var lstIdark = ReadMPDAllChannel(CurrentUint.nA);
                         ShowMsg("Finished Idark Test,Enable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(false);
+                        if (ctsTotal.Token.IsCancellationRequested)
+                        {
+                            ShowMsg($"Test is stopped!!!", false);
+                            return;
+                        }
                         //将lstIdark和lstMpd 插入当前TestData_Temp的lstTestData_Channel中，通道是一一对应的，所以可以使用索引
                         ShowMsg($"Start dealing with test data...", true);
                         for (int ch = 0; ch < MaxChannel; ch++)
@@ -1231,7 +1289,8 @@ namespace LWDM_Tx_4x25
                         TestDataCommon.pf = true & TestData_Temp.Pf;
                         //添加TestData_Temp即4条数据到TestDataCommon
                         TestDataCommon.lstTestData_Temp.Add(TestData_Temp);
-
+                        if (ctsTotal.Token.IsCancellationRequested)
+                            break;
                         //当前测试结果为fail，且Test plan设置fail后不继续测试，则跳出循环
                         if (TecTempIndex < lstTecTemp.Count - 1)
                         {
@@ -1265,14 +1324,19 @@ namespace LWDM_Tx_4x25
 
         private void btnAutoScale_Click(object sender, EventArgs e)
         {
-            ShowMsg("Running Eye diagran，pls wait...", true);
+            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+           
+            ShowMsg("AutoScaling Eye diagran，pls wait...", true);
             try
             {
-                var task = new Task(() =>
-                {
+                //var task = new Task(() =>
+                //{
                     kesight_N1902D.AutoScale();
-                });
-                task.Start();
+                //});
+                //task.Start();
+                ShowMsg("AutoScaling Eye diagran Done!", true);
             }
             catch (Exception ex)
             {
@@ -1282,15 +1346,20 @@ namespace LWDM_Tx_4x25
 
         private void btnRun_Click(object sender, EventArgs e)
         {
+            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
             try
             {
-                ShowMsg("Running Eye diagran，pls wait...", true);
+                ShowMsg("Running Eye diagram，pls wait...", true);
 
                 var task = new Task(() =>
                 {
                     kesight_N1902D.Run();
                 });
                 task.Start();
+                task.Wait();
+                ShowMsg("Running Eye Done!", true);
             }
             catch (Exception ex)
             {
@@ -1306,6 +1375,7 @@ namespace LWDM_Tx_4x25
                 ShowMsg(strMsg, false);
                 return;
             }
+
             gY7501_I2C = new GY7501_I2C();
             gY7501_I2C.Show();
         }
@@ -1332,11 +1402,9 @@ namespace LWDM_Tx_4x25
             }
             this.ProductTemp = Convert.ToDouble(this.txtProductTemp_Room.Text);
             L5525B.SetTemperature(this.ProductTemp);
-
-            this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
-
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
+            this.ProductTemp += L5525B.TempOffset;//界面上填入的温度是设置温度，实际达到温度为界面温度+L5525B.TempOffset
 
             ShowMsg($"Set product temperature to {this.ProductTemp}℃...", true);
             //直到产品温度达到要求，开始给产品加电
@@ -1350,7 +1418,7 @@ namespace LWDM_Tx_4x25
                         K2400_1.OUTPUT(true);
                         K2400_2.OUTPUT(true);
                         ShowMsg($"产品加电已完成.", true);
-                        break;
+                       break;
                     }
                 }
                 if (TemperatureIsTimeOut_Product)
@@ -1412,10 +1480,10 @@ namespace LWDM_Tx_4x25
                 {
                     TecTimer.Stop();
                     TemperatureIsTimeOut = true;
-                    if (DialogResult.Yes == MessageBox.Show($"温度设置已经超过{TC720.TimeOut}s，还未达到设定温度{this.Temp_Environment},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                    if (DialogResult.Yes == MessageBox.Show($"环境温度设置已经超过{TC720.TimeOut}s，还未达到设定温度{this.Temp_Environment},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
                     {
                         TemperatureIsOk = true;
-                        ShowMsg($"温度设置未达到设定值{TC720.TimeOut}℃，但可以继续进行测试！", true);
+                        ShowMsg($"环境温度设置未达到设定值{TC720.TimeOut}℃，但可以继续进行测试！", true);
                     }
                     else
                     {
@@ -1457,5 +1525,11 @@ namespace LWDM_Tx_4x25
             this.lstViewTestData.Items.Clear();
         }
         #endregion
+
+        private void btnStopTestProcess_Click(object sender, EventArgs e)
+        {
+            ctsTotal?.Cancel();
+            Thread.Sleep(100);
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace LWDM_Tx_4x25.Instruments
       
         #region private
 
-        private int DevHandle=-1;
+      
         private byte[] btRecv=new byte[1024];
        
         public double[] MeasureValue=new double[2] { 0.0f,0.0f};
@@ -48,7 +48,7 @@ namespace LWDM_Tx_4x25.Instruments
      /// 
      /// </summary>
      /// <param name="o"></param>
-     /// <returns>单位是nA</returns>
+     /// <returns>单位是A</returns>
         public  double Fetch(object o=null)
         {
             SetContinuous(false);
@@ -58,9 +58,8 @@ namespace LWDM_Tx_4x25.Instruments
             string[] meas_ret = str.Split(',');
             if (meas_ret.Length == 1)
             {
-                Double.TryParse(meas_ret[0], out MeasureValue[0]);   //读出来的电流是nA            
+                Double.TryParse(meas_ret[0], out MeasureValue[0]);   //读出来的电流是A            
             }
-            // MeasureValue[0] = MeasureValue[0] * 1000;
             return MeasureValue[0];
         }
 
