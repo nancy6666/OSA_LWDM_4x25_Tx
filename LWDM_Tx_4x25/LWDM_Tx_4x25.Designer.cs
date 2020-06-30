@@ -247,13 +247,13 @@
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "IMPD";
+            this.columnHeader3.Text = "IMPD(mA)";
             this.columnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader3.Width = 77;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "IDARK";
+            this.columnHeader4.Text = "IDARK(nA)";
             this.columnHeader4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader4.Width = 66;
             // 
@@ -267,11 +267,12 @@
             // 
             this.columnHeader6.Text = "JITTER_RMS";
             this.columnHeader6.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.columnHeader6.Width = 96;
+            this.columnHeader6.Width = 87;
             // 
             // columnHeader11
             // 
-            this.columnHeader11.Text = "CROSSING";
+            this.columnHeader11.Text = "CROSSING(%)";
+            this.columnHeader11.Width = 80;
             // 
             // columnHeader12
             // 
@@ -284,6 +285,7 @@
             // columnHeader14
             // 
             this.columnHeader14.Text = "ER";
+            this.columnHeader14.Width = 41;
             // 
             // columnHeader15
             // 
@@ -408,7 +410,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(176, 127);
+            this.label12.Location = new System.Drawing.Point(170, 138);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(65, 12);
             this.label12.TabIndex = 31;
@@ -417,7 +419,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(289, 127);
+            this.label11.Location = new System.Drawing.Point(288, 138);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(17, 12);
             this.label11.TabIndex = 30;
@@ -445,7 +447,7 @@
             // lblRealTemp_Product
             // 
             this.lblRealTemp_Product.AutoSize = true;
-            this.lblRealTemp_Product.Location = new System.Drawing.Point(241, 127);
+            this.lblRealTemp_Product.Location = new System.Drawing.Point(235, 138);
             this.lblRealTemp_Product.Name = "lblRealTemp_Product";
             this.lblRealTemp_Product.Size = new System.Drawing.Size(47, 12);
             this.lblRealTemp_Product.TabIndex = 27;
@@ -534,6 +536,7 @@
             this.btnRestTemp.TabIndex = 15;
             this.btnRestTemp.Text = "重置环境温度";
             this.btnRestTemp.UseVisualStyleBackColor = true;
+            this.btnRestTemp.Visible = false;
             this.btnRestTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
             // 
             // ProductTempTimer

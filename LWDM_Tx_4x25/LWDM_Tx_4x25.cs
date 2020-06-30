@@ -241,7 +241,7 @@ namespace LWDM_Tx_4x25
         public void ShowMsg(string msg, bool bPass)
         {
             this.Invoke(new ThreedShowMsgDelegate(MsgEvent), new object[] { msg, bPass });
-           // this.BeginInvoke(new Action(() => { MsgEvent(msg, bPass); }));
+            //this.BeginInvoke(new Action<string, bool>((x, y) => { MsgEvent(x, y); }), new object[] { msg, bPass });
         }
         public void ShowResult(string[] Msg, int[] iPass)
         {
@@ -250,6 +250,7 @@ namespace LWDM_Tx_4x25
         public void ShowRealTemp_Case(double Temp)
         {
             this.BeginInvoke(new ThreedShowTempDelegate(ShowTemp), new object[] { Temp });
+          //  this.BeginInvoke(new Action<double>((n) => { ShowTemp(n); }),new object[] { Temp});
         }
 
         public void ShowRealTemp_Product(double Temp)
@@ -906,7 +907,7 @@ namespace LWDM_Tx_4x25
         /// 确认界面需要输入的控件已输入值
         /// </summary>
         /// <returns></returns>
-        private bool InterfaceChecked()
+        private bool InterfaceChecked(ref CTestDataCommon testDataCommon)
         {
             if (txtSN.Text != null && txtSN.Text != "" && txtOperator.Text != null && txtOperator.Text != "" && cbxPN.SelectedIndex != -1 & this.txtProductTemp_Cold.Text != null & this.txtProductTemp_Cold.Text != "" & this.txtProductTemp_Room.Text != null & this.txtProductTemp_Room.Text != "" & this.txtProductTemp_Hot.Text != null & this.txtProductTemp_Hot.Text != "")
             {
@@ -915,6 +916,9 @@ namespace LWDM_Tx_4x25
                 lstTecTemp_Product.Add(Convert.ToDouble(this.txtProductTemp_Cold.Text));
                 lstTecTemp_Product.Add(Convert.ToDouble(this.txtProductTemp_Hot.Text));
 
+                TestDataCommon.SN = txtSN.Text;
+                TestDataCommon.Operator = txtOperator.Text;
+                TestDataCommon.Spec_id = TestSpec.ID;
                 return true;
             }
             else
@@ -1118,13 +1122,14 @@ namespace LWDM_Tx_4x25
             K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
           
             this.lstViewTestData.Items.Clear();
+
             TestDataCommon = new CTestDataCommon();
 
-            TestDataCommon.SN = txtSN.Text;
-            TestDataCommon.Operator = txtOperator.Text;
-            TestDataCommon.Spec_id = TestSpec.ID;
+            //TestDataCommon.SN = txtSN.Text;
+            //TestDataCommon.Operator = txtOperator.Text;
+            //TestDataCommon.Spec_id = TestSpec.ID;
 
-            if (!InterfaceChecked())
+            if (!InterfaceChecked(ref TestDataCommon))
             {
                 return;
             }
@@ -1133,7 +1138,7 @@ namespace LWDM_Tx_4x25
 
             if (!TemperatureIsOk | !TemperatureIsOk_Product)
             {
-                ShowMsg("The temperature haven't reached the set point，can't start test!", false);
+                ShowMsg("The temperature haven't reached the room set point，can't start test!", false);
                 return;
             }
           
@@ -1176,23 +1181,25 @@ namespace LWDM_Tx_4x25
                     {
                         if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
                         {
-                            break;
-                        }
+                                ShowMsg("Time is out for setting Temperature!", false);
+                                //温度设置超时，用户选择Yes则break当前的while循环，继续执行下面的语句；用户选No，则return结束整个测试函数
+                                if (DialogResult.No == MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                                {
+                                    return;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
                     }
-                    if (ctsTotal.Token.IsCancellationRequested)
-                    {
-                        ShowMsg($"Test is stopped!!!", false);
-                        return;
-                    }
-                    if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
-                    {
-                        ShowMsg("Time is out for setting Temperature!", false);
-                        if (DialogResult.No != MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+               
+                        if (ctsTotal.Token.IsCancellationRequested)
                         {
+                            ShowMsg($"Test is stopped!!!", false);
                             return;
                         }
-                    }
-                    for (int channel = 0; channel < MaxChannel; channel++)
+                        for (int channel = 0; channel < MaxChannel; channel++)
                     {
                         TestData_Channel = new CTestData_Channel();
                         TestData_Channel.Channel = channel + 1;
