@@ -777,7 +777,7 @@ namespace LWDM_Tx_4x25
                 TestData_Channel.Rise_time = kesight_N1902D.RiseTime;
                 TestData_Channel.Jitter_pp = kesight_N1902D.Jitter_pp;
                 TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
-
+                TestData_Channel.Crossing = kesight_N1902D.Crossing;
                 //AQ6370
                 TestData_Channel.SMSR =Math.Round( aQ6370.SMSR,2);
                 TestData_Channel.Cwl = Math.Round(aQ6370.PeakWL,2);

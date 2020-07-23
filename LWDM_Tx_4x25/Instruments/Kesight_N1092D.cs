@@ -184,7 +184,7 @@ namespace LWDM_Tx_4x25.Instruments
 
                 myN1010A.WriteString(":MEASure:EYE:CROSsing", true);
                 myN1010A.WriteString(":MEASure:EYE:CROSsing?", true);
-                this.Crossing = Convert.ToDouble(myN1010A.ReadString())*100;
+                this.Crossing = Convert.ToDouble(myN1010A.ReadString());
 
                 myN1010A.WriteString(":MEASure:EYE:RISetime", true);
                 myN1010A.WriteString(":MEASure:EYE:RISetime?", true);

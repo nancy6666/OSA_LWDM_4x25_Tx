@@ -55,8 +55,8 @@ namespace LWDM_Tx_4x25.Instruments
             Thread.Sleep(50);
             K2000.GPIBwr(":READ?");
             string str = K2000.GPIBrd(200);
-            string[] meas_ret = str.Split(',');
-            if (meas_ret.Length == 1)
+            string[] meas_ret = str.Split('\n');
+            if (meas_ret.Length !=0)
             {
                 Double.TryParse(meas_ret[0], out MeasureValue[0]);   //读出来的电流是A            
             }

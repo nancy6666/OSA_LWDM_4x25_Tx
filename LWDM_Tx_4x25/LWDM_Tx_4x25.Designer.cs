@@ -536,7 +536,6 @@
             this.btnRestTemp.TabIndex = 15;
             this.btnRestTemp.Text = "重置环境温度";
             this.btnRestTemp.UseVisualStyleBackColor = true;
-            this.btnRestTemp.Visible = false;
             this.btnRestTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
             // 
             // ProductTempTimer

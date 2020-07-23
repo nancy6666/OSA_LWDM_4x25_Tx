@@ -21,7 +21,8 @@ namespace GY7501_I2C_Control
         {
             if (disable != this.Checked)//要设置的状态和当下的状态不同
             {
-                this.Checked = disable;
+                this.Invoke(new Action<bool>(n => { this.Checked = n; }), new object[] { disable }) ;
+                //this.Checked = disable;
                 OnMouseClick(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
             }
         }
