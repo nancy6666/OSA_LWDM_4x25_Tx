@@ -246,6 +246,7 @@ namespace LWDM_Tx_4x25.Instruments
                 SetN1092();
 
                 myN1010A.WriteString(":ACQuire:RUN", true);//when a limit test is turned on
+                myN1010A.WriteString(":SYSTem:AUToscale", true);
                 Thread.Sleep(10000);
                 myN1010A.WriteString("*OPC?", true);//wait for test completion for 1000 waveforms
                 complete = myN1010A.ReadString();
