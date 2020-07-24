@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using static LWDM_Tx_4x25.LWDM_Tx_4x25;
+
 namespace GY7501_I2C_Control
 {
    public class MyCheckedBox : CheckBox
@@ -21,8 +23,14 @@ namespace GY7501_I2C_Control
         {
             if (disable != this.Checked)//要设置的状态和当下的状态不同
             {
-                this.Invoke(new Action<bool>(n => { this.Checked = n; }), new object[] { disable }) ;
-                //this.Checked = disable;
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new MyCheckedBoxDelegate(n=>this.Checked=n), new object[] { disable });
+                }
+                else
+                {
+                    this.Checked = disable;
+                }
                 OnMouseClick(new MouseEventArgs(MouseButtons.Left, 0, 0, 0, 0));
             }
         }

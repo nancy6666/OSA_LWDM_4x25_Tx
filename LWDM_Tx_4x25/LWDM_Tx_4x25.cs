@@ -21,6 +21,7 @@ namespace LWDM_Tx_4x25
     {
         #region Properties
 
+        public delegate void MyCheckedBoxDelegate(bool disable);
         public CancellationTokenSource ctsTotal;
 
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
@@ -385,16 +386,14 @@ namespace LWDM_Tx_4x25
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
 
                     //LDT5525B
-                    // com = excelCell[49, 2].value;
-                    //L5525B = new LDT5525B(com);
+                   
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
                     L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-                    // gpibAddr = Convert.ToUInt16(excelCell[56, 2].value);
-                    //aQ6370 = new AQ6370(gpibAddr);
+                    
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
                     this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
@@ -407,16 +406,14 @@ namespace LWDM_Tx_4x25
                     this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
 
                     //PM212
-                    // com = excelCell[67, 2].value;
-                    // pm212 = new PM212(com);
+                    
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
 
                     //JW8402
-                    // com = excelCell[74, 2].value;
-                    //jw8402 = new JW8402(com);
+                    
                 }
                 catch (Exception ex)
                 {
@@ -779,11 +776,11 @@ namespace LWDM_Tx_4x25
                 TestData_Channel.Jitter_rms = kesight_N1902D.JitterRMS;
                 TestData_Channel.Crossing = kesight_N1902D.Crossing;
                 //AQ6370
-                TestData_Channel.SMSR =Math.Round( aQ6370.SMSR,2);
-                TestData_Channel.Cwl = Math.Round(aQ6370.PeakWL,2);
+                TestData_Channel.SMSR = Math.Round(aQ6370.SMSR, 2);
+                TestData_Channel.Cwl = Math.Round(aQ6370.PeakWL, 2);
 
                 //PM212
-                ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
+                //  ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
                 TestData_Channel.Power = pm212.ReadPower() + pm212.lstPower_Offset[chl];
             }
             catch(Exception ex)
@@ -1122,12 +1119,8 @@ namespace LWDM_Tx_4x25
             K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
           
             this.lstViewTestData.Items.Clear();
-
+            this.lstViewLog.Items.Clear();
             TestDataCommon = new CTestDataCommon();
-
-            //TestDataCommon.SN = txtSN.Text;
-            //TestDataCommon.Operator = txtOperator.Text;
-            //TestDataCommon.Spec_id = TestSpec.ID;
 
             if (!InterfaceChecked(ref TestDataCommon))
             {
@@ -1142,7 +1135,7 @@ namespace LWDM_Tx_4x25
             //    return;
             //}
           
-            ShowMsg("Read driver data from Interface GY7501_I2C...", true);
+          //  ShowMsg("Read driver data from Interface GY7501_I2C...", true);
             try
             {
                 GetDriverGY7501Data();
@@ -1168,6 +1161,7 @@ namespace LWDM_Tx_4x25
                         this.Temp_Environment = lstTecTemp[TecTempIndex];
                         TickCountTotal = 0;
                         TecTimer.Start();
+                        Thread.Sleep(200);
 
                         L5525B.SetTemperature(lstTecTemp_Product[TecTempIndex]);
                         this.ProductTemp = lstTecTemp_Product[TecTempIndex] + L5525B.TempOffset;
@@ -1175,10 +1169,19 @@ namespace LWDM_Tx_4x25
 
                         TickCountTotal_Product = 0;
                         ProductTempTimer.Start();
-                        ShowMsg($"等待环境温度和产品温度达到设定值...", true);
+
                         //等待环境温度和产品温度达到设定值并稳定
+                        ShowMsg("等待环境温度和产品温度达到设定值...", true);
+
+                        Thread.Sleep(500);
                         while (!TemperatureIsOk | !TemperatureIsOk_Product)
                         {
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return;
+                            }
+                            Thread.Sleep(300);
                             if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
                             {
                                 ShowMsg("Time is out for setting Temperature!", false);
@@ -1203,7 +1206,12 @@ namespace LWDM_Tx_4x25
                         {
                             TestData_Channel = new CTestData_Channel();
                             TestData_Channel.Channel = channel + 1;
-                            ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
+                           // ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return;
+                            }
                             if (!jw8402.SetChannel(TestData_Channel.Channel))
                             {
                                 ShowMsg($"Error happened when switching Optical Channel to channel{channel + 1}", false);
@@ -1212,7 +1220,7 @@ namespace LWDM_Tx_4x25
                             this.Invoke(new Action(() => { this.cbxChlIndex.SelectedIndex = channel; }));
 
                             ShowMsg($"Start testing in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
-                            ShowMsg($"Running Eye...", true);
+                            ShowMsg($"Running Eye Diagram...", true);
                             if (ctsTotal.Token.IsCancellationRequested)
                             {
                                 ShowMsg($"Test is stopped!!!", false);
@@ -1232,25 +1240,28 @@ namespace LWDM_Tx_4x25
                                 ShowMsg($"Test is stopped!!!", false);
                                 return; ;
                             }
-                            ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
+                         //   ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
 
                             GetTestData_Channel(channel);
 
-                            ShowMsg("Save Eye Diagram...", true);
+                           // ShowMsg("Save Eye Diagram...", true);
                             SaveEyeImage(TecTempIndex, channel);
                             // progHandle.Report(100);
                             //添加一条测试数据到TestData_Temp
                             TestData_Temp.lstTestData_Channel.Add(TestData_Channel);
                         }
-
-                        ShowMsg($"Finished eye diagram test under temperature{lstTecTemp[TecTempIndex]}", true);
-                        ShowMsg("Read TEC Current with LDT5525B", true);
+                        if (ctsTotal.Token.IsCancellationRequested)
+                        {
+                            ShowMsg($"Test is stopped!!!", false);
+                            return;
+                        }
+                      //  ShowMsg("Read TEC Current with LDT5525B", true);
                         TestData_Temp.Itec = L5525B.ReadCurrent();
                         TestData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
                         TestData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
                         TestData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
 
-                        ShowMsg("Read Current from K2400", true);
+                       // ShowMsg("Read Current from K2400", true);
                         TestData_Temp.Icc1 = K2400_1.Current;
                         TestData_Temp.Icc2 = K2400_2.Current;
                         TestData_Temp.Icc3 = K2400_3.Current;
@@ -1263,11 +1274,11 @@ namespace LWDM_Tx_4x25
 
                         ShowMsg("Start MPD testing... ", true);
                         var lstMpd = ReadMPDAllChannel(CurrentUint.mA);
-                        ShowMsg("Start Idark testing... ", true);
-                        ShowMsg("Disable all GY7501 Tx Channel.", true);
+                     //   ShowMsg("Start Idark testing... ", true);
+                       // ShowMsg("Disable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(true);
                         var lstIdark = ReadMPDAllChannel(CurrentUint.nA);
-                        ShowMsg("Finished Idark Test,Enable all GY7501 Tx Channel.", true);
+                      //  ShowMsg("Finished Idark Test,Enable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(false);
                         if (ctsTotal.Token.IsCancellationRequested)
                         {
@@ -1275,9 +1286,14 @@ namespace LWDM_Tx_4x25
                             return;
                         }
                         //将lstIdark和lstMpd 插入当前TestData_Temp的lstTestData_Channel中，通道是一一对应的，所以可以使用索引
-                        ShowMsg($"Start dealing with test data...", true);
+                       // ShowMsg($"Start dealing with test data...", true);
                         for (int ch = 0; ch < MaxChannel; ch++)
                         {
+                            if (ctsTotal.Token.IsCancellationRequested)
+                            {
+                                ShowMsg($"Test is stopped!!!", false);
+                                return;
+                            }
                             TestData_Temp.lstTestData_Channel[ch].Idark = lstIdark[ch];
                             TestData_Temp.lstTestData_Channel[ch].Impd = lstMpd[ch];
                             //一个通道获取一次pf结果，并在界面显示一行
@@ -1310,6 +1326,7 @@ namespace LWDM_Tx_4x25
                                 break;
                             }
                         }
+                        ShowMsg($"Finish test under temperature{lstTecTemp[TecTempIndex]}!", true);
                     }
                     try
                     {
