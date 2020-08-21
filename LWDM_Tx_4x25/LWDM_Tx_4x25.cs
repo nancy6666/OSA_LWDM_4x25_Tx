@@ -1185,7 +1185,7 @@ namespace LWDM_Tx_4x25
                         //等待环境温度和产品温度达到设定值并稳定
                         ShowMsg("等待环境温度和产品温度达到设定值...", true);
 
-                        Thread.Sleep(500);
+                        Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
                         while (!TemperatureIsOk | !TemperatureIsOk_Product)
                         {
                             if (ctsTotal.Token.IsCancellationRequested)
@@ -1447,6 +1447,7 @@ namespace LWDM_Tx_4x25
             //直到产品温度达到要求，开始给产品加电
             var task = new Task(() =>
             {
+                Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
                 while (!TemperatureIsTimeOut_Product)
                 {
                     if (TemperatureIsOk_Product)
