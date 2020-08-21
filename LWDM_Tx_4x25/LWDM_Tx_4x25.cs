@@ -30,6 +30,8 @@ namespace LWDM_Tx_4x25
         public ConfigManagement cfg = new ConfigManagement();
         public CLog log = new CLog();
         public Bert Inst_Bert;
+        public int Bert_Channel = -1;
+
         public Keithley7001 K7001;
         public KEITHLEY2400 K2400_1;
         public KEITHLEY2400 K2400_2;
@@ -66,7 +68,11 @@ namespace LWDM_Tx_4x25
         public List<double> lstLdd;
 
         public List<string> lstK7001Pin;
-        public const double MaxChannel = 4;
+        public const int MaxChannel = 4;
+
+        public double[] Pre_Cursor_Array = new double[MaxChannel];
+        public double[] Main_Cursor_Array = new double[MaxChannel];
+        public double[] Post_Cursor_Array = new double[MaxChannel];
 
         delegate void ThreedShowResultDelegate(string[] Message, int[] iPass);
         private CancellationTokenSource cts = null;
@@ -201,8 +207,8 @@ namespace LWDM_Tx_4x25
             try
             {
                 Inst_Bert = new Bert(cfg.BertCom);
-                K2400_1 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_1_GPIB)); 
-                K2400_2 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_2_GPIB)); 
+                K2400_1 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_1_GPIB));
+                K2400_2 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_2_GPIB));
                 K2400_3 = new KEITHLEY2400(Convert.ToInt16(cfg.K2400_3_GPIB));
                 K2000 = new Keithley2000(Convert.ToInt16(cfg.K2000_GPIB));
                 K7001 = new Keithley7001(Convert.ToInt16(cfg.K7001_GPIB));
@@ -215,7 +221,7 @@ namespace LWDM_Tx_4x25
             }
             catch (Exception ex)
             {
-                ShowMsg($"{ex.Message}",false);
+                ShowMsg($"{ex.Message}", false);
                 return;
             }
 
@@ -251,7 +257,7 @@ namespace LWDM_Tx_4x25
         public void ShowRealTemp_Case(double Temp)
         {
             this.BeginInvoke(new ThreedShowTempDelegate(ShowTemp), new object[] { Temp });
-          //  this.BeginInvoke(new Action<double>((n) => { ShowTemp(n); }),new object[] { Temp});
+            //  this.BeginInvoke(new Action<double>((n) => { ShowTemp(n); }),new object[] { Temp});
         }
 
         public void ShowRealTemp_Product(double Temp)
@@ -386,14 +392,14 @@ namespace LWDM_Tx_4x25
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
 
                     //LDT5525B
-                   
+
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
                     L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-                    
+
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
                     this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
@@ -406,14 +412,14 @@ namespace LWDM_Tx_4x25
                     this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
 
                     //PM212
-                    
+
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
                     pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
 
                     //JW8402
-                    
+
                 }
                 catch (Exception ex)
                 {
@@ -437,9 +443,9 @@ namespace LWDM_Tx_4x25
                 {
                     InitInstruments();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    ShowMsg(ex.Message,false);
+                    ShowMsg(ex.Message, false);
                 }
                 ShowMsg("初始设置已完成", true);
             });
@@ -497,11 +503,11 @@ namespace LWDM_Tx_4x25
                 K2400_1.SetToVoltageSource();
                 K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
                 K2400_1.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_1.I_limit);
-                
+
                 K2400_2.SetToVoltageSource();
                 K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
                 K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
-              
+
                 K2400_3.SetToVoltageSource();
                 K2400_3.SetTerminalPanel(KEITHLEY2400.TeminalPanel.FRONT);
                 K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
@@ -614,7 +620,7 @@ namespace LWDM_Tx_4x25
                                     ShowRealTemp_Product(RealTimeTemperature);
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 string err = $" 实时监控产品温度时出错，{ ex.Message}";
                                 ShowMsg(err, false);
@@ -631,7 +637,7 @@ namespace LWDM_Tx_4x25
             }
         }
 
-        public enum CurrentUint { A,mA,uA,nA}
+        public enum CurrentUint { A, mA, uA, nA }
         /// <summary>
         /// K7001切换通道，K2000读取MPD的值,一个通道一次，结果存入list
         /// </summary>
@@ -642,13 +648,13 @@ namespace LWDM_Tx_4x25
             double factor = 0;
             try
             {
-                switch(unit)
+                switch (unit)
                 {
                     case CurrentUint.A:
                         factor = 1;
                         break;
                     case CurrentUint.mA:
-                        factor = Math.Pow(10,3);
+                        factor = Math.Pow(10, 3);
                         break;
                     case CurrentUint.uA:
                         factor = Math.Pow(10, 6);
@@ -665,7 +671,7 @@ namespace LWDM_Tx_4x25
                     Thread.Sleep(200);
                     K7001.CloseRelay(lstK7001Pin[chl]);
                     Thread.Sleep(100);
-                    lstMpd.Add(K2000.Fetch()*factor);
+                    lstMpd.Add(K2000.Fetch() * factor);
                     Thread.Sleep(100);
                 }
             }
@@ -758,14 +764,18 @@ namespace LWDM_Tx_4x25
         private void GetTestData_Channel(int chl)
         {
             try
-            //GY7501
             {
+                //GY7501
                 TestData_Channel.Vcpa = lstVcpa[chl];
                 TestData_Channel.Veq = lstVeq[chl];
                 TestData_Channel.Vmod = lstVmod[chl];
                 TestData_Channel.Isink = lstIsink[chl];
                 TestData_Channel.Ldd = lstLdd[chl];
 
+                //Bert
+                TestData_Channel.Pre_Cursor = this.Pre_Cursor_Array[chl];
+                TestData_Channel.Main_Cursor = this.Main_Cursor_Array[chl];
+                TestData_Channel.Post_Cursor = this.Post_Cursor_Array[chl];
                 //N1092D 数据读取
                 kesight_N1902D.QueryMeasurementResults();
                 TestData_Channel.Er = kesight_N1902D.ER;
@@ -783,7 +793,7 @@ namespace LWDM_Tx_4x25
                 //  ShowMsg($"Read power with PM212 in Channel{chl + 1}", true);
                 TestData_Channel.Power = pm212.ReadPower() + pm212.lstPower_Offset[chl];
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ShowMsg($"{ex.Message}", false);
             }
@@ -1092,11 +1102,12 @@ namespace LWDM_Tx_4x25
         {
             // Deinit();
         }
+
         private void LoadTestSpec(object sender, EventArgs e)
         {
             TestSpec = new CTestSpec();
-          //  this.lstViewTestData.Items.Clear();
-           // this.lstViewLog.Items.Clear();
+            //  this.lstViewTestData.Items.Clear();
+            // this.lstViewLog.Items.Clear();
             if (this.cbxPN.SelectedIndex != -1)
             {
                 PN = this.cbxPN.SelectedItem.ToString();
@@ -1104,6 +1115,7 @@ namespace LWDM_Tx_4x25
                 ReadTestPlanAndInitInstruments(PN);
             }
         }
+
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
             Deinit();
@@ -1117,7 +1129,7 @@ namespace LWDM_Tx_4x25
             K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
             K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
             K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-          
+
             this.lstViewTestData.Items.Clear();
             this.lstViewLog.Items.Clear();
             TestDataCommon = new CTestDataCommon();
@@ -1134,13 +1146,13 @@ namespace LWDM_Tx_4x25
             //    ShowMsg("The temperature haven't reached the room set point，can't start test!", false);
             //    return;
             //}
-          
-          //  ShowMsg("Read driver data from Interface GY7501_I2C...", true);
+
+            //  ShowMsg("Read driver data from Interface GY7501_I2C...", true);
             try
             {
                 GetDriverGY7501Data();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ShowMsg(ex.Message, false);
                 return;
@@ -1206,7 +1218,7 @@ namespace LWDM_Tx_4x25
                         {
                             TestData_Channel = new CTestData_Channel();
                             TestData_Channel.Channel = channel + 1;
-                           // ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
+                            // ShowMsg($"Switch Optical Channel to channel{channel + 1}", true);
                             if (ctsTotal.Token.IsCancellationRequested)
                             {
                                 ShowMsg($"Test is stopped!!!", false);
@@ -1240,11 +1252,11 @@ namespace LWDM_Tx_4x25
                                 ShowMsg($"Test is stopped!!!", false);
                                 return; ;
                             }
-                         //   ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
+                            //   ShowMsg($"Read test data in {lstTecTemp[TecTempIndex]}℃ and channel {channel + 1}...", true);
 
                             GetTestData_Channel(channel);
 
-                           // ShowMsg("Save Eye Diagram...", true);
+                            // ShowMsg("Save Eye Diagram...", true);
                             SaveEyeImage(TecTempIndex, channel);
                             // progHandle.Report(100);
                             //添加一条测试数据到TestData_Temp
@@ -1255,13 +1267,13 @@ namespace LWDM_Tx_4x25
                             ShowMsg($"Test is stopped!!!", false);
                             return;
                         }
-                      //  ShowMsg("Read TEC Current with LDT5525B", true);
+                        //  ShowMsg("Read TEC Current with LDT5525B", true);
                         TestData_Temp.Itec = L5525B.ReadCurrent();
                         TestData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
                         TestData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
                         TestData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
 
-                       // ShowMsg("Read Current from K2400", true);
+                        // ShowMsg("Read Current from K2400", true);
                         TestData_Temp.Icc1 = K2400_1.Current;
                         TestData_Temp.Icc2 = K2400_2.Current;
                         TestData_Temp.Icc3 = K2400_3.Current;
@@ -1274,11 +1286,11 @@ namespace LWDM_Tx_4x25
 
                         ShowMsg("Start MPD testing... ", true);
                         var lstMpd = ReadMPDAllChannel(CurrentUint.mA);
-                     //   ShowMsg("Start Idark testing... ", true);
-                       // ShowMsg("Disable all GY7501 Tx Channel.", true);
+                        //   ShowMsg("Start Idark testing... ", true);
+                        // ShowMsg("Disable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(true);
                         var lstIdark = ReadMPDAllChannel(CurrentUint.nA);
-                      //  ShowMsg("Finished Idark Test,Enable all GY7501 Tx Channel.", true);
+                        //  ShowMsg("Finished Idark Test,Enable all GY7501 Tx Channel.", true);
                         ControlGY7501TxDisableRadio(false);
                         if (ctsTotal.Token.IsCancellationRequested)
                         {
@@ -1286,7 +1298,7 @@ namespace LWDM_Tx_4x25
                             return;
                         }
                         //将lstIdark和lstMpd 插入当前TestData_Temp的lstTestData_Channel中，通道是一一对应的，所以可以使用索引
-                       // ShowMsg($"Start dealing with test data...", true);
+                        // ShowMsg($"Start dealing with test data...", true);
                         for (int ch = 0; ch < MaxChannel; ch++)
                         {
                             if (ctsTotal.Token.IsCancellationRequested)
@@ -1352,13 +1364,13 @@ namespace LWDM_Tx_4x25
             K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
             K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
             K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-           
+
             ShowMsg("AutoScaling Eye diagran，pls wait...", true);
             try
             {
                 //var task = new Task(() =>
                 //{
-                    kesight_N1902D.AutoScale();
+                kesight_N1902D.AutoScale();
                 //});
                 //task.Start();
                 ShowMsg("AutoScaling Eye diagran Done!", true);
@@ -1407,7 +1419,7 @@ namespace LWDM_Tx_4x25
 
         private void cbxChlIndex_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex+1))
+            if (!jw8402.SetChannel(this.cbxChlIndex.SelectedIndex + 1))
             {
                 ShowMsg($"Error happened when Switching optical channel to CH{this.cbxChlIndex.SelectedIndex + 1}！", false);
             }
@@ -1443,7 +1455,7 @@ namespace LWDM_Tx_4x25
                         K2400_1.OUTPUT(true);
                         K2400_2.OUTPUT(true);
                         ShowMsg($"产品加电已完成.", true);
-                       break;
+                        break;
                     }
                 }
                 if (TemperatureIsTimeOut_Product)
@@ -1544,17 +1556,75 @@ namespace LWDM_Tx_4x25
                 }
             }
         }
+
         private void txtSN_TextChanged(object sender, EventArgs e)
         {
             this.lstViewLog.Items.Clear();
             this.lstViewTestData.Items.Clear();
         }
-        #endregion
+
+        private void btnSetPre_Cusor_Click(object sender, EventArgs e)
+        {
+            Inst_Bert.Inst_PAM4_Bert.setPretap(Bert_Channel, Convert.ToDouble(this.txtPre_Cursor.Text));
+            this.lblPre_Cursor.Text = this.txtPre_Cursor.Text;
+           Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtPre_Cursor.Text);
+        }
+
+        private void btnSetMain_Cusor_Click(object sender, EventArgs e)
+        {
+            Inst_Bert.Inst_PAM4_Bert.setMaintap(Bert_Channel, Convert.ToDouble(this.txtMain_Cursor.Text));
+            this.lblMain_Cursor.Text = this.txtMain_Cursor.Text;
+        Main_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtMain_Cursor.Text);
+
+        }
+
+        private void btnSetPost_Cusor_Click(object sender, EventArgs e)
+        {
+            Inst_Bert.Inst_PAM4_Bert.setPosttap(Bert_Channel, Convert.ToDouble(this.txtPost_Cursor.Text));
+            this.lblPost_Cursor.Text = this.txtPost_Cursor.Text;
+            Post_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtPost_Cursor.Text);
+        }
+       
 
         private void btnStopTestProcess_Click(object sender, EventArgs e)
         {
             ctsTotal?.Cancel();
             Thread.Sleep(100);
+        }
+
+        private void TrackBarPre_Cursor_ValueChanged(object sender, EventArgs e)
+        {
+           Inst_Bert.Inst_PAM4_Bert.setPretap(Bert_Channel, TrackBarPre_Cursor.Value);
+            string value = Inst_Bert.Inst_PAM4_Bert.queryPreTap(Bert_Channel);
+          Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(value);
+            lblPre_Cursor.Text = value;
+            this.txtPre_Cursor.Text = value;
+        }
+
+        private void TrackBarMain_Cursor_ValueChanged(object sender, EventArgs e)
+        {
+            lblMain_Cursor.Text = TrackBarMain_Cursor.Value.ToString();
+            Inst_Bert.Inst_PAM4_Bert.setMaintap(Bert_Channel, TrackBarMain_Cursor.Value);
+            string value = Inst_Bert.Inst_PAM4_Bert.queryMain_Tap(Bert_Channel);
+            Main_Cursor_Array[Bert_Channel] = Convert.ToDouble(value);
+            this.txtMain_Cursor.Text = value;
+        }
+
+        private void TrackBarPost_Cursor_ValueChanged(object sender, EventArgs e)
+        {
+            lblPost_Cursor.Text = TrackBarPost_Cursor.Value.ToString();
+            Inst_Bert.Inst_PAM4_Bert.setPosttap(Bert_Channel, TrackBarPost_Cursor.Value);
+            string value = Inst_Bert.Inst_PAM4_Bert.queryPostTap(Bert_Channel);
+
+            Post_Cursor_Array[Bert_Channel] = Convert.ToDouble(value);
+            this.txtPost_Cursor.Text = value;
+        }
+        #endregion
+
+        private void cbxBertChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.Bert_Channel = this.cbxBertChannel.SelectedIndex;
+            this.label14.Text = $"CH{this.Bert_Channel + 1}";
         }
     }
 }

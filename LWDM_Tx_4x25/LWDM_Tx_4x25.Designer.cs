@@ -30,9 +30,7 @@
         {
             this.lstViewLog = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.btnAutoScale = new System.Windows.Forms.Button();
             this.btnRun = new System.Windows.Forms.Button();
-            this.N1092D = new System.Windows.Forms.GroupBox();
             this.btnStopTestProcess = new System.Windows.Forms.Button();
             this.cbxChlIndex = new System.Windows.Forms.ComboBox();
             this.btnTestProcess = new System.Windows.Forms.Button();
@@ -80,11 +78,43 @@
             this.label4 = new System.Windows.Forms.Label();
             this.btnRestTemp = new System.Windows.Forms.Button();
             this.ProductTempTimer = new System.Timers.Timer();
-            this.N1092D.SuspendLayout();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.label14 = new System.Windows.Forms.Label();
+            this.cbxBertChannel = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btnSetPost_Cusor = new System.Windows.Forms.Button();
+            this.btnSetMain_Cusor = new System.Windows.Forms.Button();
+            this.btnSetPre_Cusor = new System.Windows.Forms.Button();
+            this.txtPost_Cursor = new System.Windows.Forms.TextBox();
+            this.txtMain_Cursor = new System.Windows.Forms.TextBox();
+            this.txtPre_Cursor = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.lblPost_Cursor = new System.Windows.Forms.Label();
+            this.TrackBarPost_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.lblMain_Cursor = new System.Windows.Forms.Label();
+            this.TrackBarMain_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblPre_Cursor = new System.Windows.Forms.Label();
+            this.TrackBarPre_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
             ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).BeginInit();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPost_Cursor)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPost_Cursor.Properties)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarMain_Cursor)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarMain_Cursor.Properties)).BeginInit();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPre_Cursor)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPre_Cursor.Properties)).BeginInit();
             this.SuspendLayout();
             // 
             // lstViewLog
@@ -96,7 +126,7 @@
             this.lstViewLog.HideSelection = false;
             this.lstViewLog.Location = new System.Drawing.Point(386, 12);
             this.lstViewLog.Name = "lstViewLog";
-            this.lstViewLog.Size = new System.Drawing.Size(577, 512);
+            this.lstViewLog.Size = new System.Drawing.Size(577, 286);
             this.lstViewLog.TabIndex = 7;
             this.lstViewLog.UseCompatibleStateImageBehavior = false;
             this.lstViewLog.View = System.Windows.Forms.View.Details;
@@ -106,47 +136,21 @@
             this.columnHeader1.Text = "Information";
             this.columnHeader1.Width = 1000;
             // 
-            // btnAutoScale
-            // 
-            this.btnAutoScale.Location = new System.Drawing.Point(44, 79);
-            this.btnAutoScale.Name = "btnAutoScale";
-            this.btnAutoScale.Size = new System.Drawing.Size(93, 39);
-            this.btnAutoScale.TabIndex = 10;
-            this.btnAutoScale.Text = "Auto Scale";
-            this.btnAutoScale.UseVisualStyleBackColor = true;
-            this.btnAutoScale.Click += new System.EventHandler(this.btnAutoScale_Click);
-            // 
             // btnRun
             // 
-            this.btnRun.Location = new System.Drawing.Point(187, 79);
+            this.btnRun.Location = new System.Drawing.Point(350, 28);
             this.btnRun.Name = "btnRun";
-            this.btnRun.Size = new System.Drawing.Size(101, 39);
+            this.btnRun.Size = new System.Drawing.Size(101, 43);
             this.btnRun.TabIndex = 11;
             this.btnRun.Text = "Run";
             this.btnRun.UseVisualStyleBackColor = true;
             this.btnRun.Click += new System.EventHandler(this.btnRun_Click);
             // 
-            // N1092D
-            // 
-            this.N1092D.Controls.Add(this.btnStopTestProcess);
-            this.N1092D.Controls.Add(this.cbxChlIndex);
-            this.N1092D.Controls.Add(this.btnTestProcess);
-            this.N1092D.Controls.Add(this.labChlIndex);
-            this.N1092D.Controls.Add(this.btnRun);
-            this.N1092D.Controls.Add(this.btnAutoScale);
-            this.N1092D.Controls.Add(this.btnOpenGY1202Interface);
-            this.N1092D.Location = new System.Drawing.Point(32, 322);
-            this.N1092D.Name = "N1092D";
-            this.N1092D.Size = new System.Drawing.Size(311, 202);
-            this.N1092D.TabIndex = 12;
-            this.N1092D.TabStop = false;
-            this.N1092D.Text = "眼图调试";
-            // 
             // btnStopTestProcess
             // 
-            this.btnStopTestProcess.Location = new System.Drawing.Point(187, 136);
+            this.btnStopTestProcess.Location = new System.Drawing.Point(195, 119);
             this.btnStopTestProcess.Name = "btnStopTestProcess";
-            this.btnStopTestProcess.Size = new System.Drawing.Size(93, 43);
+            this.btnStopTestProcess.Size = new System.Drawing.Size(101, 43);
             this.btnStopTestProcess.TabIndex = 20;
             this.btnStopTestProcess.Text = "停止测试";
             this.btnStopTestProcess.UseVisualStyleBackColor = true;
@@ -161,7 +165,7 @@
             "CH2",
             "CH3",
             "CH4"});
-            this.cbxChlIndex.Location = new System.Drawing.Point(46, 39);
+            this.cbxChlIndex.Location = new System.Drawing.Point(49, 40);
             this.cbxChlIndex.Name = "cbxChlIndex";
             this.cbxChlIndex.Size = new System.Drawing.Size(90, 20);
             this.cbxChlIndex.TabIndex = 19;
@@ -169,9 +173,9 @@
             // 
             // btnTestProcess
             // 
-            this.btnTestProcess.Location = new System.Drawing.Point(44, 136);
+            this.btnTestProcess.Location = new System.Drawing.Point(49, 119);
             this.btnTestProcess.Name = "btnTestProcess";
-            this.btnTestProcess.Size = new System.Drawing.Size(93, 43);
+            this.btnTestProcess.Size = new System.Drawing.Size(101, 43);
             this.btnTestProcess.TabIndex = 12;
             this.btnTestProcess.Text = "开启测试流程";
             this.btnTestProcess.UseVisualStyleBackColor = true;
@@ -180,7 +184,7 @@
             // labChlIndex
             // 
             this.labChlIndex.AutoSize = true;
-            this.labChlIndex.Location = new System.Drawing.Point(11, 42);
+            this.labChlIndex.Location = new System.Drawing.Point(14, 43);
             this.labChlIndex.Name = "labChlIndex";
             this.labChlIndex.Size = new System.Drawing.Size(41, 12);
             this.labChlIndex.TabIndex = 14;
@@ -188,9 +192,9 @@
             // 
             // btnOpenGY1202Interface
             // 
-            this.btnOpenGY1202Interface.Location = new System.Drawing.Point(187, 21);
+            this.btnOpenGY1202Interface.Location = new System.Drawing.Point(195, 28);
             this.btnOpenGY1202Interface.Name = "btnOpenGY1202Interface";
-            this.btnOpenGY1202Interface.Size = new System.Drawing.Size(101, 38);
+            this.btnOpenGY1202Interface.Size = new System.Drawing.Size(101, 43);
             this.btnOpenGY1202Interface.TabIndex = 13;
             this.btnOpenGY1202Interface.Text = "打开调试界面";
             this.btnOpenGY1202Interface.UseVisualStyleBackColor = true;
@@ -400,9 +404,9 @@
             this.TEC.Controls.Add(this.lblRealTemp_Case);
             this.TEC.Controls.Add(this.环境温度);
             this.TEC.Controls.Add(this.btnRestTemp);
-            this.TEC.Location = new System.Drawing.Point(32, 124);
+            this.TEC.Location = new System.Drawing.Point(32, 110);
             this.TEC.Name = "TEC";
-            this.TEC.Size = new System.Drawing.Size(311, 174);
+            this.TEC.Size = new System.Drawing.Size(311, 175);
             this.TEC.TabIndex = 18;
             this.TEC.TabStop = false;
             this.TEC.Text = "TEC";
@@ -544,14 +548,239 @@
             this.ProductTempTimer.SynchronizingObject = this;
             this.ProductTempTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.ProductTempTimer_Tick);
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(32, 304);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(931, 229);
+            this.tabControl1.TabIndex = 19;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.btnRun);
+            this.tabPage1.Controls.Add(this.btnStopTestProcess);
+            this.tabPage1.Controls.Add(this.btnTestProcess);
+            this.tabPage1.Controls.Add(this.btnOpenGY1202Interface);
+            this.tabPage1.Controls.Add(this.cbxChlIndex);
+            this.tabPage1.Controls.Add(this.labChlIndex);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(799, 203);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "眼图调试";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.label14);
+            this.tabPage2.Controls.Add(this.cbxBertChannel);
+            this.tabPage2.Controls.Add(this.label13);
+            this.tabPage2.Controls.Add(this.btnSetPost_Cusor);
+            this.tabPage2.Controls.Add(this.btnSetMain_Cusor);
+            this.tabPage2.Controls.Add(this.btnSetPre_Cusor);
+            this.tabPage2.Controls.Add(this.txtPost_Cursor);
+            this.tabPage2.Controls.Add(this.txtMain_Cursor);
+            this.tabPage2.Controls.Add(this.txtPre_Cursor);
+            this.tabPage2.Controls.Add(this.groupBox3);
+            this.tabPage2.Controls.Add(this.groupBox2);
+            this.tabPage2.Controls.Add(this.groupBox1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(923, 203);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Bert调试";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.BackColor = System.Drawing.Color.Black;
+            this.label14.Font = new System.Drawing.Font("宋体", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label14.ForeColor = System.Drawing.SystemColors.ControlLightLight;
+            this.label14.Location = new System.Drawing.Point(454, 12);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(36, 24);
+            this.label14.TabIndex = 27;
+            this.label14.Text = "CH";
+            // 
+            // cbxBertChannel
+            // 
+            this.cbxBertChannel.FormattingEnabled = true;
+            this.cbxBertChannel.Items.AddRange(new object[] {
+            "CH1",
+            "CH2",
+            "CH3",
+            "CH4"});
+            this.cbxBertChannel.Location = new System.Drawing.Point(374, 16);
+            this.cbxBertChannel.Name = "cbxBertChannel";
+            this.cbxBertChannel.Size = new System.Drawing.Size(74, 20);
+            this.cbxBertChannel.TabIndex = 26;
+            this.cbxBertChannel.SelectedIndexChanged += new System.EventHandler(this.cbxBertChannel_SelectedIndexChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(273, 19);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(95, 12);
+            this.label13.TabIndex = 25;
+            this.label13.Text = "Select Channel:";
+            // 
+            // btnSetPost_Cusor
+            // 
+            this.btnSetPost_Cusor.Location = new System.Drawing.Point(682, 160);
+            this.btnSetPost_Cusor.Name = "btnSetPost_Cusor";
+            this.btnSetPost_Cusor.Size = new System.Drawing.Size(75, 23);
+            this.btnSetPost_Cusor.TabIndex = 24;
+            this.btnSetPost_Cusor.Text = "Set";
+            this.btnSetPost_Cusor.UseVisualStyleBackColor = true;
+            this.btnSetPost_Cusor.Click += new System.EventHandler(this.btnSetPost_Cusor_Click);
+            // 
+            // btnSetMain_Cusor
+            // 
+            this.btnSetMain_Cusor.Location = new System.Drawing.Point(682, 109);
+            this.btnSetMain_Cusor.Name = "btnSetMain_Cusor";
+            this.btnSetMain_Cusor.Size = new System.Drawing.Size(75, 23);
+            this.btnSetMain_Cusor.TabIndex = 23;
+            this.btnSetMain_Cusor.Text = "Set";
+            this.btnSetMain_Cusor.UseVisualStyleBackColor = true;
+            this.btnSetMain_Cusor.Click += new System.EventHandler(this.btnSetMain_Cusor_Click);
+            // 
+            // btnSetPre_Cusor
+            // 
+            this.btnSetPre_Cusor.Location = new System.Drawing.Point(682, 58);
+            this.btnSetPre_Cusor.Name = "btnSetPre_Cusor";
+            this.btnSetPre_Cusor.Size = new System.Drawing.Size(75, 23);
+            this.btnSetPre_Cusor.TabIndex = 22;
+            this.btnSetPre_Cusor.Text = "Set";
+            this.btnSetPre_Cusor.UseVisualStyleBackColor = true;
+            this.btnSetPre_Cusor.Click += new System.EventHandler(this.btnSetPre_Cusor_Click);
+            // 
+            // txtPost_Cursor
+            // 
+            this.txtPost_Cursor.Location = new System.Drawing.Point(593, 160);
+            this.txtPost_Cursor.Name = "txtPost_Cursor";
+            this.txtPost_Cursor.Size = new System.Drawing.Size(83, 21);
+            this.txtPost_Cursor.TabIndex = 21;
+            // 
+            // txtMain_Cursor
+            // 
+            this.txtMain_Cursor.Location = new System.Drawing.Point(592, 109);
+            this.txtMain_Cursor.Name = "txtMain_Cursor";
+            this.txtMain_Cursor.Size = new System.Drawing.Size(83, 21);
+            this.txtMain_Cursor.TabIndex = 20;
+            // 
+            // txtPre_Cursor
+            // 
+            this.txtPre_Cursor.Location = new System.Drawing.Point(593, 60);
+            this.txtPre_Cursor.Name = "txtPre_Cursor";
+            this.txtPre_Cursor.Size = new System.Drawing.Size(83, 21);
+            this.txtPre_Cursor.TabIndex = 19;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.lblPost_Cursor);
+            this.groupBox3.Controls.Add(this.TrackBarPost_Cursor);
+            this.groupBox3.Location = new System.Drawing.Point(19, 143);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(567, 46);
+            this.groupBox3.TabIndex = 17;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Post_Cursor";
+            // 
+            // lblPost_Cursor
+            // 
+            this.lblPost_Cursor.AutoSize = true;
+            this.lblPost_Cursor.Location = new System.Drawing.Point(199, 17);
+            this.lblPost_Cursor.Name = "lblPost_Cursor";
+            this.lblPost_Cursor.Size = new System.Drawing.Size(0, 12);
+            this.lblPost_Cursor.TabIndex = 3;
+            // 
+            // TrackBarPost_Cursor
+            // 
+            this.TrackBarPost_Cursor.Location = new System.Drawing.Point(11, 17);
+            this.TrackBarPost_Cursor.Name = "TrackBarPost_Cursor";
+            this.TrackBarPost_Cursor.Properties.Maximum = 1000;
+            this.TrackBarPost_Cursor.Properties.Minimum = -1000;
+            this.TrackBarPost_Cursor.Size = new System.Drawing.Size(541, 23);
+            this.TrackBarPost_Cursor.TabIndex = 2;
+            this.TrackBarPost_Cursor.Value = 0;
+            this.TrackBarPost_Cursor.ValueChanged += new System.EventHandler(this.TrackBarPost_Cursor_ValueChanged);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.lblMain_Cursor);
+            this.groupBox2.Controls.Add(this.TrackBarMain_Cursor);
+            this.groupBox2.Location = new System.Drawing.Point(19, 89);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(567, 48);
+            this.groupBox2.TabIndex = 18;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Main_Cursor";
+            // 
+            // lblMain_Cursor
+            // 
+            this.lblMain_Cursor.AutoSize = true;
+            this.lblMain_Cursor.Location = new System.Drawing.Point(199, 17);
+            this.lblMain_Cursor.Name = "lblMain_Cursor";
+            this.lblMain_Cursor.Size = new System.Drawing.Size(0, 12);
+            this.lblMain_Cursor.TabIndex = 3;
+            // 
+            // TrackBarMain_Cursor
+            // 
+            this.TrackBarMain_Cursor.Location = new System.Drawing.Point(11, 20);
+            this.TrackBarMain_Cursor.Name = "TrackBarMain_Cursor";
+            this.TrackBarMain_Cursor.Properties.Maximum = 1000;
+            this.TrackBarMain_Cursor.Properties.Minimum = -1000;
+            this.TrackBarMain_Cursor.Size = new System.Drawing.Size(541, 23);
+            this.TrackBarMain_Cursor.TabIndex = 2;
+            this.TrackBarMain_Cursor.Value = 0;
+            this.TrackBarMain_Cursor.ValueChanged += new System.EventHandler(this.TrackBarMain_Cursor_ValueChanged);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.lblPre_Cursor);
+            this.groupBox1.Controls.Add(this.TrackBarPre_Cursor);
+            this.groupBox1.Location = new System.Drawing.Point(19, 42);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(568, 41);
+            this.groupBox1.TabIndex = 16;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Pre_Cursor";
+            // 
+            // lblPre_Cursor
+            // 
+            this.lblPre_Cursor.AutoSize = true;
+            this.lblPre_Cursor.Location = new System.Drawing.Point(199, 17);
+            this.lblPre_Cursor.Name = "lblPre_Cursor";
+            this.lblPre_Cursor.Size = new System.Drawing.Size(0, 12);
+            this.lblPre_Cursor.TabIndex = 3;
+            // 
+            // TrackBarPre_Cursor
+            // 
+            this.TrackBarPre_Cursor.Location = new System.Drawing.Point(11, 16);
+            this.TrackBarPre_Cursor.Name = "TrackBarPre_Cursor";
+            this.TrackBarPre_Cursor.Properties.EditValueChangedDelay = 10;
+            this.TrackBarPre_Cursor.Properties.Maximum = 1000;
+            this.TrackBarPre_Cursor.Properties.Minimum = -1000;
+            this.TrackBarPre_Cursor.Size = new System.Drawing.Size(541, 23);
+            this.TrackBarPre_Cursor.TabIndex = 2;
+            this.TrackBarPre_Cursor.Value = 0;
+            this.TrackBarPre_Cursor.ValueChanged += new System.EventHandler(this.TrackBarPre_Cursor_ValueChanged);
+            // 
             // LWDM_Tx_4x25
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1003, 881);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.TEC);
             this.Controls.Add(this.groupBox6);
-            this.Controls.Add(this.N1092D);
             this.Controls.Add(this.lstViewTestData);
             this.Controls.Add(this.lstViewLog);
             this.MaximizeBox = false;
@@ -560,14 +789,29 @@
             this.Text = "LWDM Tx 4x25";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.LWDM_Tx_FormClosed);
             this.Load += new System.EventHandler(this.LWDM_Tx_Load);
-            this.N1092D.ResumeLayout(false);
-            this.N1092D.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             this.TEC.ResumeLayout(false);
             this.TEC.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).EndInit();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPost_Cursor.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPost_Cursor)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarMain_Cursor.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarMain_Cursor)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPre_Cursor.Properties)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.TrackBarPre_Cursor)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -575,9 +819,7 @@
         #endregion
         private System.Windows.Forms.ListView lstViewLog;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.Button btnAutoScale;
         private System.Windows.Forms.Button btnRun;
-        private System.Windows.Forms.GroupBox N1092D;
         private System.Windows.Forms.Button btnTestProcess;
         private System.Windows.Forms.ListView lstViewTestData;
         private System.Timers.Timer TecTimer;
@@ -625,6 +867,27 @@
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnStopTestProcess;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Button btnSetPost_Cusor;
+        private System.Windows.Forms.Button btnSetMain_Cusor;
+        private System.Windows.Forms.Button btnSetPre_Cusor;
+        private System.Windows.Forms.TextBox txtPost_Cursor;
+        private System.Windows.Forms.TextBox txtMain_Cursor;
+        private System.Windows.Forms.TextBox txtPre_Cursor;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Label lblPost_Cursor;
+        private DevExpress.XtraEditors.ZoomTrackBarControl TrackBarPost_Cursor;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label lblMain_Cursor;
+        private DevExpress.XtraEditors.ZoomTrackBarControl TrackBarMain_Cursor;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label lblPre_Cursor;
+        private DevExpress.XtraEditors.ZoomTrackBarControl TrackBarPre_Cursor;
+        private System.Windows.Forms.ComboBox cbxBertChannel;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label14;
     }
 }
 

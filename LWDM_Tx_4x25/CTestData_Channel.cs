@@ -223,7 +223,45 @@ namespace LWDM_Tx_4x25
                 _mask_margin = Math.Round(value, 2);
             }
         }
+        private double pre_cursor;
 
+        public double Pre_Cursor
+        {
+            get
+            {
+                return pre_cursor;
+            }
+            set
+            {
+                pre_cursor = Math.Round(value, 2);
+            }
+        }
+        private double main_cursor;
+
+        public double Main_Cursor
+        {
+            get
+            {
+                return main_cursor;
+            }
+            set
+            {
+                main_cursor = Math.Round(value, 2);
+            }
+        }
+        private double post_cursor;
+
+        public double Post_Cursor
+        {
+            get
+            {
+                return post_cursor;
+            }
+            set
+            {
+                post_cursor = Math.Round(value, 2);
+            }
+        }
         public bool Pf
         {
             get;
