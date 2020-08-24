@@ -75,12 +75,16 @@ namespace LWDM_Tx_4x25.Instruments
                 do
                 {
                     DateTime t2 = DateTime.Now;
-                    if ((t2 - t1).TotalSeconds > 10)
+                    //超过20s还未获取到扫描结束的状态，则默认扫描已经结束
+                    if ((t2 - t1).TotalSeconds > 25)
                     {
-                        t1 = DateTime.Now;
-                        // throw new Exception("获取光谱仪AQ6370的扫描状态超时！");
-                        gb.GPIBwr(":INITIATE");//start sweep
+                        break;
                     }
+                    //if ((t2 - t1).TotalSeconds > 10)
+                    //{
+                    //    t1 = DateTime.Now;
+                    //    gb.GPIBwr(":INITIATE");//start sweep
+                    //}
                     Thread.Sleep(100);
                     gb.GPIBwr(":stat:oper:even?");
                     Byte.TryParse(gb.GPIBrd(100), out status);
