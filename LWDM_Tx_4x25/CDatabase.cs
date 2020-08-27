@@ -64,7 +64,6 @@ namespace LWDM_Tx_4x25
                         data_Channel.Temp_id = data_temp_id;
                         data_Channel.Channel = ch;
                         //插入一行与温度和通道相关的数据
-                        data_Channel.Power = 0;
                         strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_ret " +
                             $"(temp_id, channel,vcpa, veq,vmod,isink,ldd,power,impd,idark,cwl,smsr,jitter_pp,jitter_rms,crossing,fall_time,rise_time,er,mask_margin,pre_cursor,main_cursor,post_cursor) " +
                             $"VALUES('{data_Channel.Temp_id}','{data_Channel.Channel}','{data_Channel.Vcpa}','{data_Channel.Veq}','{data_Channel.Vmod}','{data_Channel.Isink}','{data_Channel.Ldd}','{data_Channel.Power}','{data_Channel.Impd}','{data_Channel.Idark}','{data_Channel.Cwl}','{data_Channel.SMSR}','{data_Channel.Jitter_pp}','{data_Channel.Jitter_rms}','{data_Channel.Crossing}','{data_Channel.Fall_time}','{data_Channel.Rise_time}','{data_Channel.Er}','{data_Channel.Mask_Margin}','{data_Channel.Pre_Cursor}','{data_Channel.Main_Cursor}','{data_Channel.Post_Cursor}')";

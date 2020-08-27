@@ -76,7 +76,7 @@ namespace LWDM_Tx_4x25.Instruments
                 {
                     DateTime t2 = DateTime.Now;
                     //超过20s还未获取到扫描结束的状态，则默认扫描已经结束
-                    if ((t2 - t1).TotalSeconds > 25)
+                    if ((t2 - t1).TotalSeconds > 10)
                     {
                         break;
                     }
