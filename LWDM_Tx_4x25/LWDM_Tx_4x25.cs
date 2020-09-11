@@ -717,6 +717,8 @@ namespace LWDM_Tx_4x25
                 TecTimer.Start();
                 if (ctsTotal.Token.IsCancellationRequested)
                     return;
+
+                TestDataCommon.Test_Stop_Time = DateTime.Now.ToString();
                 //保存数据
                 if (DialogResult.Yes == MessageBox.Show("Test done，Save the test data to Database？", "Save test data", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
                 {
@@ -1139,7 +1141,7 @@ namespace LWDM_Tx_4x25
                 return;
             }
             ShowMsg("Start Test Process...", true);
-            TestDataCommon.Test_Start_Time = DateTime.Now.ToLongTimeString();
+            TestDataCommon.Test_Start_Time = DateTime.Now.ToString();
 
             //if (!TemperatureIsOk | !TemperatureIsOk_Product)
             //{

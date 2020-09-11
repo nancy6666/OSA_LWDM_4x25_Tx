@@ -34,6 +34,7 @@ namespace LWDM_Tx_4x25
             {
                 cmd.Connection = conn;
                 cmd.Transaction = conn.BeginTransaction();
+                
                 //插入common数据
                 var strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common " +
                     $"(spec_id,sn,operator,test_station,test_start_time,test_end_time,pf) " +
