@@ -337,35 +337,34 @@ namespace LWDM_Tx_4x25
                 try
                 {                   
                     //Bert paras
-                    var com = excelCell[4, 2].value;
-                    //// Inst_Bert = new Bert(com);
-                    Inst_Bert.Ppg_data_rate = excelCell[5, 2].value;
-                    Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
-                    Inst_Bert.Clock = excelCell[7, 2].value;
+                  
+                    Inst_Bert.Ppg_data_rate = excelCell[4, 2].value;
+                    Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[5, 2].value);
+                    Inst_Bert.Clock = excelCell[6, 2].value;
 
-                    K2400_1.Vcc = Convert.ToDecimal(excelCell[11, 2].value);
-                    K2400_1.I_limit = Convert.ToDecimal(excelCell[12, 2].value);
+                    K2400_1.Vcc = Convert.ToDecimal(excelCell[9, 2].value);
+                    K2400_1.I_limit = Convert.ToDecimal(excelCell[10, 2].value);
 
-                    K2400_2.Vcc = Convert.ToDecimal(excelCell[16, 2].value);
-                    K2400_2.I_limit = Convert.ToDecimal(excelCell[17, 2].value);
+                    K2400_2.Vcc = Convert.ToDecimal(excelCell[13, 2].value);
+                    K2400_2.I_limit = Convert.ToDecimal(excelCell[14, 2].value);
 
-                    K2400_3.Vcc = Convert.ToDecimal(excelCell[21, 2].value);
-                    K2400_3.I_limit = Convert.ToDecimal(excelCell[22, 2].value);
+                    K2400_3.Vcc = Convert.ToDecimal(excelCell[17, 2].value);
+                    K2400_3.I_limit = Convert.ToDecimal(excelCell[18, 2].value);
 
                     lstK7001Pin = new List<string>();
-                    lstK7001Pin.Add(excelCell[29, 2].value);
-                    lstK7001Pin.Add(excelCell[30, 2].value);
-                    lstK7001Pin.Add(excelCell[31, 2].value);
-                    lstK7001Pin.Add(excelCell[32, 2].value);
+                    lstK7001Pin.Add(excelCell[21, 2].value);
+                    lstK7001Pin.Add(excelCell[22, 2].value);
+                    lstK7001Pin.Add(excelCell[23, 2].value);
+                    lstK7001Pin.Add(excelCell[24, 2].value);
 
                     //N1092 paras
-                    kesight_N1902D.Channel = Convert.ToString(excelCell[35, 2].value);
-                    kesight_N1902D.Channel_bandWidth = Convert.ToString(excelCell[36, 2].value);
-                    kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[37, 2].value);
+                    kesight_N1902D.Channel = Convert.ToString(excelCell[27, 2].value);
+                    kesight_N1902D.Channel_bandWidth = Convert.ToString(excelCell[28, 2].value);
+                    kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[29, 2].value);
 
                     //T720
                     lstTecTemp = new List<double>();
-                    for (int index = 41; index < 44; index++)
+                    for (int index = 32; index < 35; index++)
                     {
                         string blTempChoose = Convert.ToString(excelCell[index, 4].value);
                         if (blTempChoose.ToUpper().Contains("TRUE"))
@@ -380,36 +379,34 @@ namespace LWDM_Tx_4x25
                     //lstTecTempNote.Add(Convert.ToString(excelCell[42, 3].value));
                     //lstTecTempNote.Add(Convert.ToString(excelCell[43, 3].value));
 
-                    TC720.TempSpan = excelCell[44, 2].value;
-                    TC720.StablizaitonTime = Convert.ToInt32(excelCell[45, 2].value);
-                    TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
+                    TC720.TempSpan = excelCell[35, 2].value;
+                    TC720.StablizaitonTime = Convert.ToInt32(excelCell[36, 2].value);
+                    TC720.TimeOut = Convert.ToInt32(excelCell[37, 2].value);
 
                     //LDT5525B
-                    L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
-                    L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
-                    L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
-                    L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
+                    L5525B.StablizationTime = Convert.ToInt32(excelCell[40, 2].value);
+                    L5525B.TempSpan = Convert.ToDouble(excelCell[41, 2].value);
+                    L5525B.TimeOut = Convert.ToInt32(excelCell[42, 2].value);
+                    L5525B.TempOffset = Convert.ToDouble(excelCell[43, 2].value);
 
                     //AQ6730
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[59, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[61, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[63, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[58, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[60, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[62, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[64, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[46, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[48, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[50, 2].value));
+                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[52, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[47, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[49, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[51, 2].value));
+                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[53, 2].value));
 
                     //PM212
 
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[68, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[69, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[70, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[71, 2].value));
-
-                    //JW8402
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[56, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[57, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[58, 2].value));
+                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[59, 2].value));
 
                 }
                 catch (Exception ex)
