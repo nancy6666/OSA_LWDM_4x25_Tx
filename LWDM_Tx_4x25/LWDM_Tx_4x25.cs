@@ -335,7 +335,7 @@ namespace LWDM_Tx_4x25
                 Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(pn);
                 Excel.Range excelCell = worksheet.UsedRange;
                 try
-                {
+                {                   
                     //Bert paras
                     var com = excelCell[4, 2].value;
                     //// Inst_Bert = new Bert(com);
@@ -343,29 +343,15 @@ namespace LWDM_Tx_4x25
                     Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[6, 2].value);
                     Inst_Bert.Clock = excelCell[7, 2].value;
 
-                    //K2400
-                    //  var gpibAddr = Convert.ToUInt16(excelCell[10, 2].value);
-                    //K2400_1 = new KEITHLEY2400(gpibAddr);
                     K2400_1.Vcc = Convert.ToDecimal(excelCell[11, 2].value);
                     K2400_1.I_limit = Convert.ToDecimal(excelCell[12, 2].value);
 
-                    // gpibAddr = Convert.ToUInt16(excelCell[15, 2].value);
-                    // K2400_2 = new KEITHLEY2400(gpibAddr);
                     K2400_2.Vcc = Convert.ToDecimal(excelCell[16, 2].value);
                     K2400_2.I_limit = Convert.ToDecimal(excelCell[17, 2].value);
 
-                    // gpibAddr = Convert.ToUInt16(excelCell[20, 2].value);
-                    //K2400_3 = new KEITHLEY2400(gpibAddr);
                     K2400_3.Vcc = Convert.ToDecimal(excelCell[21, 2].value);
                     K2400_3.I_limit = Convert.ToDecimal(excelCell[22, 2].value);
 
-                    //K2000
-                    // gpibAddr = Convert.ToUInt16(excelCell[25, 2].value);
-                    // K2000 = new Keithley2000(gpibAddr);
-
-                    //K7001
-                    //gpibAddr = Convert.ToUInt16(excelCell[28, 2].value);
-                    // K7001 = new Keithley7001(gpibAddr);
                     lstK7001Pin = new List<string>();
                     lstK7001Pin.Add(excelCell[29, 2].value);
                     lstK7001Pin.Add(excelCell[30, 2].value);
@@ -378,28 +364,33 @@ namespace LWDM_Tx_4x25
                     kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[37, 2].value);
 
                     //T720
-                    // com = excelCell[40, 2].value;
-                    // TC720 = new TC720(com);
                     lstTecTemp = new List<double>();
-                    lstTecTemp.Add(excelCell[41, 2].value);
-                    lstTecTemp.Add(excelCell[42, 2].value);
-                    lstTecTemp.Add(excelCell[43, 2].value);
-                    lstTecTempNote.Add(Convert.ToString(excelCell[41, 3].value));
-                    lstTecTempNote.Add(Convert.ToString(excelCell[42, 3].value));
-                    lstTecTempNote.Add(Convert.ToString(excelCell[43, 3].value));
+                    for (int index = 41; index < 44; index++)
+                    {
+                        string blTempChoose = Convert.ToString(excelCell[index, 4].value);
+                        if (blTempChoose.ToUpper().Contains("TRUE"))
+                        {
+                            lstTecTemp.Add(excelCell[index, 2].value);
+                            lstTecTempNote.Add(excelCell[index, 3].value);
+                        }
+                    }
+                    //lstTecTemp.Add(excelCell[42, 2].value);
+                    //lstTecTemp.Add(excelCell[43, 2].value);
+                    //lstTecTempNote.Add(Convert.ToString(excelCell[41, 3].value));
+                    //lstTecTempNote.Add(Convert.ToString(excelCell[42, 3].value));
+                    //lstTecTempNote.Add(Convert.ToString(excelCell[43, 3].value));
+
                     TC720.TempSpan = excelCell[44, 2].value;
                     TC720.StablizaitonTime = Convert.ToInt32(excelCell[45, 2].value);
                     TC720.TimeOut = Convert.ToInt32(excelCell[46, 2].value);
 
                     //LDT5525B
-
                     L5525B.StablizationTime = Convert.ToInt32(excelCell[50, 2].value);
                     L5525B.TempSpan = Convert.ToDouble(excelCell[51, 2].value);
                     L5525B.TimeOut = Convert.ToInt32(excelCell[52, 2].value);
                     L5525B.TempOffset = Convert.ToDouble(excelCell[53, 2].value);
 
                     //AQ6730
-
                     lstAQ6370_StartWave = new List<double>();
                     lstAQ6370_StopWave = new List<double>();
                     this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[57, 2].value));
@@ -1164,7 +1155,7 @@ namespace LWDM_Tx_4x25
                 ctsTotal = new CancellationTokenSource();
                 var task = new Task(() =>
                 {
-                    for (int TecTempIndex = 0; TecTempIndex < 3; TecTempIndex++)
+                    for (int TecTempIndex = 0; TecTempIndex < lstTecTemp.Count(); TecTempIndex++)
                     {
                         TestData_Temp = new CTestData_Temp();
                         TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
