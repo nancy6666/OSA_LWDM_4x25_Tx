@@ -370,7 +370,7 @@ namespace LWDM_Tx_4x25
                         if (blTempChoose.ToUpper().Contains("TRUE"))
                         {
                             lstTecTemp.Add(excelCell[index, 2].value);
-                            lstTecTempNote.Add(excelCell[index, 3].value);
+                            lstTecTempNote.Add(Convert.ToString(excelCell[index, 3].value));
                         }
                     }
                     //lstTecTemp.Add(excelCell[42, 2].value);
