@@ -23,6 +23,8 @@ namespace GY7501_I2C_Control
         public const int DEV_GY7604 = 9; //4ch-I2C
         public const int DEV_GY7608 = 10;//8ch-I2C
 
+        public const byte SLAVEADDR = 0xA6;
+
         [StructLayout(LayoutKind.Sequential)]
         public struct GYI2C_DATA_INFO
         {
@@ -113,7 +115,7 @@ namespace GY7501_I2C_Control
         /// <param name="writeNum">要写入的字节数，要将寄存器地址所占自己也计算在内</param>
         public void SetValue(byte[] dataBuff)
         {
-            SendBuff.SlaveAddr = GY7501_I2C.SlaveAddr;
+            SendBuff.SlaveAddr = SLAVEADDR;
             SendBuff.Databuffer = new byte[520];
 
             for (int i = 0; i < dataBuff.Length; i++)
@@ -137,7 +139,7 @@ namespace GY7501_I2C_Control
         /// <returns>读取到的数据组</returns>
         public byte[] ReadValue(byte regAddr,uint readByteNum=1)
         {
-            ReadBuff.SlaveAddr = GY7501_I2C.SlaveAddr;
+            ReadBuff.SlaveAddr = SLAVEADDR;
             ReadBuff.Databuffer = new byte[520];
             ReadBuff.Databuffer[0] = regAddr;
             ReadBuff.WriteNum = 1;

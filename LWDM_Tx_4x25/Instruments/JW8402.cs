@@ -41,7 +41,7 @@ namespace LWDM_Tx_4x25.Instruments
         /// <summary>
         /// 设置通道（小于 100 路时）
         /// </summary>
-        /// <param name="nChannel">00～99（表示切换到第几通道）1表示通道1</param>
+        /// <param name="nChannel">00～99（表示切换到第几通道）4表示通道4</param>
         /// <param name="devAddr">00～99（表示设备地址）</param>
         /// <returns>true:成功</returns>
         public bool SetChannel(int nChannel,int devAddr=01)

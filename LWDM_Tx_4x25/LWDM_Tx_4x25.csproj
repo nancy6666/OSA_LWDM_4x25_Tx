@@ -82,7 +82,7 @@
     <Compile Include="CTestDataCommon.cs" />
     <Compile Include="CTestData_Channel.cs" />
     <Compile Include="CTestData_Temp.cs" />
-    <Compile Include="DataManagement.cs" />
+    <Compile Include="GY7501_DataManagement.cs" />
     <Compile Include="GlobalVar.cs" />
     <Compile Include="GY7501_I2C.cs">
       <SubType>Form</SubType>
@@ -140,8 +140,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="GY7501_config.csv" />
-    <None Include="LWDM 4x25 TEST PLAN.xlsx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

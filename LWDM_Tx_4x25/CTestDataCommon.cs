@@ -43,11 +43,11 @@ namespace LWDM_Tx_4x25
             get;
             set;
         }
-      public bool pf
+        public string Rate
         {
-            get;
-            set;
+            get;set;
         }
+        public bool Pf = true;
         public List<CTestData_Temp> lstTestData_Temp = new List<CTestData_Temp>();
         
     }

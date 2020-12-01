@@ -12,6 +12,9 @@ namespace LWDM_Tx_4x25.Instruments
     public class Bert
     {
         public Inst_PAM4_Bert Inst_PAM4_Bert;
+        public const double PPGRATE25G = 25.78125;
+        public const double PPGRATE28G = 28.12500;
+
         public double Ppg_data_rate
         {
             get;

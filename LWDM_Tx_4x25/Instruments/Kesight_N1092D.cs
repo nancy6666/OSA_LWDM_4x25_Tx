@@ -12,6 +12,13 @@ namespace LWDM_Tx_4x25.Instruments
     public class Kesight_N1092D
     {
         #region Properties
+
+        public string MaskMarginPattern;
+        public  string MaskPattern25G = $":MTESt1:LOAD:FNAMe \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx\"";
+        public string MaskPattern28G ="" ;
+        public const string BANDWIDTH25G = "19.3";
+        public const string BANDWIDTH28G = "21.0";
+
         public string Channel
         {
             get;
@@ -146,7 +153,7 @@ namespace LWDM_Tx_4x25.Instruments
                 //Set mask margin
                 myN1010A.WriteString(":MTESt1:DISPlay OFF");
                 Thread.Sleep(100);
-                myN1010A.WriteString($":MTESt1:LOAD:FNAMe \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx\""); //set mask 100G LR
+                myN1010A.WriteString(MaskMarginPattern); //set mask 100G LR
                 myN1010A.WriteString(":MTESt1:LOAD", true);
                 myN1010A.WriteString(":MTESt:MARGin:STATe ON", true);
                 myN1010A.WriteString(":MTESt:MARGin:METHod AUTO", true);
@@ -226,7 +233,6 @@ namespace LWDM_Tx_4x25.Instruments
         {
             try
             {
-                SetN1092();
                 myN1010A.WriteString(":SYSTem:AUToscale", true);
                 Thread.Sleep(5000);
                 myN1010A.WriteString("*OPC?");
@@ -242,8 +248,6 @@ namespace LWDM_Tx_4x25.Instruments
             try
             {
                 myN1010A.WriteString("ACQuire:SINGle", true);// Stop waveform acquisition.
-
-                SetN1092();
 
                 myN1010A.WriteString(":ACQuire:RUN", true);//when a limit test is turned on
                 myN1010A.WriteString(":SYSTem:AUToscale", true);

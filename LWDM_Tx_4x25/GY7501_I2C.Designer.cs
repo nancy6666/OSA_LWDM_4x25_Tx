@@ -63,7 +63,6 @@
             this.groupBox40 = new System.Windows.Forms.GroupBox();
             this.NumTx0Ldd = new GY7501_I2C_Control.MyNumericUpDown();
             this.label39 = new System.Windows.Forms.Label();
-            this.btnSetChip = new System.Windows.Forms.Button();
             this.groupBox10 = new System.Windows.Forms.GroupBox();
             this.NumTx1Ldd = new GY7501_I2C_Control.MyNumericUpDown();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
@@ -118,7 +117,7 @@
             this.Tx3VcpaEnable = new GY7501_I2C_Control.MyCheckedBox();
             this.groupBox38 = new System.Windows.Forms.GroupBox();
             this.NumTx3Vcpa = new GY7501_I2C_Control.MyNumericUpDown();
-            this.btnReadConfig = new System.Windows.Forms.Button();
+            this.btnReadConfigSetChip = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -191,6 +190,7 @@
             // 
             this.txtSlaveAddress.Location = new System.Drawing.Point(140, 32);
             this.txtSlaveAddress.Name = "txtSlaveAddress";
+            this.txtSlaveAddress.ReadOnly = true;
             this.txtSlaveAddress.Size = new System.Drawing.Size(45, 21);
             this.txtSlaveAddress.TabIndex = 1;
             this.txtSlaveAddress.Text = "A6";
@@ -545,16 +545,6 @@
             this.label39.Size = new System.Drawing.Size(53, 12);
             this.label39.TabIndex = 44;
             this.label39.Text = "LDD Set:";
-            // 
-            // btnSetChip
-            // 
-            this.btnSetChip.Location = new System.Drawing.Point(522, 25);
-            this.btnSetChip.Name = "btnSetChip";
-            this.btnSetChip.Size = new System.Drawing.Size(75, 35);
-            this.btnSetChip.TabIndex = 49;
-            this.btnSetChip.Text = " Set Chip";
-            this.btnSetChip.UseVisualStyleBackColor = true;
-            this.btnSetChip.Click += new System.EventHandler(this.btnSetChip_Click);
             // 
             // groupBox10
             // 
@@ -1198,15 +1188,15 @@
             this.NumTx3Vcpa.Size = new System.Drawing.Size(120, 21);
             this.NumTx3Vcpa.TabIndex = 0;
             // 
-            // btnReadConfig
+            // btnReadConfigSetChip
             // 
-            this.btnReadConfig.Location = new System.Drawing.Point(387, 25);
-            this.btnReadConfig.Name = "btnReadConfig";
-            this.btnReadConfig.Size = new System.Drawing.Size(90, 35);
-            this.btnReadConfig.TabIndex = 72;
-            this.btnReadConfig.Text = "Read Config";
-            this.btnReadConfig.UseVisualStyleBackColor = true;
-            this.btnReadConfig.Click += new System.EventHandler(this.btnReadConfig_Click);
+            this.btnReadConfigSetChip.Location = new System.Drawing.Point(387, 25);
+            this.btnReadConfigSetChip.Name = "btnReadConfigSetChip";
+            this.btnReadConfigSetChip.Size = new System.Drawing.Size(129, 35);
+            this.btnReadConfigSetChip.TabIndex = 72;
+            this.btnReadConfigSetChip.Text = "Read Config Set Chip";
+            this.btnReadConfigSetChip.UseVisualStyleBackColor = true;
+            this.btnReadConfigSetChip.Click += new System.EventHandler(this.btnReadConfigSetChip_Click);
             // 
             // btnSave
             // 
@@ -1225,7 +1215,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(825, 593);
             this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.btnReadConfig);
+            this.Controls.Add(this.btnReadConfigSetChip);
             this.Controls.Add(this.groupBox29);
             this.Controls.Add(this.groupBox19);
             this.Controls.Add(this.groupBox30);
@@ -1253,7 +1243,6 @@
             this.Controls.Add(this.groupBox17);
             this.Controls.Add(this.groupBox18);
             this.Controls.Add(this.groupBox39);
-            this.Controls.Add(this.btnSetChip);
             this.Controls.Add(this.groupBox40);
             this.Controls.Add(this.label39);
             this.Controls.Add(this.btnReadSlave);
@@ -1390,7 +1379,6 @@
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.GroupBox groupBox40;
         private System.Windows.Forms.Label label39;
-        private System.Windows.Forms.Button btnSetChip;
         private System.Windows.Forms.GroupBox groupBox10;
         private System.Windows.Forms.GroupBox groupBox11;
         private System.Windows.Forms.GroupBox groupBox12;
@@ -1417,7 +1405,7 @@
         private System.Windows.Forms.GroupBox groupBox36;
         private System.Windows.Forms.GroupBox groupBox37;
         private System.Windows.Forms.GroupBox groupBox38;
-        private System.Windows.Forms.Button btnReadConfig;
+        private System.Windows.Forms.Button btnReadConfigSetChip;
         private System.Windows.Forms.Button btnSave;
         private MyCheckedBox Tx0VcpaEnable;
         private MyCheckedBox Tx0VeqEnable;

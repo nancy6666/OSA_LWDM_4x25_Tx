@@ -53,6 +53,8 @@
             this.columnHeader15 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TecTimer = new System.Timers.Timer();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.cbxSelectTestRate = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.cbxPN = new System.Windows.Forms.ComboBox();
             this.txtOperator = new System.Windows.Forms.TextBox();
             this.txtSN = new System.Windows.Forms.TextBox();
@@ -67,13 +69,7 @@
             this.label10 = new System.Windows.Forms.Label();
             this.btnSetProductTemp1 = new System.Windows.Forms.Button();
             this.lblRealTemp_Product = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.txtProductTemp_Hot = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtProductTemp_Cold = new System.Windows.Forms.TextBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.txtProductTemp_Room = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnRestTemp = new System.Windows.Forms.Button();
@@ -124,9 +120,9 @@
             this.lstViewLog.Font = new System.Drawing.Font("宋体", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lstViewLog.GridLines = true;
             this.lstViewLog.HideSelection = false;
-            this.lstViewLog.Location = new System.Drawing.Point(386, 12);
+            this.lstViewLog.Location = new System.Drawing.Point(494, 12);
             this.lstViewLog.Name = "lstViewLog";
-            this.lstViewLog.Size = new System.Drawing.Size(577, 286);
+            this.lstViewLog.Size = new System.Drawing.Size(577, 297);
             this.lstViewLog.TabIndex = 7;
             this.lstViewLog.UseCompatibleStateImageBehavior = false;
             this.lstViewLog.View = System.Windows.Forms.View.Details;
@@ -221,7 +217,7 @@
             this.lstViewTestData.HideSelection = false;
             this.lstViewTestData.Location = new System.Drawing.Point(32, 550);
             this.lstViewTestData.Name = "lstViewTestData";
-            this.lstViewTestData.Size = new System.Drawing.Size(931, 373);
+            this.lstViewTestData.Size = new System.Drawing.Size(931, 362);
             this.lstViewTestData.TabIndex = 13;
             this.lstViewTestData.UseCompatibleStateImageBehavior = false;
             this.lstViewTestData.View = System.Windows.Forms.View.Details;
@@ -303,6 +299,8 @@
             // 
             // groupBox6
             // 
+            this.groupBox6.Controls.Add(this.cbxSelectTestRate);
+            this.groupBox6.Controls.Add(this.label5);
             this.groupBox6.Controls.Add(this.cbxPN);
             this.groupBox6.Controls.Add(this.txtOperator);
             this.groupBox6.Controls.Add(this.txtSN);
@@ -311,10 +309,33 @@
             this.groupBox6.Controls.Add(this.label1);
             this.groupBox6.Location = new System.Drawing.Point(32, 12);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(311, 92);
+            this.groupBox6.Size = new System.Drawing.Size(438, 92);
             this.groupBox6.TabIndex = 14;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "测试信息";
+            // 
+            // cbxSelectTestRate
+            // 
+            this.cbxSelectTestRate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSelectTestRate.FormattingEnabled = true;
+            this.cbxSelectTestRate.Items.AddRange(new object[] {
+            "25G",
+            "28G",
+            "25G & 28G"});
+            this.cbxSelectTestRate.Location = new System.Drawing.Point(328, 49);
+            this.cbxSelectTestRate.Name = "cbxSelectTestRate";
+            this.cbxSelectTestRate.Size = new System.Drawing.Size(104, 20);
+            this.cbxSelectTestRate.TabIndex = 7;
+            this.cbxSelectTestRate.SelectedIndexChanged += new System.EventHandler(this.cbxSelectTestRate_SelectedIndexChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(360, 23);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(29, 12);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "Rate";
             // 
             // cbxPN
             // 
@@ -352,7 +373,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(117, 23);
+            this.label2.Location = new System.Drawing.Point(122, 23);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 12);
             this.label2.TabIndex = 1;
@@ -392,13 +413,7 @@
             this.TEC.Controls.Add(this.label10);
             this.TEC.Controls.Add(this.btnSetProductTemp1);
             this.TEC.Controls.Add(this.lblRealTemp_Product);
-            this.TEC.Controls.Add(this.label9);
-            this.TEC.Controls.Add(this.label8);
             this.TEC.Controls.Add(this.label7);
-            this.TEC.Controls.Add(this.txtProductTemp_Hot);
-            this.TEC.Controls.Add(this.label6);
-            this.TEC.Controls.Add(this.txtProductTemp_Cold);
-            this.TEC.Controls.Add(this.label5);
             this.TEC.Controls.Add(this.txtProductTemp_Room);
             this.TEC.Controls.Add(this.label4);
             this.TEC.Controls.Add(this.lblRealTemp_Case);
@@ -406,7 +421,7 @@
             this.TEC.Controls.Add(this.btnRestTemp);
             this.TEC.Location = new System.Drawing.Point(32, 110);
             this.TEC.Name = "TEC";
-            this.TEC.Size = new System.Drawing.Size(311, 175);
+            this.TEC.Size = new System.Drawing.Size(438, 175);
             this.TEC.TabIndex = 18;
             this.TEC.TabStop = false;
             this.TEC.Text = "TEC";
@@ -414,7 +429,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(170, 138);
+            this.label12.Location = new System.Drawing.Point(11, 125);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(65, 12);
             this.label12.TabIndex = 31;
@@ -423,7 +438,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(288, 138);
+            this.label11.Location = new System.Drawing.Point(143, 125);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(17, 12);
             this.label11.TabIndex = 30;
@@ -451,70 +466,20 @@
             // lblRealTemp_Product
             // 
             this.lblRealTemp_Product.AutoSize = true;
-            this.lblRealTemp_Product.Location = new System.Drawing.Point(235, 138);
+            this.lblRealTemp_Product.Location = new System.Drawing.Point(90, 125);
             this.lblRealTemp_Product.Name = "lblRealTemp_Product";
             this.lblRealTemp_Product.Size = new System.Drawing.Size(47, 12);
             this.lblRealTemp_Product.TabIndex = 27;
             this.lblRealTemp_Product.Text = "label10";
             // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(147, 141);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(17, 12);
-            this.label9.TabIndex = 26;
-            this.label9.Text = "℃";
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(147, 108);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(17, 12);
-            this.label8.TabIndex = 25;
-            this.label8.Text = "℃";
-            // 
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(147, 76);
+            this.label7.Location = new System.Drawing.Point(143, 79);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(17, 12);
             this.label7.TabIndex = 24;
             this.label7.Text = "℃";
-            // 
-            // txtProductTemp_Hot
-            // 
-            this.txtProductTemp_Hot.Location = new System.Drawing.Point(76, 138);
-            this.txtProductTemp_Hot.Name = "txtProductTemp_Hot";
-            this.txtProductTemp_Hot.Size = new System.Drawing.Size(64, 21);
-            this.txtProductTemp_Hot.TabIndex = 23;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 141);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(65, 12);
-            this.label6.TabIndex = 22;
-            this.label6.Text = "产品高温：";
-            // 
-            // txtProductTemp_Cold
-            // 
-            this.txtProductTemp_Cold.Location = new System.Drawing.Point(77, 108);
-            this.txtProductTemp_Cold.Name = "txtProductTemp_Cold";
-            this.txtProductTemp_Cold.Size = new System.Drawing.Size(64, 21);
-            this.txtProductTemp_Cold.TabIndex = 21;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(11, 108);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(65, 12);
-            this.label5.TabIndex = 20;
-            this.label5.Text = "产品低温：";
             // 
             // txtProductTemp_Room
             // 
@@ -530,7 +495,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(65, 12);
             this.label4.TabIndex = 18;
-            this.label4.Text = "产品常温：";
+            this.label4.Text = "产品温度：";
             // 
             // btnRestTemp
             // 
@@ -569,7 +534,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(799, 203);
+            this.tabPage1.Size = new System.Drawing.Size(923, 203);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "眼图调试";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -777,13 +742,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1003, 881);
+            this.AutoScroll = true;
+            this.ClientSize = new System.Drawing.Size(1099, 938);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.TEC);
             this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.lstViewTestData);
             this.Controls.Add(this.lstViewLog);
-            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "LWDM_Tx_4x25";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "LWDM Tx 4x25";
@@ -846,13 +812,7 @@
         private System.Windows.Forms.Label labChlIndex;
         private System.Windows.Forms.Button btnOpenGY1202Interface;
         private System.Windows.Forms.ComboBox cbxChlIndex;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox txtProductTemp_Hot;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox txtProductTemp_Cold;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label lblRealTemp_Product;
         private System.Windows.Forms.Button btnSetProductTemp1;
         private System.Windows.Forms.Button btnRestTemp;
@@ -888,6 +848,8 @@
         private System.Windows.Forms.ComboBox cbxBertChannel;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.ComboBox cbxSelectTestRate;
+        private System.Windows.Forms.Label label5;
     }
 }
 

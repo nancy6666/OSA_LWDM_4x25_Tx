@@ -19,7 +19,7 @@ namespace LWDM_Tx_4x25
             conn = new SqlConnection(connectString);
         }
 
-        public void SaveTestData(CTestDataCommon testData)
+        public void SaveTestData(List<CTestDataCommon> lstTestDataCommon)
         {
             SqlCommand cmd = new SqlCommand();
             try
@@ -34,46 +34,51 @@ namespace LWDM_Tx_4x25
             {
                 cmd.Connection = conn;
                 cmd.Transaction = conn.BeginTransaction();
-                
-                //插入common数据
-                var strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common " +
-                    $"(spec_id,sn,operator,test_station,test_start_time,test_end_time,pf) " +
-                    $"OUTPUT inserted.id " +
-                    $"VALUES({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{testData.Test_Stop_Time}','{testData.pf}')";
-                cmd.CommandType = CommandType.Text;
-                cmd.CommandText = strSql;
-                testData.ID=(int) cmd.ExecuteScalar();//返回插入行的id
-         
-                for (int i = 0; i < testData.lstTestData_Temp.Count; i++)
-                {
-                    CTestData_Temp data = testData.lstTestData_Temp[i];
-                    data.Common_id = testData.ID;
-                    //插入一行与温度相关，与通道无关数据，并返回id
-                    strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common_temp " +
-                        $"(common_id, temp_out,temp_in, vcc1,vcc2,vcc3,icc1,icc2,icc3,itec,pf)" +
-                        $" OUTPUT inserted.id " +
-                        $"VALUES({data.Common_id}, '{data.Temp_out}','{data.Temp_in}','{data.Vcc1}','{data.Vcc2}','{data.Vcc3}','{data.Icc1}','{data.Icc2}','{data.Icc3}','{data.Itec}','{data.Pf}')";
 
+                //插入common数据
+                for (int index = 0; index <lstTestDataCommon.Count();index++)
+                {
+                    var testData = lstTestDataCommon[index];
+
+                    var strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common " +
+                    $"(spec_id,sn,operator,test_station,test_start_time,test_end_time,rate,pf) " +
+                    $"OUTPUT inserted.id " +
+                    $"VALUES({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{DateTime.Now}','{testData.Rate}''{testData.Pf}')";
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = strSql;
-                   
-                    var data_temp_id = (int)cmd.ExecuteScalar();
+                    testData.ID = (int)cmd.ExecuteScalar();//返回插入行的id
 
-                    for(int ch=0;ch<data.lstTestData_Channel.Count;ch++)
+                    for (int i = 0; i < testData.lstTestData_Temp.Count; i++)
                     {
-                        CTestData_Channel data_Channel = data.lstTestData_Channel[ch];
-                        data_Channel.Temp_id = data_temp_id;
-                        data_Channel.Channel = ch;
-                        //插入一行与温度和通道相关的数据
-                        strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_ret " +
-                            $"(temp_id, channel,vcpa, veq,vmod,isink,ldd,power,impd,idark,cwl,smsr,jitter_pp,jitter_rms,crossing,fall_time,rise_time,er,mask_margin,pre_cursor,main_cursor,post_cursor) " +
-                            $"VALUES('{data_Channel.Temp_id}','{data_Channel.Channel}','{data_Channel.Vcpa}','{data_Channel.Veq}','{data_Channel.Vmod}','{data_Channel.Isink}','{data_Channel.Ldd}','{data_Channel.Power}','{data_Channel.Impd}','{data_Channel.Idark}','{data_Channel.Cwl}','{data_Channel.SMSR}','{data_Channel.Jitter_pp}','{data_Channel.Jitter_rms}','{data_Channel.Crossing}','{data_Channel.Fall_time}','{data_Channel.Rise_time}','{data_Channel.Er}','{data_Channel.Mask_Margin}','{data_Channel.Pre_Cursor}','{data_Channel.Main_Cursor}','{data_Channel.Post_Cursor}')";
+                        CTestData_Temp data = testData.lstTestData_Temp[i];
+                        data.Common_id = testData.ID;
+                        //插入一行与温度相关，与通道无关数据，并返回id
+                        strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common_temp " +
+                            $"(common_id, temp_out,temp_in, vcc1,vcc2,vcc3,icc1,icc2,icc3,itec,pf)" +
+                            $" OUTPUT inserted.id " +
+                            $"VALUES({data.Common_id}, '{data.Temp_out}','{data.Temp_in}','{data.Vcc1}','{data.Vcc2}','{data.Vcc3}','{data.Icc1}','{data.Icc2}','{data.Icc3}','{data.Itec}','{data.Pf}')";
+
                         cmd.CommandType = CommandType.Text;
                         cmd.CommandText = strSql;
-                        cmd.ExecuteNonQuery();
+
+                        var data_temp_id = (int)cmd.ExecuteScalar();
+
+                        for (int ch = 0; ch < data.lstTestData_Channel.Count; ch++)
+                        {
+                            CTestData_Channel data_Channel = data.lstTestData_Channel[ch];
+                            data_Channel.Temp_id = data_temp_id;
+                            data_Channel.Channel = ch;
+                            //插入一行与温度和通道相关的数据
+                            strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_ret " +
+                                $"(temp_id, channel,vcpa, veq,vmod,isink,ldd,power,impd,idark,cwl,smsr,jitter_pp,jitter_rms,crossing,fall_time,rise_time,er,mask_margin,pre_cursor,main_cursor,post_cursor) " +
+                                $"VALUES('{data_Channel.Temp_id}','{data_Channel.Channel}','{data_Channel.Vcpa}','{data_Channel.Veq}','{data_Channel.Vmod}','{data_Channel.Isink}','{data_Channel.Ldd}','{data_Channel.Power}','{data_Channel.Impd}','{data_Channel.Idark}','{data_Channel.Cwl}','{data_Channel.SMSR}','{data_Channel.Jitter_pp}','{data_Channel.Jitter_rms}','{data_Channel.Crossing}','{data_Channel.Fall_time}','{data_Channel.Rise_time}','{data_Channel.Er}','{data_Channel.Mask_Margin}','{data_Channel.Pre_Cursor}','{data_Channel.Main_Cursor}','{data_Channel.Post_Cursor}')";
+                            cmd.CommandType = CommandType.Text;
+                            cmd.CommandText = strSql;
+                            cmd.ExecuteNonQuery();
+                        }
                     }
+                    cmd.Transaction.Commit();
                 }
-                cmd.Transaction.Commit();
             }
             catch (Exception ex)
             {
