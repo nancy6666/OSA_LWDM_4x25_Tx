@@ -1677,17 +1677,16 @@ namespace LWDM_Tx_4x25
 
         private void btnRestTemp_Click(object sender, EventArgs e)
         {
-            if (lstTecTemp != null)
+            if (this.txtEnvirnTemp.Text != "")
             {
-                TC720.WriteTemperature(Channel.CH1, lstTecTemp[0]);//将TEC设置回常温
-                this.Temp_Environment = lstTecTemp[0];
+                this.Temp_Environment =Convert.ToDouble( this.txtEnvirnTemp.Text);
+                TC720.WriteTemperature(Channel.CH1, this.Temp_Environment);//将TEC设置回常温
                 TickCountTotal = 0;
                 TecTimer.Start();
-                ShowMsg($"Reset environment temperature to {lstTecTemp[0]}...", true);
             }
             else
             {
-                ShowMsg("Pls choose PN at first!", false);
+                ShowMsg("请先输入环境温度!", false);
             }
         }
 

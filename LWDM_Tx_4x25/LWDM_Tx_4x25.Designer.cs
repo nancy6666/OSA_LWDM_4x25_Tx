@@ -72,7 +72,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.txtProductTemp_Room = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.btnRestTemp = new System.Windows.Forms.Button();
+            this.btnSetEnvirnTemp = new System.Windows.Forms.Button();
             this.ProductTempTimer = new System.Timers.Timer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -95,6 +95,8 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblPre_Cursor = new System.Windows.Forms.Label();
             this.TrackBarPre_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtEnvirnTemp = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
@@ -408,6 +410,8 @@
             // 
             // TEC
             // 
+            this.TEC.Controls.Add(this.label6);
+            this.TEC.Controls.Add(this.txtEnvirnTemp);
             this.TEC.Controls.Add(this.label12);
             this.TEC.Controls.Add(this.label11);
             this.TEC.Controls.Add(this.label10);
@@ -418,7 +422,7 @@
             this.TEC.Controls.Add(this.label4);
             this.TEC.Controls.Add(this.lblRealTemp_Case);
             this.TEC.Controls.Add(this.环境温度);
-            this.TEC.Controls.Add(this.btnRestTemp);
+            this.TEC.Controls.Add(this.btnSetEnvirnTemp);
             this.TEC.Location = new System.Drawing.Point(32, 110);
             this.TEC.Name = "TEC";
             this.TEC.Size = new System.Drawing.Size(438, 175);
@@ -431,14 +435,13 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(11, 125);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(65, 12);
+            this.label12.Size = new System.Drawing.Size(0, 12);
             this.label12.TabIndex = 31;
-            this.label12.Text = "产品温度：";
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(143, 125);
+            this.label11.Location = new System.Drawing.Point(143, 86);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(17, 12);
             this.label11.TabIndex = 30;
@@ -466,7 +469,7 @@
             // lblRealTemp_Product
             // 
             this.lblRealTemp_Product.AutoSize = true;
-            this.lblRealTemp_Product.Location = new System.Drawing.Point(90, 125);
+            this.lblRealTemp_Product.Location = new System.Drawing.Point(90, 86);
             this.lblRealTemp_Product.Name = "lblRealTemp_Product";
             this.lblRealTemp_Product.Size = new System.Drawing.Size(47, 12);
             this.lblRealTemp_Product.TabIndex = 27;
@@ -475,7 +478,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(143, 79);
+            this.label7.Location = new System.Drawing.Point(391, 80);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(17, 12);
             this.label7.TabIndex = 24;
@@ -483,7 +486,7 @@
             // 
             // txtProductTemp_Room
             // 
-            this.txtProductTemp_Room.Location = new System.Drawing.Point(77, 76);
+            this.txtProductTemp_Room.Location = new System.Drawing.Point(325, 77);
             this.txtProductTemp_Room.Name = "txtProductTemp_Room";
             this.txtProductTemp_Room.Size = new System.Drawing.Size(64, 21);
             this.txtProductTemp_Room.TabIndex = 19;
@@ -491,21 +494,21 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(11, 76);
+            this.label4.Location = new System.Drawing.Point(6, 86);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(65, 12);
             this.label4.TabIndex = 18;
             this.label4.Text = "产品温度：";
             // 
-            // btnRestTemp
+            // btnSetEnvirnTemp
             // 
-            this.btnRestTemp.Location = new System.Drawing.Point(187, 23);
-            this.btnRestTemp.Name = "btnRestTemp";
-            this.btnRestTemp.Size = new System.Drawing.Size(101, 37);
-            this.btnRestTemp.TabIndex = 15;
-            this.btnRestTemp.Text = "重置环境温度";
-            this.btnRestTemp.UseVisualStyleBackColor = true;
-            this.btnRestTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
+            this.btnSetEnvirnTemp.Location = new System.Drawing.Point(187, 23);
+            this.btnSetEnvirnTemp.Name = "btnSetEnvirnTemp";
+            this.btnSetEnvirnTemp.Size = new System.Drawing.Size(101, 37);
+            this.btnSetEnvirnTemp.TabIndex = 15;
+            this.btnSetEnvirnTemp.Text = "设置环境温度";
+            this.btnSetEnvirnTemp.UseVisualStyleBackColor = true;
+            this.btnSetEnvirnTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
             // 
             // ProductTempTimer
             // 
@@ -738,6 +741,22 @@
             this.TrackBarPre_Cursor.Value = 0;
             this.TrackBarPre_Cursor.ValueChanged += new System.EventHandler(this.TrackBarPre_Cursor_ValueChanged);
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(391, 29);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(17, 12);
+            this.label6.TabIndex = 33;
+            this.label6.Text = "℃";
+            // 
+            // txtEnvirnTemp
+            // 
+            this.txtEnvirnTemp.Location = new System.Drawing.Point(325, 26);
+            this.txtEnvirnTemp.Name = "txtEnvirnTemp";
+            this.txtEnvirnTemp.Size = new System.Drawing.Size(64, 21);
+            this.txtEnvirnTemp.TabIndex = 32;
+            // 
             // LWDM_Tx_4x25
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -815,7 +834,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label lblRealTemp_Product;
         private System.Windows.Forms.Button btnSetProductTemp1;
-        private System.Windows.Forms.Button btnRestTemp;
+        private System.Windows.Forms.Button btnSetEnvirnTemp;
         private  System.Timers.Timer ProductTempTimer;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
@@ -850,6 +869,8 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.ComboBox cbxSelectTestRate;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtEnvirnTemp;
     }
 }
 
