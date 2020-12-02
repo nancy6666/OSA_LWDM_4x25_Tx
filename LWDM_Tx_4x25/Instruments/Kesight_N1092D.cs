@@ -15,7 +15,7 @@ namespace LWDM_Tx_4x25.Instruments
 
         public string MaskMarginPattern;
         public  string MaskPattern25G = $":MTESt1:LOAD:FNAMe \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx\"";
-        public string MaskPattern28G ="" ;
+        public string MaskPattern28G = $":MTESt1:LOAD:FNAMe \" % DEMO_DIR %\\Masks\\Ethernet\\027.952493 - OTU4_G959_1.mskx\"";
         public const string BANDWIDTH25G = "19.3";
         public const string BANDWIDTH28G = "21.0";
 

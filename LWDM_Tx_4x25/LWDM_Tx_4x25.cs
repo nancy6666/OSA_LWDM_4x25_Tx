@@ -339,7 +339,7 @@ namespace LWDM_Tx_4x25
         }
         #endregion
 
-        #region Big Methods
+         #region Big Methods
 
         /// <summary>
         /// Set devices according to test plan file
@@ -439,6 +439,7 @@ namespace LWDM_Tx_4x25
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[62, 2].value));
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[63, 2].value));
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[64, 2].value));
+                    ShowMsg("配置信息读取结束，请继续下一步操作.", true);
                 }
                 catch (Exception ex)
                 {
@@ -557,9 +558,15 @@ namespace LWDM_Tx_4x25
                 return;
             }
             ShowMsg("初始设置已完成", true);
-            if (WaitEnvironmTempOK(this.Temp_Environment))
+          try
             {
+                WaitEnvironmTempOK(this.Temp_Environment);
+           
                 ConfirmProductTempByWave();
+            }
+            catch(Exception ex)
+            {
+                throw ex;
             }
         }
         /// <summary>
@@ -1065,17 +1072,13 @@ namespace LWDM_Tx_4x25
             try
             {
                 this.ProductTempInPlan = lstTempProductInPlan[0];
-                if (SetAndWaitProductTempOK(this.ProductTempSetToDevice))
-                {
+                SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+               
                     ShowMsg($"给产品加电...", true);
                     K2400_3.OUTPUT(true);
                     K2400_1.OUTPUT(true);
                     K2400_2.OUTPUT(true);
-                }
-                else
-                {
-                    return;//控温失败，停止测试
-                }
+               
                 //根据GY7501的config文件设置芯片参数
                 GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
                 GY7501_Data.SetValuesToChip();
@@ -1130,7 +1133,7 @@ namespace LWDM_Tx_4x25
                 {
                     this.ProductTempInPlan = lstTempProductInPlan[CurrentTempIndex + 1];
                     //下一档的温度设置成功，返回true，表明可进行洗一次的GoOnWaveComparisonOrNot
-                    if ( SetAndWaitProductTempOK(this.ProductTempSetToDevice))
+                    SetAndWaitProductTempOK(this.ProductTempSetToDevice);
                     {
                         ret= true;
                     }
@@ -1158,9 +1161,8 @@ namespace LWDM_Tx_4x25
         /// </summary>
         /// <param name="tempSetToDevice">要设置的温度</param>
         /// <returns></returns>
-        private bool SetAndWaitProductTempOK(double tempSetToDevice)
+        private void SetAndWaitProductTempOK(double tempSetToDevice)
         {
-            bool ret = false;
             L5525B.SetTemperature(tempSetToDevice);
             TickCountTotal_Product = 0;
             ProductTempTimer.Start();//启动产品温度监控计时器
@@ -1174,8 +1176,7 @@ namespace LWDM_Tx_4x25
                 {
                     if (TemperatureIsOk_Product)
                     {
-                        ret = true;
-                        break;
+                        return;
                     }
                 }
                 if (TemperatureIsTimeOut_Product)
@@ -1184,18 +1185,18 @@ namespace LWDM_Tx_4x25
                     {
                         TemperatureIsOk_Product = true;
                         ShowMsg($"产品温度设置未达到设定值{tempSetToDevice}℃，但可以继续进行测试！", true);
-                        ret = true;
+                        return;
                     }
                     else
                     {
-                        ShowMsg($"产品温度设置未达到设定值{tempSetToDevice}℃，不可以继续进行测试！", false);
-                        ret = false;
+                        strMsg = $"产品温度设置未达到设定值{tempSetToDevice}℃，不可以继续进行测试！";
+                        ShowMsg(strMsg, false);
+                        throw new Exception(strMsg);
                     }
 
                 }
             });
             task.Start();
-            return ret;
         }
 
         #endregion
@@ -1248,9 +1249,8 @@ namespace LWDM_Tx_4x25
               
             }
         }
-        private bool WaitEnvironmTempOK(double temp)
+        private void WaitEnvironmTempOK(double temp)
         {
-            bool ret = false;
             ShowMsg($"等待环境温度设为 {temp}℃...", true);
             //等待环境温度达到设定值并稳定
             var task = new Task(() =>
@@ -1260,8 +1260,7 @@ namespace LWDM_Tx_4x25
                 {
                     if (TemperatureIsOk)
                     {
-                        ret = true;
-                        break;
+                        return;
                     }
                 }
                 if (TemperatureIsTimeOut)
@@ -1270,17 +1269,18 @@ namespace LWDM_Tx_4x25
                     {
                         TemperatureIsOk = true;
                         ShowMsg($"产品温度设置未达到设定值{temp}℃，但可以继续进行测试！", true);
-                        ret = true;
+                        return;
                     }
                     else
                     {
-                        ShowMsg($"产品温度设置未达到设定值{temp}℃，不可以继续进行测试！", false);
+                        strMsg = $"产品温度设置未达到设定值{temp}℃，不可以继续进行测试！";
+                        ShowMsg(strMsg, false);
+                        throw new Exception(strMsg);
                     }
 
                 }
             });
             task.Start();
-            return ret;
         }
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
@@ -1318,7 +1318,7 @@ namespace LWDM_Tx_4x25
             testDataCommon.Rate = this.TestRate;
           
             //如果是25G & 28G，则会测试2个速率，得到两组testcommon数据
-            if (this.cbxSelectTestRate.SelectedText == "25G & 28G")
+            if (this.cbxSelectTestRate.Text == "25G & 28G")
             {
                 lstTestDataCommon = Enumerable.Repeat<CTestDataCommon>(testDataCommon, 2).ToList();//该list长度为2，内容为testDataCommon
             }
@@ -1399,7 +1399,7 @@ namespace LWDM_Tx_4x25
                         }
                         TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0]);
                         lstTestDataCommon[0] = testDataCommon;
-                        if (this.cbxSelectTestRate.SelectedText == "25G & 28G")
+                        if (this.cbxSelectTestRate.Text == "25G & 28G")
                         {
                             SelectRate(EnumRate._25G);
                             kesight_N1902D.SetN1092();
@@ -1662,17 +1662,13 @@ namespace LWDM_Tx_4x25
                 return;
             }
             this.ProductTempInPlan = Convert.ToDouble(this.txtProductTemp_Room.Text);
-            if (SetAndWaitProductTempOK(this.ProductTempSetToDevice))
-            {
+            SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+          
                 ShowMsg($"给产品加电...", true);
                 K2400_3.OUTPUT(true);
                 K2400_1.OUTPUT(true);
                 K2400_2.OUTPUT(true);
-            }
-            else
-            {
-                return;//控温失败，停止测试
-            }
+           
         }
 
         private void btnRestTemp_Click(object sender, EventArgs e)
@@ -1824,7 +1820,7 @@ namespace LWDM_Tx_4x25
 
         private void cbxSelectTestRate_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(this.cbxPN.SelectedText==null | this.cbxPN.SelectedText=="")
+            if(this.cbxPN.SelectedValue==null | this.cbxPN.SelectedValue=="")
             {               
                 this.cbxSelectTestRate.SelectedIndexChanged -=cbxSelectTestRate_SelectedIndexChanged;
                 this.cbxSelectTestRate.SelectedIndex = -1;
@@ -1833,7 +1829,7 @@ namespace LWDM_Tx_4x25
                 MessageBox.Show("请先选择PN!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            switch(this.cbxSelectTestRate.SelectedValue)
+            switch(this.cbxSelectTestRate.Text)
             {
                 case "25G":
                     SelectRate(EnumRate._25G);
