@@ -558,7 +558,16 @@ namespace LWDM_Tx_4x25
                 return;
             }
             ShowMsg("初始设置已完成", true);
-          try
+            try
+            {
+                //GY7501
+                GY7501_Data.OpenGY7501();
+            }
+            catch (Exception ex)
+            {
+                ShowMsg($"Init GY7501 error,{ex.Message}", false);
+            }
+            try
             {
                 WaitEnvironmTempOK(this.Temp_Environment);
            
@@ -568,6 +577,7 @@ namespace LWDM_Tx_4x25
             {
                 throw ex;
             }
+            
         }
         /// <summary>
         /// 实施监控TEC环境温度
@@ -1637,7 +1647,7 @@ namespace LWDM_Tx_4x25
                 return;
             }
 
-            gY7501_I2C = new GY7501_I2C();
+            gY7501_I2C = new GY7501_I2C(GY7501_Data);
             gY7501_I2C.Show();
         }
 

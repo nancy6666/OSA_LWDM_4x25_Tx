@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GY7501_I2C_Control
@@ -66,6 +67,11 @@ namespace GY7501_I2C_Control
         public bool ChannelDisable;
         public List<GY7501_DataManagement> lstGY7501_Data = new List<GY7501_DataManagement>();
         #endregion
+
+        public void OpenGY7501()
+        {
+          //  GlobalVar.uSB_I2C_Adapter.OpenGY7501();
+        }
         public void ReadConfigValues(string fileFullPath)
         {
             lstGY7501_Data = new List<GY7501_DataManagement>();
@@ -86,14 +92,15 @@ namespace GY7501_I2C_Control
                         {
                             configPerLine = rl.Split(',');
                             this.VcpaValue = Convert.ToDouble(configPerLine[1]);
-                            this.VcpaEnable= Convert.ToBoolean(configPerLine[2]);
+                            
+                            this.VcpaEnable= Convert.ToBoolean(Convert.ToInt16(configPerLine[2]));
                             this.VeqValue = Convert.ToDouble(configPerLine[3]);
-                            this.VeqEnable = Convert.ToBoolean(configPerLine[4]);
-                            this.VeqPositive = Convert.ToBoolean(configPerLine[5]);
+                            this.VeqEnable = Convert.ToBoolean(Convert.ToInt16(configPerLine[4]));
+                            this.VeqPositive = Convert.ToBoolean(Convert.ToInt16(configPerLine[5]));
                             this.IsnkValue = Convert.ToDouble(configPerLine[6]);
                             this.ModulationValue = Convert.ToDouble(configPerLine[7]);
                             this.LDDValue = Convert.ToDouble(configPerLine[8]);
-                            this.ChannelDisable = Convert.ToBoolean(configPerLine[9]);
+                            this.ChannelDisable = Convert.ToBoolean(Convert.ToInt16(configPerLine[9]));
                             lstGY7501_Data.Add(this);
                         }
                         else
@@ -132,7 +139,7 @@ namespace GY7501_I2C_Control
             byte[] valueReadFromChip = new byte[10];
             try
             {
-                valueReadFromChip = GlobalVar.uSB_I2C_Adapter.ReadValue((byte)startAddr, 10);
+                valueReadFromChip = GlobalVar.uSB_I2C_Adapter.ReadValue(0x00, 10);
             }
             catch (Exception ex)
             {
@@ -166,6 +173,7 @@ namespace GY7501_I2C_Control
             try
             {
                 GlobalVar.uSB_I2C_Adapter.SetValue(dataBuffer.ToArray());
+                Thread.Sleep(300);
             }
             catch (Exception ex)
             {

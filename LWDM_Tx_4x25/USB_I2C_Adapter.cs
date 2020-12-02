@@ -107,6 +107,22 @@ namespace GY7501_I2C_Control
 
         #region Public Methods
 
+        public void OpenGY7501()
+        {
+            if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                throw new Exception("GY7501 设备打开失败！");
+            }
+            //设置I2C Adapter 模式和时钟
+            if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                throw new Exception("设置I2C 适配器的Mode出错！");
+            }
+            if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
+            {
+                throw new Exception("设置I2C 适配器的时钟出错！");
+            }
+        }
         /// <summary>
         /// 像寄存器写入数据
         /// </summary>

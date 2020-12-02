@@ -28,9 +28,9 @@ namespace GY7501_I2C_Control
 
       //  public static byte SlaveAddr;
 
-        GY7501_DataManagement dataManagement;
+      public  GY7501_DataManagement dataManagement;
 
-        public GY7501_I2C()
+        public GY7501_I2C(GY7501_DataManagement data)
         {
             InitializeComponent();
             dataManagement = new GY7501_DataManagement();
