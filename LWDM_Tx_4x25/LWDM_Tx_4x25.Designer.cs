@@ -64,6 +64,8 @@
             this.环境温度 = new System.Windows.Forms.Label();
             this.lblRealTemp_Case = new System.Windows.Forms.Label();
             this.TEC = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtEnvirnTemp = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -73,7 +75,7 @@
             this.txtProductTemp_Room = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnSetEnvirnTemp = new System.Windows.Forms.Button();
-            this.ProductTempTimer = new System.Timers.Timer();
+            this.ProductTempTimer1 = new System.Timers.Timer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
@@ -95,12 +97,10 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblPre_Cursor = new System.Windows.Forms.Label();
             this.TrackBarPre_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtEnvirnTemp = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -430,6 +430,22 @@
             this.TEC.TabStop = false;
             this.TEC.Text = "TEC";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(391, 29);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(17, 12);
+            this.label6.TabIndex = 33;
+            this.label6.Text = "℃";
+            // 
+            // txtEnvirnTemp
+            // 
+            this.txtEnvirnTemp.Location = new System.Drawing.Point(325, 26);
+            this.txtEnvirnTemp.Name = "txtEnvirnTemp";
+            this.txtEnvirnTemp.Size = new System.Drawing.Size(64, 21);
+            this.txtEnvirnTemp.TabIndex = 32;
+            // 
             // label12
             // 
             this.label12.AutoSize = true;
@@ -510,11 +526,11 @@
             this.btnSetEnvirnTemp.UseVisualStyleBackColor = true;
             this.btnSetEnvirnTemp.Click += new System.EventHandler(this.btnRestTemp_Click);
             // 
-            // ProductTempTimer
+            // ProductTempTimer1
             // 
-            this.ProductTempTimer.Interval = 1000D;
-            this.ProductTempTimer.SynchronizingObject = this;
-            this.ProductTempTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.ProductTempTimer_Tick);
+            this.ProductTempTimer1.Interval = 1000D;
+            this.ProductTempTimer1.SynchronizingObject = this;
+            this.ProductTempTimer1.Elapsed += new System.Timers.ElapsedEventHandler(this.ProductTempTimer_Tick);
             // 
             // tabControl1
             // 
@@ -673,6 +689,9 @@
             // 
             this.TrackBarPost_Cursor.Location = new System.Drawing.Point(11, 17);
             this.TrackBarPost_Cursor.Name = "TrackBarPost_Cursor";
+            // 
+            // 
+            // 
             this.TrackBarPost_Cursor.Properties.Maximum = 1000;
             this.TrackBarPost_Cursor.Properties.Minimum = -1000;
             this.TrackBarPost_Cursor.Size = new System.Drawing.Size(541, 23);
@@ -703,6 +722,9 @@
             // 
             this.TrackBarMain_Cursor.Location = new System.Drawing.Point(11, 20);
             this.TrackBarMain_Cursor.Name = "TrackBarMain_Cursor";
+            // 
+            // 
+            // 
             this.TrackBarMain_Cursor.Properties.Maximum = 1000;
             this.TrackBarMain_Cursor.Properties.Minimum = -1000;
             this.TrackBarMain_Cursor.Size = new System.Drawing.Size(541, 23);
@@ -733,6 +755,9 @@
             // 
             this.TrackBarPre_Cursor.Location = new System.Drawing.Point(11, 16);
             this.TrackBarPre_Cursor.Name = "TrackBarPre_Cursor";
+            // 
+            // 
+            // 
             this.TrackBarPre_Cursor.Properties.EditValueChangedDelay = 10;
             this.TrackBarPre_Cursor.Properties.Maximum = 1000;
             this.TrackBarPre_Cursor.Properties.Minimum = -1000;
@@ -740,22 +765,6 @@
             this.TrackBarPre_Cursor.TabIndex = 2;
             this.TrackBarPre_Cursor.Value = 0;
             this.TrackBarPre_Cursor.ValueChanged += new System.EventHandler(this.TrackBarPre_Cursor_ValueChanged);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(391, 29);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(17, 12);
-            this.label6.TabIndex = 33;
-            this.label6.Text = "℃";
-            // 
-            // txtEnvirnTemp
-            // 
-            this.txtEnvirnTemp.Location = new System.Drawing.Point(325, 26);
-            this.txtEnvirnTemp.Name = "txtEnvirnTemp";
-            this.txtEnvirnTemp.Size = new System.Drawing.Size(64, 21);
-            this.txtEnvirnTemp.TabIndex = 32;
             // 
             // LWDM_Tx_4x25
             // 
@@ -779,7 +788,7 @@
             this.groupBox6.PerformLayout();
             this.TEC.ResumeLayout(false);
             this.TEC.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ProductTempTimer1)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -835,7 +844,7 @@
         private System.Windows.Forms.Label lblRealTemp_Product;
         private System.Windows.Forms.Button btnSetProductTemp1;
         private System.Windows.Forms.Button btnSetEnvirnTemp;
-        private  System.Timers.Timer ProductTempTimer;
+        private  System.Timers.Timer ProductTempTimer1;
         private System.Windows.Forms.ColumnHeader columnHeader10;
         private System.Windows.Forms.ColumnHeader columnHeader11;
         private System.Windows.Forms.ColumnHeader columnHeader12;

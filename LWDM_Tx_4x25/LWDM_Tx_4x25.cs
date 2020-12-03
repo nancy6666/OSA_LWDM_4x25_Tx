@@ -110,7 +110,7 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private GY7501_I2C gY7501_I2C;
 
-        private GY7501_DataManagement GY7501_Data = new GY7501_DataManagement();
+        private GY7501_DataManagement GY7501_Data;
 
         private int[] iFail = new Int32[5];
         private string[] testResult = new string[6];
@@ -195,7 +195,7 @@ namespace LWDM_Tx_4x25
                     _temperatureIsOk_Product = value;
                     if (value)
                     {
-                        ProductTempTimer.Stop();
+                        ProductTempTimer1.Stop();
                         if (TickCountTotal_Product <= L5525B.TimeOut)
                         {
                             ShowMsg($"产品温度已经稳定为{this.ProductTempInPlan}左右...", true);
@@ -561,7 +561,8 @@ namespace LWDM_Tx_4x25
             try
             {
                 //GY7501
-                GY7501_Data.OpenGY7501();
+                gY7501_I2C = new GY7501_I2C(GY7501_Data);
+                GY7501_Data = gY7501_I2C.dataManagement;
             }
             catch (Exception ex)
             {
@@ -570,7 +571,7 @@ namespace LWDM_Tx_4x25
             try
             {
                 WaitEnvironmTempOK(this.Temp_Environment);
-           
+
                 ConfirmProductTempByWave();
             }
             catch(Exception ex)
@@ -1079,38 +1080,84 @@ namespace LWDM_Tx_4x25
         private void ConfirmProductTempByWave()
         {
             ShowMsg($"波长与ITU对比测试...", true);
+
             try
             {
-                this.ProductTempInPlan = lstTempProductInPlan[0];
-                SetAndWaitProductTempOK(this.ProductTempSetToDevice);
                
-                    ShowMsg($"给产品加电...", true);
-                    K2400_3.OUTPUT(true);
-                    K2400_1.OUTPUT(true);
-                    K2400_2.OUTPUT(true);
-               
-                //根据GY7501的config文件设置芯片参数
-                GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
-                GY7501_Data.SetValuesToChip();
-               
-                //波长差值大于0.8nm，温度降到中间档，继续波长比对
-                if (GoOnWaveComparisonOrNot(0))
+                var task = new Task(() =>
                 {
-                    //波长差值大于0.8nm，温度降到最后一档
-                    if (GoOnWaveComparisonOrNot(1))
-                    {
-                        //最后一档温度
-                        GoOnWaveComparisonOrNot(2);
+                    this.ProductTempInPlan = lstTempProductInPlan[0];
+                    SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+                    ////L5525B.SetTemperature(this.ProductTempSetToDevice);
+                    ////TickCountTotal_Product = 0;
+                    ////ProductTempTimer1.Start();//启动产品温度监控计时器
+
+                    ////ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
+                    //////直到产品温度达到要求，开始给产品加电         
+
+                    ////while (!TemperatureIsTimeOut_Product)
+                    ////{
+                    ////    if (TemperatureIsOk_Product)
+                    ////    {
+                    ////       break;
+                    ////    }
+                    ////}
+                    ////if (TemperatureIsTimeOut_Product)
+                    ////{
+                    ////    if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{ProductTempInPlan},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                    ////    {
+                    ////        TemperatureIsOk_Product = true;
+                    ////    ShowMsg($"产品温度设置未达到设定值{ProductTempInPlan}℃，但可以继续进行测试！", true);
+
+                    ////}
+                    ////else
+                    //////{
+                    ////    strMsg = $"产品温度设置未达到设定值{ProductTempInPlan}℃，不可以继续进行测试！";
+                    ////    ShowMsg(strMsg, false);
+                    ////    throw new Exception(strMsg);
+                //    //}
+                //}
+                    PowerOnK2400();
+                    strMsg = "产品加电已完成，请reset！";
+                    if (MessageBox.Show(strMsg, "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                    {  //根据GY7501的config文件设置芯片参数
+                        GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
+                        GY7501_Data.SetValuesToChip();
+                        ReadK2400();
+                        //波长差值大于0.8nm，温度降到中间档，继续波长比对
+                        if (GoOnWaveComparisonOrNot(0))
+                        {
+                            //波长差值大于0.8nm，温度降到最后一档
+                            if (GoOnWaveComparisonOrNot(1))
+                            {
+                                //最后一档温度
+                                GoOnWaveComparisonOrNot(2);
+                            }
+                        }
                     }
-                }
+                   
+                });
+                task.Start();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"波长对比测试失败，{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
+        private void PowerOnK2400()
+        {
+            ShowMsg($"给产品加电...", true);
+            K2400_3.OUTPUT(true);
+            K2400_1.OUTPUT(true);
+            K2400_2.OUTPUT(true);
+        }
+        private void ReadK2400()
+        {
+            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+        }
         /// <summary>
         /// 根据波长差值范围判断，如果大于0.8nm，温度下降一档后返回true，表明可进行再一次的波长对比
         /// </summary>
@@ -1139,14 +1186,12 @@ namespace LWDM_Tx_4x25
             else if (maxWaveSub > 0.8)
             {
                 //下降温度到下一档
-                if(CurrentTempIndex<2)
+                if (CurrentTempIndex < 2)
                 {
                     this.ProductTempInPlan = lstTempProductInPlan[CurrentTempIndex + 1];
                     //下一档的温度设置成功，返回true，表明可进行洗一次的GoOnWaveComparisonOrNot
                     SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-                    {
-                        ret= true;
-                    }
+                    ret = true;
                 }
                 //如果当前温度是最后一档温度，不再继续下降温度
                 else
@@ -1155,11 +1200,12 @@ namespace LWDM_Tx_4x25
                     ShowMsg(strMsg, false);
                     MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
             }
             else
             {
-                strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值在0.7~0.8nm，可以继续测试！";
+                strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值在0.7~0.8nm，可以继续测试！"; MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(strMsg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 ShowMsg(strMsg, true);
                 IsWaveSubOk = true;
             }
@@ -1175,38 +1221,41 @@ namespace LWDM_Tx_4x25
         {
             L5525B.SetTemperature(tempSetToDevice);
             TickCountTotal_Product = 0;
-            ProductTempTimer.Start();//启动产品温度监控计时器
-
-            ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
-            //直到产品温度达到要求，开始给产品加电
-            var task = new Task(() =>
+            this.Invoke(new Action(() =>
             {
-                Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
-                while (!TemperatureIsTimeOut_Product)
+                ProductTempTimer1.Start();
+            }));
+            Thread.Sleep(1000);
+            //    var task = new Task(() => { 
+            //ProductTempTimer1.Start();//启动产品温度监控计时器
+            //});
+            //task.Start();
+            //task.Wait();
+            ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
+            //直到产品温度达到要求，开始给产品加电         
+           
+            while (!TemperatureIsTimeOut_Product)
+            {
+                if (TemperatureIsOk_Product)
                 {
-                    if (TemperatureIsOk_Product)
-                    {
-                        return;
-                    }
+                    return;
                 }
-                if (TemperatureIsTimeOut_Product)
+            }
+            if (TemperatureIsTimeOut_Product)
+            {
+                if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{ProductTempInPlan},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
                 {
-                    if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{tempSetToDevice},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                    {
-                        TemperatureIsOk_Product = true;
-                        ShowMsg($"产品温度设置未达到设定值{tempSetToDevice}℃，但可以继续进行测试！", true);
-                        return;
-                    }
-                    else
-                    {
-                        strMsg = $"产品温度设置未达到设定值{tempSetToDevice}℃，不可以继续进行测试！";
-                        ShowMsg(strMsg, false);
-                        throw new Exception(strMsg);
-                    }
-
+                    TemperatureIsOk_Product = true;
+                    ShowMsg($"产品温度设置未达到设定值{ProductTempInPlan}℃，但可以继续进行测试！", true);
+                    return;
                 }
-            });
-            task.Start();
+                else
+                {
+                    strMsg = $"产品温度设置未达到设定值{ProductTempInPlan}℃，不可以继续进行测试！";
+                    ShowMsg(strMsg, false);
+                    throw new Exception(strMsg);
+                }
+            }
         }
 
         #endregion
@@ -1263,34 +1312,30 @@ namespace LWDM_Tx_4x25
         {
             ShowMsg($"等待环境温度设为 {temp}℃...", true);
             //等待环境温度达到设定值并稳定
-            var task = new Task(() =>
-            {
-                Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
-                while (!TemperatureIsTimeOut)
-                {
-                    if (TemperatureIsOk)
-                    {
-                        return;
-                    }
-                }
-                if (TemperatureIsTimeOut)
-                {
-                    if (DialogResult.Yes == MessageBox.Show($"环境温度设置已经超过{TC720.TimeOut}s，还未达到设定温度{temp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                    {
-                        TemperatureIsOk = true;
-                        ShowMsg($"产品温度设置未达到设定值{temp}℃，但可以继续进行测试！", true);
-                        return;
-                    }
-                    else
-                    {
-                        strMsg = $"产品温度设置未达到设定值{temp}℃，不可以继续进行测试！";
-                        ShowMsg(strMsg, false);
-                        throw new Exception(strMsg);
-                    }
 
+            Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
+            while (!TemperatureIsTimeOut)
+            {
+                if (TemperatureIsOk)
+                {
+                    return;
                 }
-            });
-            task.Start();
+            }
+            if (TemperatureIsTimeOut)
+            {
+                if (DialogResult.Yes == MessageBox.Show($"环境温度设置已经超过{TC720.TimeOut}s，还未达到设定温度{temp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                {
+                    TemperatureIsOk = true;
+                    ShowMsg($"产品温度设置未达到设定值{temp}℃，但可以继续进行测试！", true);
+                    return;
+                }
+                else
+                {
+                    strMsg = $"产品温度设置未达到设定值{temp}℃，不可以继续进行测试！";
+                    ShowMsg(strMsg, false);
+                    throw new Exception(strMsg);
+                }
+            }
         }
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
@@ -1309,9 +1354,7 @@ namespace LWDM_Tx_4x25
                 MessageBox.Show(strMsg, "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            ReadK2400();
 
             this.lstViewTestData.Items.Clear();
             this.lstViewLog.Items.Clear();
@@ -1374,7 +1417,7 @@ namespace LWDM_Tx_4x25
                         ShowMsg($"Set product temperature to {this.ProductTempInPlan}...", true);
 
                         TickCountTotal_Product = 0;
-                        ProductTempTimer.Start();
+                        ProductTempTimer1.Start();
 
                         //等待环境温度和产品温度达到设定值并稳定
                         ShowMsg("等待环境温度和产品温度达到设定值...", true);
@@ -1593,9 +1636,7 @@ namespace LWDM_Tx_4x25
         }
         private void btnAutoScale_Click(object sender, EventArgs e)
         {
-            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            ReadK2400();
 
             ShowMsg("AutoScaling Eye diagran，pls wait...", true);
             try
@@ -1616,9 +1657,7 @@ namespace LWDM_Tx_4x25
 
         private void btnRun_Click(object sender, EventArgs e)
         {
-            K2400_1.Current = K2400_1.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_2.Current = K2400_2.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
-            K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
+            ReadK2400();
             try
             {
                 ShowMsg("Running Eye diagram，pls wait...", true);
@@ -1647,7 +1686,7 @@ namespace LWDM_Tx_4x25
                 return;
             }
 
-            gY7501_I2C = new GY7501_I2C(GY7501_Data);
+           // gY7501_I2C = new GY7501_I2C(GY7501_Data);
             gY7501_I2C.Show();
         }
 
@@ -1672,13 +1711,42 @@ namespace LWDM_Tx_4x25
                 return;
             }
             this.ProductTempInPlan = Convert.ToDouble(this.txtProductTemp_Room.Text);
-            SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-          
-                ShowMsg($"给产品加电...", true);
-                K2400_3.OUTPUT(true);
-                K2400_1.OUTPUT(true);
-                K2400_2.OUTPUT(true);
-           
+            //  SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+            Task task = new Task(() =>
+            {
+            L5525B.SetTemperature(this.ProductTempSetToDevice);
+            TickCountTotal_Product = 0;
+
+            ProductTempTimer1.Start();
+
+            ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
+            //直到产品温度达到要求，开始给产品加电         
+            Thread.Sleep(100);
+            while (!TemperatureIsTimeOut_Product)
+            {
+                if (TemperatureIsOk_Product)
+                {
+                    break;
+                }
+            }
+            if (TemperatureIsTimeOut_Product)
+            {
+                if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{ProductTempInPlan},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                {
+                    TemperatureIsOk_Product = true;
+                    ShowMsg($"产品温度设置未达到设定值{ProductTempInPlan}℃，但可以继续进行测试！", true);
+
+                }
+                else
+                {
+                    strMsg = $"产品温度设置未达到设定值{ProductTempInPlan}℃，不可以继续进行测试！";
+                    ShowMsg(strMsg, false);
+                    throw new Exception(strMsg);
+                }
+            }
+            PowerOnK2400();
+            });
+            task.Start();
         }
 
         private void btnRestTemp_Click(object sender, EventArgs e)
@@ -1752,7 +1820,7 @@ namespace LWDM_Tx_4x25
                 TemperatureIsTimeOut_Product = false;
                 if (TickCountTotal_Product > L5525B.TimeOut)
                 {
-                    ProductTempTimer.Stop();
+                    ProductTempTimer1.Stop();
                     TemperatureIsTimeOut_Product = true;
                 }
             }

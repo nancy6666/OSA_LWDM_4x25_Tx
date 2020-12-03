@@ -25,15 +25,14 @@ namespace GY7501_I2C_Control
         /// </summary>
         public int RegDataBitNum { get; set; }
 
-        private byte oldValue { get; set; }
+        private decimal oldValue { get; set; }
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             base.OnKeyPress(e);
-           
             List<byte> dataBuff = new List<byte>();
             if(e.KeyChar== (char)Keys.Enter)
             {
-                var valueToWrite = Convert.ToByte(this.Value);
+                byte valueToWrite=0;
                 if (RegNum == 2)
                 {
                     byte[] byteArray = BitConverter.GetBytes((ushort)(this.Value));
@@ -41,6 +40,7 @@ namespace GY7501_I2C_Control
                     dataBuff.Add(byteArray[1]);
                     dataBuff.Add(byteArray[0]);
                     GlobalVar.uSB_I2C_Adapter.SetValue(dataBuff.ToArray());
+                    return;
                 }
                 if(RegReadBackStatus)//回读寄存器的值,取data以外的后几位，并与当前控件里的data值合成
                 {
@@ -53,6 +53,8 @@ namespace GY7501_I2C_Control
                         byte bit =Convert.ToByte( initialValueBits.Get(moveBit - 1 - i));
                         initialValue = initialValue << 1 | bit;
                     }
+                     valueToWrite = Convert.ToByte(this.Value);
+
                     var value = valueToWrite << moveBit | initialValue ;
                     dataBuff.Add(RegAddr);
                     dataBuff.Add(Convert.ToByte(value));
@@ -65,7 +67,7 @@ namespace GY7501_I2C_Control
                     GlobalVar.uSB_I2C_Adapter.SetValue(dataBuff.ToArray());
                 }
 
-                oldValue = valueToWrite;
+                oldValue = this.Value;
                 this.BackColor = Color.White;
                 this.Select(0, this.Text.Length);
             }

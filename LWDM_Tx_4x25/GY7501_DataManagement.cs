@@ -139,7 +139,7 @@ namespace GY7501_I2C_Control
             byte[] valueReadFromChip = new byte[10];
             try
             {
-                valueReadFromChip = GlobalVar.uSB_I2C_Adapter.ReadValue(0x00, 10);
+                valueReadFromChip = GlobalVar.uSB_I2C_Adapter.ReadValue((byte)startAddr, 10);
             }
             catch (Exception ex)
             {
@@ -174,6 +174,7 @@ namespace GY7501_I2C_Control
             {
                 GlobalVar.uSB_I2C_Adapter.SetValue(dataBuffer.ToArray());
                 Thread.Sleep(300);
+                //byte[] readdata=GlobalVar.uSB_I2C_Adapter.ReadValue((byte)startAddr, 10);
             }
             catch (Exception ex)
             {

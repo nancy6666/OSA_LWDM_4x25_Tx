@@ -33,34 +33,45 @@ namespace GY7501_I2C_Control
         public GY7501_I2C(GY7501_DataManagement data)
         {
             InitializeComponent();
-            dataManagement = new GY7501_DataManagement();
-            //if (this.txtSlaveAddress.Text != null & this.txtSlaveAddress.Text != " ")
-            //{
-            //    SlaveAddr = Convert.ToByte(Int32.Parse(this.txtSlaveAddress.Text, NumberStyles.HexNumber));
+            dataManagement = new GY7501_DataManagement(); if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                MessageBox.Show("设备打开失败！", "打开设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            //设置I2C Adapter 模式和时钟
+            if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+            {
+                MessageBox.Show("设置I2C 适配器的Mode出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
+            {
+                MessageBox.Show("设置I2C 适配器的时钟出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
-            //}
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             try
             {
-                if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-                {
-                    MessageBox.Show("设备打开失败！", "打开设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                //设置I2C Adapter 模式和时钟
-                if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
-                {
-                    MessageBox.Show("设置I2C 适配器的Mode出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
-                {
-                    MessageBox.Show("设置I2C 适配器的时钟出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                //if (USB_I2C_Adapter.GYI2C_Open(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+                //{
+                //    MessageBox.Show("设备打开失败！", "打开设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //    return;
+                //}
+                ////设置I2C Adapter 模式和时钟
+                //if (USB_I2C_Adapter.GYI2C_SetMode(USB_I2C_Adapter.DEV_GY7501A, 0, 0) != 1)
+                //{
+                //    MessageBox.Show("设置I2C 适配器的Mode出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //    return;
+                //}
+                //if (USB_I2C_Adapter.GYI2C_SetClk(USB_I2C_Adapter.DEV_GY7501A, 0, 100) != 1)
+                //{
+                //    MessageBox.Show("设置I2C 适配器的时钟出错！", "设置设备", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //    return;
+                //}
                 ReadInitalParametersFromChip();
             }
             catch(Exception ex)
