@@ -80,11 +80,7 @@ namespace LWDM_Tx_4x25.Instruments
                     {
                         break;
                     }
-                    //if ((t2 - t1).TotalSeconds > 10)
-                    //{
-                    //    t1 = DateTime.Now;
-                    //    gb.GPIBwr(":INITIATE");//start sweep
-                    //}
+                
                     Thread.Sleep(100);
                     gb.GPIBwr(":stat:oper:even?");
                     Byte.TryParse(gb.GPIBrd(100), out status);

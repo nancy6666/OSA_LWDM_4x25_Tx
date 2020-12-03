@@ -49,7 +49,7 @@ namespace LWDM_Tx_4x25
         public List<double> lstAQ6370_StartWave;
         public List<double> lstAQ6370_StopWave;
 
-        public List<double> lstITU = new List<double> { 1295.56, 1300.05, 1304.58, 1309.14 };
+        public List<double> lstITU = new List<double>();
         public Kesight_N1092D kesight_N1902D;
         delegate void ThreedShowMsgDelegate(string Message, bool bPass);
         delegate void ThreedShowTempDelegate(double Temp);
@@ -427,6 +427,12 @@ namespace LWDM_Tx_4x25
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[62, 2].value));
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[63, 2].value));
                     this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[64, 2].value));
+                    //ITU
+                    this.lstITU.Add(Convert.ToDouble(excelCell[67, 2].value));
+                    this.lstITU.Add(Convert.ToDouble(excelCell[68, 2].value));
+                    this.lstITU.Add(Convert.ToDouble(excelCell[69, 2].value));
+                    this.lstITU.Add(Convert.ToDouble(excelCell[70, 2].value));
+
                     ShowMsg("配置信息读取结束，请继续下一步操作.", true);
                 }
                 catch (Exception ex)
@@ -1068,20 +1074,20 @@ namespace LWDM_Tx_4x25
             ShowMsg($"波长与ITU对比测试...", true);
 
             try
-            {
-               
+            {               
                 var task = new Task(() =>
                 {
                     this.ProductTempInPlan = lstTempProductInPlan[0];
                     SetAndWaitProductTempOK(this.ProductTempSetToDevice);
                    
                     PowerOnK2400();
-                    strMsg = "产品加电已完成，请reset！";
+
+                    strMsg = "产品加电已完成，请reset产品，同时解锁K2400！";
                     if (MessageBox.Show(strMsg, "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                     {  //根据GY7501的config文件设置芯片参数
                         GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
                         GY7501_Data.SetValuesToChip();
-                        ReadK2400();
+                        //ReadK2400();
                         //波长差值大于0.8nm，温度降到中间档，继续波长比对
                         if (GoOnWaveComparisonOrNot(0))
                         {
