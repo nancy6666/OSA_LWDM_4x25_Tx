@@ -14,10 +14,10 @@ namespace LWDM_Tx_4x25.Instruments
         #region Properties
 
         public string MaskMarginPattern;
-        public  string MaskPattern25G = $":MTESt1:LOAD:FNAMe \"% DEMO_DIR %\\Masks\\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx\"";
-        public string MaskPattern28G = $":MTESt1:LOAD:FNAMe \" % DEMO_DIR %\\Masks\\Ethernet\\027.952493 - OTU4_G959_1.mskx\"";
-        public const string BANDWIDTH25G = "19.3";
-        public const string BANDWIDTH28G = "21.0";
+        public  string MaskPattern25G = @"C:\Program Files\Keysight\FlexDCA\Demo\Masks\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx";
+        public string MaskPattern28G = @"C:\Program Files\Keysight\FlexDCA\Demo\Masks\Ethernet\027.952493 - OTU4_G959_1.mskx";
+        public const string RATE25G = "25.78125";
+        public const string RATE28G = "27.952493";
 
         public string Channel
         {
@@ -37,16 +37,16 @@ namespace LWDM_Tx_4x25.Instruments
             }
 
         }
-        private string channel_bandWidth;
-        public string Channel_bandWidth
+        private string rate;
+        public string Rate
         {
             get
             {
-                return channel_bandWidth;
+                return rate;
             }
             set
             {
-                this.channel_bandWidth = value + "E+9";
+                this.rate = value + "E+9";
             }
         }
         public double AOP_Offset
@@ -139,21 +139,22 @@ namespace LWDM_Tx_4x25.Instruments
                 ////set acquisition limit
                 myN1010A.WriteString($":LTESt:ACQuire:CTYPe:WAVeforms", true);//  Create test based on acquisition to waveforms.
                 myN1010A.WriteString($":LTESt:ACQuire:CTYPe:WAVeforms 1000", true);//set number of waveforms
-               ///????need to confirm patterns or waveforms
-                // myN1010A.WriteString($":LTESt:ACQuire:CTYPe:PATTerns 1000", true);//set number of waveforms
-
+           
                 myN1010A.WriteString($":LTESt:ACQuire:STATe ON", true);//enable limits
+                //:CHAN1A:FSELect:RATe 27.95249E+9
 
                 //myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FRATe {this.Filter_rate}", true);
                 //myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FRATe?", true);
                 //var a = myN1010A.ReadString();
-                myN1010A.WriteString($":CHANnel{this.Channel}:SIRC:FBANdwidth {this.Channel_bandWidth}", true);
+                myN1010A.WriteString($":CHANnel{this.Channel}:FSELect:RATe {this.Rate}", true);
                 myN1010A.WriteString($":CHAN{this.Channel}:ATTenuator:DECibels {this.AOP_Offset}", true);//设置AOP offset
 
                 //Set mask margin
                 myN1010A.WriteString(":MTESt1:DISPlay OFF");
+                //:MTESt1:LOAD:FNAMe "%DEMO_DIR%\Masks\Ethernet\025.78125 - 100GBASE-LR4_Tx_Optical_D31.mskx"
                 Thread.Sleep(100);
-                myN1010A.WriteString(MaskMarginPattern); //set mask 100G LR
+                string maskname= ":MTESt1:LOAD:FNAMe \"" +  MaskMarginPattern + "\"";
+                myN1010A.WriteString(maskname); //set mask 100G LR
                 myN1010A.WriteString(":MTESt1:LOAD", true);
                 myN1010A.WriteString(":MTESt:MARGin:STATe ON", true);
                 myN1010A.WriteString(":MTESt:MARGin:METHod AUTO", true);

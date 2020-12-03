@@ -339,8 +339,8 @@ namespace LWDM_Tx_4x25
             strMsg = "正在获取test plan 的内容,请稍等...";
             ShowMsg(strMsg, true);
 
-            var task1 = new Task(() =>
-            {
+            //var task1 = new Task(() =>
+            //{
                 string TestPlanFile = $"{ Directory.GetCurrentDirectory()}\\config\\LWDM 4x25 TEST PLAN.xlsx";
                 Excel.Application excelApp = new Excel.Application
                 {
@@ -374,7 +374,7 @@ namespace LWDM_Tx_4x25
 
                     //N1092 paras
                     kesight_N1902D.Channel = Convert.ToString(excelCell[27, 2].value);
-                    kesight_N1902D.Channel_bandWidth = Convert.ToString(excelCell[28, 2].value);
+                    kesight_N1902D.Rate = Convert.ToString(excelCell[28, 2].value);
                     kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[29, 2].value);
 
                     //T720
@@ -450,8 +450,8 @@ namespace LWDM_Tx_4x25
                     System.Diagnostics.Process p = System.Diagnostics.Process.GetProcessById(kill);
                     p.Kill();
                 }
-            });
-            task1.Start();
+            //});
+            //task1.Start();
         }
 
         /// <summary>
@@ -476,23 +476,21 @@ namespace LWDM_Tx_4x25
                 return;
             }
             //Bert的初始设置
-            try
-            {
-                ShowMsg("对Bert进行初始设置", true);
-                Inst_Bert.SetBert();
-            }
-            catch (Exception ex)
-            {
-                ShowMsg($"对Bert进行初始设置时出错，{ex.Message}", false);
-                return;
-            }
+            //try
+            //{
+            //    ShowMsg("对Bert进行初始设置", true);
+            //    Inst_Bert.SetBert();
+            //}
+            //catch (Exception ex)
+            //{
+            //    ShowMsg($"对Bert进行初始设置时出错，{ex.Message}", false);
+            //    return;
+            //}
 
             //N1092A 的初始设置
             try
             {
                 kesight_N1902D.Init();
-                ShowMsg("对N1092进行初始设置", true);
-                kesight_N1902D.SetN1092();
             }
             catch (Exception ex)
             {
@@ -811,10 +809,10 @@ namespace LWDM_Tx_4x25
         /// </summary>
         /// <param name="TestData"></param>
         /// <param name="tec_temp_out"></param>
-        private void GetPfAndShowTestData(CTestData_Channel TestData, double tec_temp_out)
+        private void GetPfAndShowTestData(CTestData_Channel TestData, double tec_temp_out,string rate)
         {
-            testResult = new string[] { tec_temp_out.ToString(), TestData.Channel.ToString(), TestData.Cwl.ToString(), TestData.SMSR.ToString(), TestData.Power.ToString(), TestData.Impd.ToString(), TestData.Idark.ToString(), TestData.Jitter_pp.ToString(), TestData.Jitter_rms.ToString(), TestData.Crossing.ToString(), TestData.Fall_time.ToString(), TestData.Rise_time.ToString(), TestData.Er.ToString(), TestData.Mask_Margin.ToString() };
-            iFail = new Int32[14];
+            testResult = new string[] { tec_temp_out.ToString(), rate, TestData.Channel.ToString(), TestData.Cwl.ToString(), TestData.SMSR.ToString(), TestData.Power.ToString(), TestData.Impd.ToString(), TestData.Idark.ToString(), TestData.Jitter_pp.ToString(), TestData.Jitter_rms.ToString(), TestData.Crossing.ToString(), TestData.Fall_time.ToString(), TestData.Rise_time.ToString(), TestData.Er.ToString(), TestData.Mask_Margin.ToString() };
+            iFail = new Int32[15];
 
             if (TestData.Cwl >= TestSpec.Cwl_min && TestData.Cwl <= TestSpec.Cwl_max)
             {
@@ -845,73 +843,73 @@ namespace LWDM_Tx_4x25
                                                         else
                                                         {
                                                             TestData.Pf = false;
-                                                            iFail[13] = 1;
+                                                            iFail[14] = 1;
                                                         }
                                                     }
                                                     else
                                                     {
                                                         TestData.Pf = false;
-                                                        iFail[12] = 1;
+                                                        iFail[13] = 1;
                                                     }
                                                 }
                                                 else
                                                 {
                                                     TestData.Pf = false;
-                                                    iFail[11] = 1;
+                                                    iFail[12] = 1;
                                                 }
                                             }
                                             else
                                             {
                                                 TestData.Pf = false;
-                                                iFail[10] = 1;
+                                                iFail[11] = 1;
                                             }
                                         }
                                         else
                                         {
                                             TestData.Pf = false;
-                                            iFail[9] = 1;
+                                            iFail[10] = 1;
                                         }
                                     }
                                     else
                                     {
                                         TestData.Pf = false;
-                                        iFail[8] = 1;
+                                        iFail[9] = 1;
                                     }
                                 }
                                 else
                                 {
                                     TestData.Pf = false;
-                                    iFail[7] = 1;
+                                    iFail[8] = 1;
                                 }
                             }
                             else
                             {
                                 TestData.Pf = false;
-                                iFail[6] = 1;
+                                iFail[7] = 1;
                             }
                         }
                         else
                         {
                             TestData.Pf = false;
-                            iFail[5] = 1;
+                            iFail[6] = 1;
                         }
                     }
                     else
                     {
                         TestData.Pf = false;
-                        iFail[4] = 1;
+                        iFail[5] = 1;
                     }
                 }
                 else
                 {
                     TestData.Pf = false;
-                    iFail[3] = 1;
+                    iFail[4] = 1;
                 }
             }
             else
             {
                 TestData.Pf = false;
-                iFail[2] = 1;
+                iFail[3] = 1;
             }
 
             ShowResult(testResult, iFail);
@@ -969,7 +967,7 @@ namespace LWDM_Tx_4x25
                 {
                     Directory.CreateDirectory(ImageFileName);
                 }
-                string ImageName = $"{ImageFileName}\\{dataCommon.SN}-{dataCommon.Rate}-{temp_note}-Ch{channel}-{DateTime.Now.ToString("hh-mm")}.jpg";
+                string ImageName = $"{ImageFileName}\\{dataCommon.SN}-{dataCommon.Rate}-{temp_note}-Ch{channel}-{DateTime.Now.ToString("hh-mm-ss")}.jpg";
                 if (File.Exists(ImageName))
                 {
                     if (DialogResult.Yes == MessageBox.Show($"{ImageName}已存在，是否替换？", "眼图图片保存", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
@@ -1154,13 +1152,12 @@ namespace LWDM_Tx_4x25
             K2400_3.Current = K2400_3.GetMeasuredData(KEITHLEY2400.EnumDataStringElements.CURR).Current;
         }
         /// <summary>
-        /// 根据波长差值范围判断，如果大于0.8nm，温度下降一档后返回true，表明可进行再一次的波长对比
+        /// 根据波长差值范围判断，如果大于0.7nm，温度下降一档后返回true，表明可进行再一次的波长对比
         /// </summary>
         /// <returns>true:进入下一次比对；false:不进入下一次比对，此时温度已达标或者产品Fail</returns>
         private bool GoOnWaveComparisonOrNot(int CurrentTempIndex)
         {
-            bool ret = false;
-            double maxWaveSub = 0;
+            int chlPassNum = 0 ;
             double waveSub = 0;
             for (int i = 0; i < MaxChannel; i++)
             {  //光开关切换通道，选择通道
@@ -1168,43 +1165,47 @@ namespace LWDM_Tx_4x25
                 //AQ6370扫描一次，读取peakWL
                 aQ6370.StartSweep(lstAQ6370_StartWave[i], lstAQ6370_StopWave[i]);
                 waveSub = aQ6370.PeakWL - lstITU[i];
-                maxWaveSub = waveSub > maxWaveSub ? waveSub : maxWaveSub;
+                //某个通道波长与ITU的差值小于0.7，则产品直接fail，无需再进行测试
+                if (waveSub<-0.7)
+                {
+                    strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值已低于0.7nm，判定该产品Fail，停止测试！";
+                    ShowMsg(strMsg, false);
+                    MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+                else if(waveSub>-0.7&waveSub<0.7)
+                {
+                    chlPassNum++;
+                }
             }
-            //波长与ITU的差值小于0.7，则产品直接fail，无需再进行测试
-            if (maxWaveSub < 0.7)
+            //四个通道都在+-0.7范围内，温度pass，无需降温，返回false
+           if(chlPassNum==4)
             {
-                strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值已低于0.7nm，判定该产品Fail，停止测试！";
-                ShowMsg(strMsg, false);
-                MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                strMsg = $"产品温度{ProductTempInPlan}℃下，四个通道波长与ITU差值在-0.7~0.7nm，温度pass，可以继续测试！"; 
+                ShowMsg(strMsg, true);
+                IsWaveSubOk = true;
+                return false;
             }
-            //波长与ITU的差值大于0.8nm，则温度下降一档
-            else if (maxWaveSub > 0.8)
+           //有通道差值大于0.7，需降温
+           else
             {
-                //下降温度到下一档
+                //如果当前温度不是最后一档温度，下降温度到下一档
                 if (CurrentTempIndex < 2)
                 {
                     this.ProductTempInPlan = lstTempProductInPlan[CurrentTempIndex + 1];
                     //下一档的温度设置成功，返回true，表明可进行洗一次的GoOnWaveComparisonOrNot
                     SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-                    ret = true;
+                    return true;
                 }
                 //如果当前温度是最后一档温度，不再继续下降温度
                 else
                 {
-                    strMsg = "最后一档温度，波长差依然大于0.8nm，该产品Fail！";
+                    strMsg = "最后一档温度，波长差依然大于0.7nm，该产品Fail！";
                     ShowMsg(strMsg, false);
                     MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
             }
-            else
-            {
-                strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值在0.7~0.8nm，可以继续测试！"; MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                MessageBox.Show(strMsg, "Information", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                ShowMsg(strMsg, true);
-                IsWaveSubOk = true;
-            }
-            return ret;
         }
 
         /// <summary>
@@ -1296,7 +1297,7 @@ namespace LWDM_Tx_4x25
                 PN = this.cbxPN.SelectedItem.ToString();
                 TestSpec = db.GetTestSpec(PN);
                 ReadTestPlan(PN);
-              
+                InitInstruments();
             }
         }
         private void WaitEnvironmTempOK(double temp)
@@ -1345,7 +1346,7 @@ namespace LWDM_Tx_4x25
                 MessageBox.Show(strMsg, "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ReadK2400();
+           // ReadK2400();
 
             this.lstViewTestData.Items.Clear();
             this.lstViewLog.Items.Clear();
@@ -1360,9 +1361,9 @@ namespace LWDM_Tx_4x25
             ShowMsg("Start Test Process...", true);
             testDataCommon.Test_Start_Time = DateTime.Now.ToString();
             testDataCommon.Rate = this.TestRate;
-          
+            var strRate = this.cbxSelectTestRate.Text;
             //如果是25G & 28G，则会测试2个速率，得到两组testcommon数据
-            if (this.cbxSelectTestRate.Text == "25G & 28G")
+            if (strRate == "25G & 28G")
             {
                 lstTestDataCommon = Enumerable.Repeat<CTestDataCommon>(testDataCommon, 2).ToList();//该list长度为2，内容为testDataCommon
             }
@@ -1443,18 +1444,15 @@ namespace LWDM_Tx_4x25
                         }
                         TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0]);
                         lstTestDataCommon[0] = testDataCommon;
-                        if (this.cbxSelectTestRate.Text == "25G & 28G")
+                        if (strRate == "25G & 28G")
                         {
-                            SelectRate(EnumRate._25G);
-                            kesight_N1902D.SetN1092();
-                            Inst_Bert.SetBert();
+                            SelectAndSetRate(EnumRate._25G);
+                           
                             TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[1]);
-                            //如果是最后一个温度，则速率无需再设置回28G
+                            //如果不是最后一个温度，则速率设置回28G
                             if (TecTempIndex < lstTecTemp.Count - 1)
                             {
-                                SelectRate(EnumRate._28G);
-                                kesight_N1902D.SetN1092();
-                                Inst_Bert.SetBert();
+                                SelectAndSetRate(EnumRate._28G);
                             }
                         }
                     }
@@ -1486,7 +1484,7 @@ namespace LWDM_Tx_4x25
         /// 速率确定后，给相关参数赋想要的值
         /// </summary>
         /// <param name="rate">25G或者28G</param>
-        private void SelectRate(EnumRate rate)
+        private void SelectAndSetRate(EnumRate rate)
         {
             switch (rate)
             {
@@ -1494,15 +1492,17 @@ namespace LWDM_Tx_4x25
                     this.TestRate = "25G";
                     Inst_Bert.Ppg_data_rate = Bert.PPGRATE25G;
                     kesight_N1902D.MaskMarginPattern = kesight_N1902D.MaskPattern25G;
-                    kesight_N1902D.Channel_bandWidth = Kesight_N1092D.BANDWIDTH25G;
+                    kesight_N1902D.Rate = Kesight_N1092D.RATE25G;
                     break;
                 case EnumRate._28G:
                     this.TestRate = "28G";
                     Inst_Bert.Ppg_data_rate = Bert.PPGRATE28G;
                     kesight_N1902D.MaskMarginPattern = kesight_N1902D.MaskPattern28G;
-                    kesight_N1902D.Channel_bandWidth = Kesight_N1092D.BANDWIDTH28G;
+                    kesight_N1902D.Rate = Kesight_N1092D.RATE28G;
                     break;
             }
+            Inst_Bert.SetBert();
+            kesight_N1902D.SetN1092();
         }
         private void TestProcessWithSpecificTemp(int TecTempIndex, CTestDataCommon dataCommon )
         {
@@ -1594,7 +1594,7 @@ namespace LWDM_Tx_4x25
                 TestData_Temp.lstTestData_Channel[ch].Idark = lstIdark[ch];
                 TestData_Temp.lstTestData_Channel[ch].Impd = lstMpd[ch];
                 //一个通道获取一次pf结果，并在界面显示一行
-                GetPfAndShowTestData(TestData_Temp.lstTestData_Channel[ch], lstTecTemp[TecTempIndex]);
+                GetPfAndShowTestData(TestData_Temp.lstTestData_Channel[ch], lstTecTemp[TecTempIndex],dataCommon.Rate);
 
                 TestData_Temp.Pf = true & TestData_Temp.lstTestData_Channel[ch].Pf;
             }
@@ -1873,14 +1873,14 @@ namespace LWDM_Tx_4x25
             switch(this.cbxSelectTestRate.Text)
             {
                 case "25G":
-                    SelectRate(EnumRate._25G);
+                    SelectAndSetRate(EnumRate._25G);
                     break;
                 case "28G":
                 case "25G & 28G":
-                    SelectRate(EnumRate._28G);
+                    SelectAndSetRate(EnumRate._28G);
                     break;
             }
-            InitInstruments();
+          //  InitInstruments();
         }
     }
 }

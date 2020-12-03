@@ -97,6 +97,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.lblPre_Cursor = new System.Windows.Forms.Label();
             this.TrackBarPre_Cursor = new DevExpress.XtraEditors.ZoomTrackBarControl();
+            this.columnHeader16 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             ((System.ComponentModel.ISupportInitialize)(this.TecTimer)).BeginInit();
             this.groupBox6.SuspendLayout();
             this.TEC.SuspendLayout();
@@ -202,6 +203,7 @@
             // 
             this.lstViewTestData.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader7,
+            this.columnHeader16,
             this.columnHeader10,
             this.columnHeader8,
             this.columnHeader9,
@@ -219,7 +221,7 @@
             this.lstViewTestData.HideSelection = false;
             this.lstViewTestData.Location = new System.Drawing.Point(32, 550);
             this.lstViewTestData.Name = "lstViewTestData";
-            this.lstViewTestData.Size = new System.Drawing.Size(931, 362);
+            this.lstViewTestData.Size = new System.Drawing.Size(976, 362);
             this.lstViewTestData.TabIndex = 13;
             this.lstViewTestData.UseCompatibleStateImageBehavior = false;
             this.lstViewTestData.View = System.Windows.Forms.View.Details;
@@ -766,6 +768,10 @@
             this.TrackBarPre_Cursor.Value = 0;
             this.TrackBarPre_Cursor.ValueChanged += new System.EventHandler(this.TrackBarPre_Cursor_ValueChanged);
             // 
+            // columnHeader16
+            // 
+            this.columnHeader16.Text = "Rate";
+            // 
             // LWDM_Tx_4x25
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -880,6 +886,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtEnvirnTemp;
+        private System.Windows.Forms.ColumnHeader columnHeader16;
     }
 }
 

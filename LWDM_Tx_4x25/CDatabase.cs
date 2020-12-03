@@ -43,7 +43,7 @@ namespace LWDM_Tx_4x25
                     var strSql = $"INSERT INTO dbo.tx_lwdm_4x25_test_common " +
                     $"(spec_id,sn,operator,test_station,test_start_time,test_end_time,rate,pf) " +
                     $"OUTPUT inserted.id " +
-                    $"VALUES({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{DateTime.Now}','{testData.Rate}''{testData.Pf}')";
+                    $"VALUES({testData.Spec_id}, '{testData.SN}','{testData.Operator}','{SystemInformation.ComputerName}','{testData.Test_Start_Time}','{DateTime.Now}','{testData.Rate}','{testData.Pf}')";
                     cmd.CommandType = CommandType.Text;
                     cmd.CommandText = strSql;
                     testData.ID = (int)cmd.ExecuteScalar();//返回插入行的id
@@ -77,8 +77,9 @@ namespace LWDM_Tx_4x25
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    cmd.Transaction.Commit();
+                    
                 }
+                cmd.Transaction.Commit();
             }
             catch (Exception ex)
             {
