@@ -82,6 +82,9 @@
     <Compile Include="CTestDataCommon.cs" />
     <Compile Include="CTestData_Channel.cs" />
     <Compile Include="CTestData_Temp.cs" />
+    <Compile Include="DoubleBufferListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GY7501_DataManagement.cs" />
     <Compile Include="GlobalVar.cs" />
     <Compile Include="GY7501_I2C.cs">

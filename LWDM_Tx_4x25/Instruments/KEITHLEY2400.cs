@@ -154,7 +154,7 @@ namespace LWDM_Tx_4x25.Instruments
         {
             if (on) { GPIBDevice.GPIBwr("OUTP ON"); }
             else { GPIBDevice.GPIBwr("OUTP OFF"); }
-            Thread.Sleep(1000);
+            Thread.Sleep(300);
         }
 
         /// <summary>
@@ -610,6 +610,7 @@ namespace LWDM_Tx_4x25.Instruments
         public void SetSOURCEVOLTlevel(decimal lev)
         {
             GPIBDevice.GPIBwr(":SOUR:VOLT:LEV " + lev.ToString());
+            Thread.Sleep(500);
         }
 
         /// <summary>
@@ -633,6 +634,7 @@ namespace LWDM_Tx_4x25.Instruments
             {
                 GPIBDevice.GPIBwr(":READ?");
                 string str = GPIBDevice.GPIBrd(200);
+                Thread.Sleep(100);
                 return str;
             }
             catch(Exception e)

@@ -295,28 +295,16 @@ namespace LWDM_Tx_4x25
         private void MsgEvent(string msg, bool bPass)
         {
             log.WriteLog(msg);
-            //if(lstViewLog.Items.Count>=30)
-            //{
-            //    lstViewLog.Items.Clear();
-            //}
+            if (lstViewLog.Items.Count >= 50)
+            {
+                lstViewLog.Items.Clear();
+            }
             lstViewLog.BeginUpdate();
             try
             {
-                ListViewItem lvi = null;
-                string temp = "";
-                if (msg.Contains("."))
-                {
-                    int iPos = msg.IndexOf('.');
-                    temp = msg.Substring(0, iPos - 1);
-                    lvi = lstViewLog.FindItemWithText(temp);
-                    if (lvi != null)
-                    {
-                        lstViewLog.Items.Remove(lvi);
-                    }
-                }
-                lvi = new ListViewItem(msg);
+                ListViewItem lvi = new ListViewItem(msg);
                 lstViewLog.Items.Add(lvi);
-                //lvi.UseItemStyleForSubItems = false;
+                lstViewLog.Items[lstViewLog.Items.Count - 1].EnsureVisible();//滚动到最后
 
                 if (!bPass)
                     lvi.ForeColor = Color.Red;
@@ -511,16 +499,16 @@ namespace LWDM_Tx_4x25
                 ShowMsg("对K2400进行初始设置", true);
 
                 K2400_1.SetToVoltageSource();
-                K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
+               // K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
                 K2400_1.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_1.I_limit);
 
                 K2400_2.SetToVoltageSource();
-                K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
+               // K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
                 K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
 
                 K2400_3.SetToVoltageSource();
                 K2400_3.SetTerminalPanel(KEITHLEY2400.TeminalPanel.FRONT);
-                K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
+            //  K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
                 K2400_3.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_3.I_limit);
             }
             catch (Exception ex)
@@ -717,9 +705,7 @@ namespace LWDM_Tx_4x25
             {
                 ShowMsg($"Test process ended,turn off the K2400...", true);
                 //产品断电
-                K2400_1.OUTPUT(false);
-                K2400_2.OUTPUT(false);
-                K2400_3.OUTPUT(false);
+                PowerOffK2400();
                 ShowMsg($"Turn off the LDT5525 ...", true);
                 //关闭产品温度
                 L5525B.SetOutputStatus(false);
@@ -1088,35 +1074,7 @@ namespace LWDM_Tx_4x25
                 {
                     this.ProductTempInPlan = lstTempProductInPlan[0];
                     SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-                    ////L5525B.SetTemperature(this.ProductTempSetToDevice);
-                    ////TickCountTotal_Product = 0;
-                    ////ProductTempTimer1.Start();//启动产品温度监控计时器
-
-                    ////ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
-                    //////直到产品温度达到要求，开始给产品加电         
-
-                    ////while (!TemperatureIsTimeOut_Product)
-                    ////{
-                    ////    if (TemperatureIsOk_Product)
-                    ////    {
-                    ////       break;
-                    ////    }
-                    ////}
-                    ////if (TemperatureIsTimeOut_Product)
-                    ////{
-                    ////    if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{ProductTempInPlan},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                    ////    {
-                    ////        TemperatureIsOk_Product = true;
-                    ////    ShowMsg($"产品温度设置未达到设定值{ProductTempInPlan}℃，但可以继续进行测试！", true);
-
-                    ////}
-                    ////else
-                    //////{
-                    ////    strMsg = $"产品温度设置未达到设定值{ProductTempInPlan}℃，不可以继续进行测试！";
-                    ////    ShowMsg(strMsg, false);
-                    ////    throw new Exception(strMsg);
-                //    //}
-                //}
+                   
                     PowerOnK2400();
                     strMsg = "产品加电已完成，请reset！";
                     if (MessageBox.Show(strMsg, "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
@@ -1147,10 +1105,41 @@ namespace LWDM_Tx_4x25
 
         private void PowerOnK2400()
         {
-            ShowMsg($"给产品加电...", true);
-            K2400_3.OUTPUT(true);
-            K2400_1.OUTPUT(true);
-            K2400_2.OUTPUT(true);
+            try
+            {
+                K2400_3.SetSOURCEVOLTlevel(0);
+                K2400_1.SetSOURCEVOLTlevel(0);
+                K2400_2.SetSOURCEVOLTlevel(0);
+                ShowMsg($"给产品加电...", true);
+                K2400_3.OUTPUT(true);
+                K2400_1.OUTPUT(true);
+                K2400_2.OUTPUT(true);
+                K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
+                K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
+                K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
+            }
+            catch (Exception ex)
+            {
+                ShowMsg($"K2400加电失败，{ex.Message}",false);
+            }
+          
+        }
+        private void PowerOffK2400()
+        {
+            try
+            {
+                K2400_3.SetSOURCEVOLTlevel(0);
+                K2400_1.SetSOURCEVOLTlevel(0);
+                K2400_2.SetSOURCEVOLTlevel(0);
+                K2400_3.OUTPUT(false);
+                K2400_1.OUTPUT(false);
+                K2400_2.OUTPUT(false);
+            }
+            catch (Exception ex)
+            {
+                ShowMsg($"K2400断电失败，{ex.Message}", false);
+            }
+
         }
         private void ReadK2400()
         {
@@ -1226,11 +1215,7 @@ namespace LWDM_Tx_4x25
                 ProductTempTimer1.Start();
             }));
             Thread.Sleep(1000);
-            //    var task = new Task(() => { 
-            //ProductTempTimer1.Start();//启动产品温度监控计时器
-            //});
-            //task.Start();
-            //task.Wait();
+           
             ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
             //直到产品温度达到要求，开始给产品加电         
            
@@ -1711,39 +1696,11 @@ namespace LWDM_Tx_4x25
                 return;
             }
             this.ProductTempInPlan = Convert.ToDouble(this.txtProductTemp_Room.Text);
-            //  SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+           
             Task task = new Task(() =>
             {
-            L5525B.SetTemperature(this.ProductTempSetToDevice);
-            TickCountTotal_Product = 0;
-
-            ProductTempTimer1.Start();
-
-            ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
-            //直到产品温度达到要求，开始给产品加电         
-            Thread.Sleep(100);
-            while (!TemperatureIsTimeOut_Product)
-            {
-                if (TemperatureIsOk_Product)
-                {
-                    break;
-                }
-            }
-            if (TemperatureIsTimeOut_Product)
-            {
-                if (DialogResult.Yes == MessageBox.Show($"产品温度设置已经超过{L5525B.TimeOut}s，还未达到设定温度{ProductTempInPlan},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                {
-                    TemperatureIsOk_Product = true;
-                    ShowMsg($"产品温度设置未达到设定值{ProductTempInPlan}℃，但可以继续进行测试！", true);
-
-                }
-                else
-                {
-                    strMsg = $"产品温度设置未达到设定值{ProductTempInPlan}℃，不可以继续进行测试！";
-                    ShowMsg(strMsg, false);
-                    throw new Exception(strMsg);
-                }
-            }
+                SetAndWaitProductTempOK(this.ProductTempSetToDevice);
+              
             PowerOnK2400();
             });
             task.Start();
