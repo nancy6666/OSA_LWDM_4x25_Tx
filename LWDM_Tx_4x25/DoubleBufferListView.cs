@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace LWDM_Tx_4x25
 {
-    class DoubleBufferListView:ListView
+   public class DoubleBufferListView:ListView
     {
       public DoubleBufferListView()
         {

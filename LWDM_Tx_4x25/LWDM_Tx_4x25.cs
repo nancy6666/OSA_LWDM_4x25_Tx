@@ -57,13 +57,12 @@ namespace LWDM_Tx_4x25
         public string PN;
         public CTestSpec TestSpec;
         public CTestData_Channel TestData_Channel;
-        public CTestData_Temp TestData_Temp;
         private List<double> lstTecTemp;
         private List<double> lstTempProductInPlan;
         private List<string> lstTecTempNote;
 
         private double Temp_Environment;
-     //   private CTestDataCommon TestDataCommon;
+        //   private CTestDataCommon TestDataCommon;
         private List<CTestDataCommon> lstTestDataCommon;
         public List<double> lstVcpa;
         public List<double> lstVeq;
@@ -103,7 +102,7 @@ namespace LWDM_Tx_4x25
             }
         }
 
-        public string TestRate="";
+        public string TestRate = "";
 
         /// <summary>
         /// 子窗体对象，全局使用
@@ -145,7 +144,7 @@ namespace LWDM_Tx_4x25
                         TecTimer.Stop();
                         if (TickCountTotal <= TC720.TimeOut)
                         {
-                            ShowMsg($"环境温度已经稳定为{this.Temp_Environment}左右，可以进行测试!", true);
+                            ShowMsg($"环境温度已经稳定为{this.Temp_Environment}左右...", true);
                         }
                         TickCountTotal = 0;
                     }
@@ -230,7 +229,7 @@ namespace LWDM_Tx_4x25
 
         private void LWDM_Tx_Load(object sender, EventArgs e)
         {
-            ShowMsg("Open All Devices...", true);
+            ShowMsg("打开所有设备...", true);
             try
             {
                 Inst_Bert = new Bert(cfg.BertCom);
@@ -251,8 +250,6 @@ namespace LWDM_Tx_4x25
                 ShowMsg($"{ex.Message}", false);
                 return;
             }
-
-            ShowMsg("Getting PN numbers from database...", true);
             try
             {
                 this.cbxPN.SelectedIndexChanged -= new System.EventHandler(this.LoadTestSpec);
@@ -265,9 +262,9 @@ namespace LWDM_Tx_4x25
                 ShowMsg(ex.Message, false);
                 return;
             }
-
             ReadRealTECTemp_Out();
             ReadRealTECTemp_Product();
+            ShowMsg("请填写基础信息，并选择PN！", true);
         }
 
         #region Interface Display Methods
@@ -327,7 +324,7 @@ namespace LWDM_Tx_4x25
         }
         #endregion
 
-         #region Big Methods
+        #region Big Methods
 
         /// <summary>
         /// Set devices according to test plan file
@@ -341,115 +338,108 @@ namespace LWDM_Tx_4x25
 
             //var task1 = new Task(() =>
             //{
-                string TestPlanFile = $"{ Directory.GetCurrentDirectory()}\\config\\LWDM 4x25 TEST PLAN.xlsx";
-                Excel.Application excelApp = new Excel.Application
+            string TestPlanFile = $"{ Directory.GetCurrentDirectory()}\\config\\LWDM 4x25 TEST PLAN.xlsx";
+            Excel.Application excelApp = new Excel.Application
+            {
+                Visible = false
+            };
+            Excel.Workbook workbook = excelApp.Workbooks.Open(TestPlanFile);
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(pn);
+            Excel.Range excelCell = worksheet.UsedRange;
+            try
+            {
+                //Bert paras
+
+                Inst_Bert.Ppg_data_rate = excelCell[4, 2].value;
+                Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[5, 2].value);
+                Inst_Bert.Clock = excelCell[6, 2].value;
+
+                K2400_1.Vcc = Convert.ToDecimal(excelCell[9, 2].value);
+                K2400_1.I_limit = Convert.ToDecimal(excelCell[10, 2].value);
+
+                K2400_2.Vcc = Convert.ToDecimal(excelCell[13, 2].value);
+                K2400_2.I_limit = Convert.ToDecimal(excelCell[14, 2].value);
+
+                K2400_3.Vcc = Convert.ToDecimal(excelCell[17, 2].value);
+                K2400_3.I_limit = Convert.ToDecimal(excelCell[18, 2].value);
+
+                lstK7001Pin = new List<string>();
+                lstK7001Pin.Add(excelCell[21, 2].value);
+                lstK7001Pin.Add(excelCell[22, 2].value);
+                lstK7001Pin.Add(excelCell[23, 2].value);
+                lstK7001Pin.Add(excelCell[24, 2].value);
+
+                //N1092 paras
+                kesight_N1902D.Channel = Convert.ToString(excelCell[27, 2].value);
+                kesight_N1902D.Rate = Convert.ToString(excelCell[28, 2].value);
+                kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[29, 2].value);
+
+                //T720
+                lstTecTemp = new List<double>();
+                for (int index = 32; index < 35; index++)
                 {
-                    Visible = false
-                };
-                Excel.Workbook workbook = excelApp.Workbooks.Open(TestPlanFile);
-                Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(pn);
-                Excel.Range excelCell = worksheet.UsedRange;
-                try
-                {                   
-                    //Bert paras
-                  
-                    Inst_Bert.Ppg_data_rate = excelCell[4, 2].value;
-                    Inst_Bert.Ppg_PRBS_pattern = Convert.ToString(excelCell[5, 2].value);
-                    Inst_Bert.Clock = excelCell[6, 2].value;
-
-                    K2400_1.Vcc = Convert.ToDecimal(excelCell[9, 2].value);
-                    K2400_1.I_limit = Convert.ToDecimal(excelCell[10, 2].value);
-
-                    K2400_2.Vcc = Convert.ToDecimal(excelCell[13, 2].value);
-                    K2400_2.I_limit = Convert.ToDecimal(excelCell[14, 2].value);
-
-                    K2400_3.Vcc = Convert.ToDecimal(excelCell[17, 2].value);
-                    K2400_3.I_limit = Convert.ToDecimal(excelCell[18, 2].value);
-
-                    lstK7001Pin = new List<string>();
-                    lstK7001Pin.Add(excelCell[21, 2].value);
-                    lstK7001Pin.Add(excelCell[22, 2].value);
-                    lstK7001Pin.Add(excelCell[23, 2].value);
-                    lstK7001Pin.Add(excelCell[24, 2].value);
-
-                    //N1092 paras
-                    kesight_N1902D.Channel = Convert.ToString(excelCell[27, 2].value);
-                    kesight_N1902D.Rate = Convert.ToString(excelCell[28, 2].value);
-                    kesight_N1902D.AOP_Offset = Convert.ToDouble(excelCell[29, 2].value);
-
-                    //T720
-                    lstTecTemp = new List<double>();
-                    for (int index = 32; index < 35; index++)
+                    string blTempChoose = Convert.ToString(excelCell[index, 4].value);
+                    if (blTempChoose.ToUpper().Contains("TRUE"))
                     {
-                        string blTempChoose = Convert.ToString(excelCell[index, 4].value);
-                        if (blTempChoose.ToUpper().Contains("TRUE"))
-                        {
-                            lstTecTemp.Add(excelCell[index, 2].value);
-                            lstTecTempNote.Add(Convert.ToString(excelCell[index, 3].value));
-                        }
+                        lstTecTemp.Add(excelCell[index, 2].value);
+                        lstTecTempNote.Add(Convert.ToString(excelCell[index, 3].value));
                     }
-                    //lstTecTemp.Add(excelCell[42, 2].value);
-                    //lstTecTemp.Add(excelCell[43, 2].value);
-                    //lstTecTempNote.Add(Convert.ToString(excelCell[41, 3].value));
-                    //lstTecTempNote.Add(Convert.ToString(excelCell[42, 3].value));
-                    //lstTecTempNote.Add(Convert.ToString(excelCell[43, 3].value));
-
-                    TC720.TempSpan = excelCell[35, 2].value;
-                    TC720.StablizaitonTime = Convert.ToInt32(excelCell[36, 2].value);
-                    TC720.TimeOut = Convert.ToInt32(excelCell[37, 2].value);
-
-                    //LDT5525B
-                    L5525B.StablizationTime = Convert.ToInt32(excelCell[40, 2].value);
-                    L5525B.TempSpan = Convert.ToDouble(excelCell[41, 2].value);
-                    L5525B.TimeOut = Convert.ToInt32(excelCell[42, 2].value);
-                    L5525B.TempOffset = Convert.ToDouble(excelCell[43, 2].value);
-
-                    //AQ6730
-                    lstAQ6370_StartWave = new List<double>();
-                    lstAQ6370_StopWave = new List<double>();
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[46, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[48, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[50, 2].value));
-                    this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[52, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[47, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[49, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[51, 2].value));
-                    this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[53, 2].value));
-
-                    //PM212
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[56, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[57, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[58, 2].value));
-                    pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[59, 2].value));
-
-                    //Product Temp
-                    this.lstTempProductInPlan = new List<double>();
-                    this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[62, 2].value));
-                    this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[63, 2].value));
-                    this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[64, 2].value));
-                    //ITU
-                    this.lstITU.Add(Convert.ToDouble(excelCell[67, 2].value));
-                    this.lstITU.Add(Convert.ToDouble(excelCell[68, 2].value));
-                    this.lstITU.Add(Convert.ToDouble(excelCell[69, 2].value));
-                    this.lstITU.Add(Convert.ToDouble(excelCell[70, 2].value));
-
-                    ShowMsg("配置信息读取结束，请继续下一步操作.", true);
                 }
-                catch (Exception ex)
-                {
-                    ShowMsg($"读取Test plan 出错，{ex.Message}", false);
-                    return;
-                }
-                finally
-                {
-                    workbook.Close();
-                    excelApp.Quit();
-                    IntPtr t = new IntPtr(excelApp.Hwnd);
-                    int kill = 0;
-                    GetWindowThreadProcessId(t, out kill);
-                    System.Diagnostics.Process p = System.Diagnostics.Process.GetProcessById(kill);
-                    p.Kill();
-                }
+                TC720.TempSpan = excelCell[35, 2].value;
+                TC720.StablizaitonTime = Convert.ToInt32(excelCell[36, 2].value);
+                TC720.TimeOut = Convert.ToInt32(excelCell[37, 2].value);
+
+                //LDT5525B
+                L5525B.StablizationTime = Convert.ToInt32(excelCell[40, 2].value);
+                L5525B.TempSpan = Convert.ToDouble(excelCell[41, 2].value);
+                L5525B.TimeOut = Convert.ToInt32(excelCell[42, 2].value);
+                L5525B.TempOffset = Convert.ToDouble(excelCell[43, 2].value);
+
+                //AQ6730
+                lstAQ6370_StartWave = new List<double>();
+                lstAQ6370_StopWave = new List<double>();
+                this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[46, 2].value));
+                this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[48, 2].value));
+                this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[50, 2].value));
+                this.lstAQ6370_StartWave.Add(Convert.ToDouble(excelCell[52, 2].value));
+                this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[47, 2].value));
+                this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[49, 2].value));
+                this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[51, 2].value));
+                this.lstAQ6370_StopWave.Add(Convert.ToDouble(excelCell[53, 2].value));
+
+                //PM212
+                pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[56, 2].value));
+                pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[57, 2].value));
+                pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[58, 2].value));
+                pm212.lstPower_Offset.Add(Convert.ToDouble(excelCell[59, 2].value));
+
+                //Product Temp
+                this.lstTempProductInPlan = new List<double>();
+                this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[62, 2].value));
+                this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[63, 2].value));
+                this.lstTempProductInPlan.Add(Convert.ToDouble(excelCell[64, 2].value));
+                //ITU
+                this.lstITU.Add(Convert.ToDouble(excelCell[67, 2].value));
+                this.lstITU.Add(Convert.ToDouble(excelCell[68, 2].value));
+                this.lstITU.Add(Convert.ToDouble(excelCell[69, 2].value));
+                this.lstITU.Add(Convert.ToDouble(excelCell[70, 2].value));
+
+            }
+            catch (Exception ex)
+            {
+                ShowMsg($"读取Test plan 出错，{ex.Message}", false);
+                return;
+            }
+            finally
+            {
+                workbook.Close();
+                excelApp.Quit();
+                IntPtr t = new IntPtr(excelApp.Hwnd);
+                int kill = 0;
+                GetWindowThreadProcessId(t, out kill);
+                System.Diagnostics.Process p = System.Diagnostics.Process.GetProcessById(kill);
+                p.Kill();
+            }
             //});
             //task1.Start();
         }
@@ -459,7 +449,7 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private void InitInstruments()
         {
-            strMsg = "对设备进行初始设计...";
+            strMsg = "对设备进行初始设置...";
             ShowMsg(strMsg, true);
             //TEC 的初始设置
             try
@@ -475,18 +465,7 @@ namespace LWDM_Tx_4x25
                 ShowMsg($"对TEC进行初始设置时出错，{ex.Message}", false);
                 return;
             }
-            //Bert的初始设置
-            //try
-            //{
-            //    ShowMsg("对Bert进行初始设置", true);
-            //    Inst_Bert.SetBert();
-            //}
-            //catch (Exception ex)
-            //{
-            //    ShowMsg($"对Bert进行初始设置时出错，{ex.Message}", false);
-            //    return;
-            //}
-
+           
             //N1092A 的初始设置
             try
             {
@@ -500,19 +479,17 @@ namespace LWDM_Tx_4x25
             //K2400的设置
             try
             {
-                ShowMsg("对K2400进行初始设置", true);
-
                 K2400_1.SetToVoltageSource();
-               // K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
+                // K2400_1.SetSOURCEVOLTlevel(K2400_1.Vcc);
                 K2400_1.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_1.I_limit);
 
                 K2400_2.SetToVoltageSource();
-               // K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
+                // K2400_2.SetSOURCEVOLTlevel(K2400_2.Vcc);
                 K2400_2.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_2.I_limit);
 
                 K2400_3.SetToVoltageSource();
                 K2400_3.SetTerminalPanel(KEITHLEY2400.TeminalPanel.FRONT);
-            //  K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
+                //  K2400_3.SetSOURCEVOLTlevel(K2400_3.Vcc);
                 K2400_3.SetComplianceofCURR(KEITHLEY2400.ComplianceLIMIT.REAL, K2400_3.I_limit);
             }
             catch (Exception ex)
@@ -549,7 +526,6 @@ namespace LWDM_Tx_4x25
                 ShowMsg("PM212设置波长时出错", false);
                 return;
             }
-            ShowMsg("初始设置已完成", true);
             try
             {
                 //GY7501
@@ -560,17 +536,7 @@ namespace LWDM_Tx_4x25
             {
                 ShowMsg($"Init GY7501 error,{ex.Message}", false);
             }
-            try
-            {
-                WaitEnvironmTempOK(this.Temp_Environment);
-
-                ConfirmProductTempByWave();
-            }
-            catch(Exception ex)
-            {
-                throw ex;
-            }
-            
+            ShowMsg("设备初始化完成！", true);
         }
         /// <summary>
         /// 实施监控TEC环境温度
@@ -707,6 +673,10 @@ namespace LWDM_Tx_4x25
         {
             try
             {
+                if (DialogResult.No == MessageBox.Show("测试完成，是否给产品断电？", "产品断电", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                {
+                    return;//产品不断电返回
+                }
                 ShowMsg($"Test process ended,turn off the K2400...", true);
                 //产品断电
                 PowerOffK2400();
@@ -721,39 +691,35 @@ namespace LWDM_Tx_4x25
                 TecTimer.Start();
                 if (ctsTotal.Token.IsCancellationRequested)
                     return;
-
                 //保存数据
-                if (DialogResult.Yes == MessageBox.Show("Test done，Save the test data to Database？", "Save test data", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                if (DialogResult.Yes == MessageBox.Show("测试完成，是否保存数据到数据库？", "保存数据", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 {
-                    var task1 = new Task(() =>
-                    {
-                        ShowMsg("Save the test data to Database...", true);
-                        db.SaveTestData(lstTestDataCommon);
 
-                        ShowMsg("Saving the test data to Database is Done！", true);
-                    });
-                    task1.Start();
+                    ShowMsg("Save the test data to Database...", true);
+                    db.SaveTestData(lstTestDataCommon);
+
+                    ShowMsg("Saving the test data to Database is Done！", true);
                 }
-                if (ctsTotal.Token.IsCancellationRequested)
-                    return;
-                var task = new Task(() =>
-                {
-                    while (!TemperatureIsTimeOut)
-                    {
-                        if (TemperatureIsOk)
-                        {
-                            strMsg = $"Test is done，the temperature reached the room temperature,pls unload the product！";
-                            ShowMsg(strMsg, true);
-                            MessageBox.Show(strMsg, "Test Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            break;
-                        }
-                    }
-                    if (TemperatureIsTimeOut)
-                    {
-                        ShowMsg("The temperature couldn't reach the room temperature,pls take care to unload the product ！", false);
-                    }
-                });
-                task.Start();
+                WaitEnvironmTempOK(this.Temp_Environment);
+                strMsg = $"测试完成，环境温度已达常温,请卸载产品！";
+                ShowMsg(strMsg, true);
+               
+                //  MessageBox.Show(strMsg, "Test Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                //while (!TemperatureIsTimeOut)
+                //{
+                //    if (TemperatureIsOk)
+                //    {
+                //        strMsg = $"测试完成，环境温度已达常温,请卸载产品！";
+                //        ShowMsg(strMsg, true);
+                //        MessageBox.Show(strMsg, "Test Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //        break;
+                //    }
+                //}
+                //if (TemperatureIsTimeOut)
+                //{
+                //    ShowMsg("The temperature couldn't reach the room temperature,pls take care to unload the product ！", false);
+                //}
             }
             catch (Exception ex)
             {
@@ -809,7 +775,7 @@ namespace LWDM_Tx_4x25
         /// </summary>
         /// <param name="TestData"></param>
         /// <param name="tec_temp_out"></param>
-        private void GetPfAndShowTestData(CTestData_Channel TestData, double tec_temp_out,string rate)
+        private void GetPfAndShowTestData(CTestData_Channel TestData, double tec_temp_out, string rate)
         {
             testResult = new string[] { tec_temp_out.ToString(), rate, TestData.Channel.ToString(), TestData.Cwl.ToString(), TestData.SMSR.ToString(), TestData.Power.ToString(), TestData.Impd.ToString(), TestData.Idark.ToString(), TestData.Jitter_pp.ToString(), TestData.Jitter_rms.ToString(), TestData.Crossing.ToString(), TestData.Fall_time.ToString(), TestData.Rise_time.ToString(), TestData.Er.ToString(), TestData.Mask_Margin.ToString() };
             iFail = new Int32[15];
@@ -919,11 +885,11 @@ namespace LWDM_Tx_4x25
         /// 确认界面需要输入的控件已输入值
         /// </summary>
         /// <returns></returns>
-        private bool InterfaceChecked( CTestDataCommon testDataCommon)
+        private bool InterfaceChecked(CTestDataCommon testDataCommon)
         {
-            if (txtSN.Text != null && txtSN.Text != "" && txtOperator.Text != null && this.cbxSelectTestRate.SelectedIndex!=-1)
+            if (txtSN.Text != null && txtSN.Text != "" && txtOperator.Text != null && this.cbxSelectTestRate.SelectedIndex != -1)
             {
-              
+
                 testDataCommon.SN = txtSN.Text;
                 testDataCommon.Operator = txtOperator.Text;
                 testDataCommon.Spec_id = TestSpec.ID;
@@ -940,7 +906,7 @@ namespace LWDM_Tx_4x25
         /// 保存眼图
         /// </summary>
         /// <returns></returns>
-        private bool SaveEyeImage(int temp_index, int channel,CTestDataCommon dataCommon)
+        private bool SaveEyeImage(int temp_index, int channel, CTestDataCommon dataCommon)
         {
             string temp_note = "";
             switch (temp_index)
@@ -1070,36 +1036,31 @@ namespace LWDM_Tx_4x25
         private void ConfirmProductTempByWave()
         {
             ShowMsg($"波长与ITU对比测试...", true);
-
             try
-            {               
-                var task = new Task(() =>
-                {
-                    this.ProductTempInPlan = lstTempProductInPlan[0];
-                    SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-                   
-                    PowerOnK2400();
+            {
+                this.ProductTempInPlan = lstTempProductInPlan[0];
+                SetAndWaitProductTempOK(this.ProductTempSetToDevice);
 
-                    strMsg = "产品加电已完成，请reset产品，同时解锁K2400！";
-                    if (MessageBox.Show(strMsg, "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                    {  //根据GY7501的config文件设置芯片参数
-                        GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
-                        GY7501_Data.SetValuesToChip();
-                        //ReadK2400();
-                        //波长差值大于0.8nm，温度降到中间档，继续波长比对
-                        if (GoOnWaveComparisonOrNot(0))
+                PowerOnK2400();
+
+                strMsg = "产品加电已完成，请reset产品，同时解锁K2400！";
+                if (MessageBox.Show(strMsg, "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {  //根据GY7501的config文件设置芯片参数
+                    GY7501_Data.ReadConfigValues($"{ Directory.GetCurrentDirectory()}\\config\\GY7501_config.csv");
+                    GY7501_Data.SetValuesToChip();
+                    //ReadK2400();
+                    //波长差值大于0.8nm，温度降到中间档，继续波长比对
+                    if (GoOnWaveComparisonOrNot(0))
+                    {
+                        //波长差值大于0.8nm，温度降到最后一档
+                        if (GoOnWaveComparisonOrNot(1))
                         {
-                            //波长差值大于0.8nm，温度降到最后一档
-                            if (GoOnWaveComparisonOrNot(1))
-                            {
-                                //最后一档温度
-                                GoOnWaveComparisonOrNot(2);
-                            }
+                            //最后一档温度
+                            GoOnWaveComparisonOrNot(2);
                         }
                     }
-                   
-                });
-                task.Start();
+                    ShowMsg("产品温度确认已完成，请调试眼图!", true);
+                }
             }
             catch (Exception ex)
             {
@@ -1124,9 +1085,9 @@ namespace LWDM_Tx_4x25
             }
             catch (Exception ex)
             {
-                ShowMsg($"K2400加电失败，{ex.Message}",false);
+                ShowMsg($"K2400加电失败，{ex.Message}", false);
             }
-          
+
         }
         private void PowerOffK2400()
         {
@@ -1157,7 +1118,7 @@ namespace LWDM_Tx_4x25
         /// <returns>true:进入下一次比对；false:不进入下一次比对，此时温度已达标或者产品Fail</returns>
         private bool GoOnWaveComparisonOrNot(int CurrentTempIndex)
         {
-            int chlPassNum = 0 ;
+            int chlPassNum = 0;
             double waveSub = 0;
             for (int i = 0; i < MaxChannel; i++)
             {  //光开关切换通道，选择通道
@@ -1166,28 +1127,28 @@ namespace LWDM_Tx_4x25
                 aQ6370.StartSweep(lstAQ6370_StartWave[i], lstAQ6370_StopWave[i]);
                 waveSub = aQ6370.PeakWL - lstITU[i];
                 //某个通道波长与ITU的差值小于0.7，则产品直接fail，无需再进行测试
-                if (waveSub<-0.7)
+                if (waveSub < -0.7)
                 {
                     strMsg = $"产品温度{ProductTempInPlan}℃下，通道波长与ITU差值已低于0.7nm，判定该产品Fail，停止测试！";
                     ShowMsg(strMsg, false);
                     MessageBox.Show(strMsg, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return false;
                 }
-                else if(waveSub>-0.7&waveSub<0.7)
+                else if (waveSub > -0.7 & waveSub < 0.7)
                 {
                     chlPassNum++;
                 }
             }
             //四个通道都在+-0.7范围内，温度pass，无需降温，返回false
-           if(chlPassNum==4)
+            if (chlPassNum == 4)
             {
-                strMsg = $"产品温度{ProductTempInPlan}℃下，四个通道波长与ITU差值在-0.7~0.7nm，温度pass，可以继续测试！"; 
+                strMsg = $"产品温度{ProductTempInPlan}℃下，四个通道波长与ITU差值在-0.7~0.7nm，温度pass，可以继续测试！";
                 ShowMsg(strMsg, true);
                 IsWaveSubOk = true;
                 return false;
             }
-           //有通道差值大于0.7，需降温
-           else
+            //有通道差值大于0.7，需降温
+            else
             {
                 //如果当前温度不是最后一档温度，下降温度到下一档
                 if (CurrentTempIndex < 2)
@@ -1222,10 +1183,10 @@ namespace LWDM_Tx_4x25
                 ProductTempTimer1.Start();
             }));
             Thread.Sleep(1000);
-           
+
             ShowMsg($"设置产品温度为 {this.ProductTempInPlan}℃，等待中...", true);
             //直到产品温度达到要求，开始给产品加电         
-           
+
             while (!TemperatureIsTimeOut_Product)
             {
                 if (TemperatureIsOk_Product)
@@ -1298,6 +1259,7 @@ namespace LWDM_Tx_4x25
                 TestSpec = db.GetTestSpec(PN);
                 ReadTestPlan(PN);
                 InitInstruments();
+                ShowMsg("请选择Rate！", true);
             }
         }
         private void WaitEnvironmTempOK(double temp)
@@ -1318,12 +1280,12 @@ namespace LWDM_Tx_4x25
                 if (DialogResult.Yes == MessageBox.Show($"环境温度设置已经超过{TC720.TimeOut}s，还未达到设定温度{temp},是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
                 {
                     TemperatureIsOk = true;
-                    ShowMsg($"产品温度设置未达到设定值{temp}℃，但可以继续进行测试！", true);
+                    ShowMsg($"环境温度设置未达到设定值{temp}℃，但可以继续进行测试！", true);
                     return;
                 }
                 else
                 {
-                    strMsg = $"产品温度设置未达到设定值{temp}℃，不可以继续进行测试！";
+                    strMsg = $"环境温度设置未达到设定值{temp}℃，不可以继续进行测试！";
                     ShowMsg(strMsg, false);
                     throw new Exception(strMsg);
                 }
@@ -1339,25 +1301,25 @@ namespace LWDM_Tx_4x25
         /// </summary>
         private void btnTestProcess_Click(object sender, EventArgs e)
         {
-            if(!IsWaveSubOk)
+            if (!IsWaveSubOk)
             {
-                strMsg = "通道波长与ITU的差值不在0.7~0.8nm范围内，产品Fail，不能进行测试！";
+                strMsg = "产品温度确认失败，不能进行测试！";
                 ShowMsg(strMsg, false);
                 MessageBox.Show(strMsg, "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-           // ReadK2400();
+            // ReadK2400();
 
             this.lstViewTestData.Items.Clear();
             this.lstViewLog.Items.Clear();
 
-           CTestDataCommon testDataCommon = new CTestDataCommon();
+            CTestDataCommon testDataCommon = new CTestDataCommon();
 
             if (!InterfaceChecked(testDataCommon))
             {
                 return;
             }
-           
+
             ShowMsg("Start Test Process...", true);
             testDataCommon.Test_Start_Time = DateTime.Now.ToString();
             testDataCommon.Rate = this.TestRate;
@@ -1382,21 +1344,23 @@ namespace LWDM_Tx_4x25
             }
             try
             {
+                var testData_Temp = new CTestData_Temp();
+
+                testData_Temp.Temp_in = this.ProductTempInPlan;
+                testData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
+                testData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
+                testData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
+
+                testData_Temp.Icc1 = K2400_1.Current;
+                testData_Temp.Icc2 = K2400_2.Current;
+                testData_Temp.Icc3 = K2400_3.Current;
                 ctsTotal = new CancellationTokenSource();
+
                 var task = new Task(() =>
                 {
                     for (int TecTempIndex = 0; TecTempIndex < lstTecTemp.Count(); TecTempIndex++)
                     {
-                        TestData_Temp = new CTestData_Temp();
-                        TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
-                        TestData_Temp.Temp_in = this.ProductTempInPlan;
-                        TestData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
-                        TestData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
-                        TestData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
-
-                        TestData_Temp.Icc1 = K2400_1.Current;
-                        TestData_Temp.Icc2 = K2400_2.Current;
-                        TestData_Temp.Icc3 = K2400_3.Current;
+                        testData_Temp.Temp_out = lstTecTemp[TecTempIndex];
 
                         ShowMsg($"Set environment temperature to {lstTecTemp[TecTempIndex]}...", true);
                         TC720.WriteTemperature(Channel.CH1, lstTecTemp[TecTempIndex]);
@@ -1404,51 +1368,50 @@ namespace LWDM_Tx_4x25
                         TickCountTotal = 0;
                         TecTimer.Start();
                         Thread.Sleep(200);
+                        WaitEnvironmTempOK(this.Temp_Environment);
+                        //L5525B.SetTemperature(ProductTempSetToDevice);
+                        //ShowMsg($"Set product temperature to {this.ProductTempInPlan}...", true);
 
-                        L5525B.SetTemperature(ProductTempSetToDevice);
-                        ShowMsg($"Set product temperature to {this.ProductTempInPlan}...", true);
-
-                        TickCountTotal_Product = 0;
-                        ProductTempTimer1.Start();
+                        //TickCountTotal_Product = 0;
+                        //ProductTempTimer1.Start();
 
                         //等待环境温度和产品温度达到设定值并稳定
-                        ShowMsg("等待环境温度和产品温度达到设定值...", true);
+                        //ShowMsg("等待环境温度和产品温度达到设定值...", true);
 
-                        Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
-                        while (!TemperatureIsOk | !TemperatureIsOk_Product)
-                        {
-                            if (ctsTotal.Token.IsCancellationRequested)
-                            {
-                                ShowMsg($"Test is stopped!!!", false);
-                                return;
-                            }
-                            Thread.Sleep(300);
-                            if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
-                            {
-                                ShowMsg("Time is out for setting Temperature!", false);
-                                //温度设置超时，用户选择Yes则break当前的while循环，继续执行下面的语句；用户选No，则return结束整个测试函数
-                                if (DialogResult.No == MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                                {
-                                    return;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
+                        //Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
+                        //while (!TemperatureIsOk | !TemperatureIsOk_Product)
+                        //{
+                        //    if (ctsTotal.Token.IsCancellationRequested)
+                        //    {
+                        //        ShowMsg($"Test is stopped!!!", false);
+                        //        return;
+                        //    }
+                        //    Thread.Sleep(300);
+                        //    if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
+                        //    {
+                        //        ShowMsg("Time is out for setting Temperature!", false);
+                        //        //温度设置超时，用户选择Yes则break当前的while循环，继续执行下面的语句；用户选No，则return结束整个测试函数
+                        //        if (DialogResult.No == MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                        //        {
+                        //            return;
+                        //        }
+                        //        else
+                        //        {
+                        //            break;
+                        //        }
+                        //    }
+                        //}
                         if (ctsTotal.Token.IsCancellationRequested)
                         {
                             ShowMsg($"Test is stopped!!!", false);
                             return;
                         }
-                        TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0]);
-                        lstTestDataCommon[0] = testDataCommon;
+                        TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0], testData_Temp);
                         if (strRate == "25G & 28G")
                         {
                             SelectAndSetRate(EnumRate._25G);
-                           
-                            TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[1]);
+
+                            TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[1], testData_Temp);
                             //如果不是最后一个温度，则速率设置回28G
                             if (TecTempIndex < lstTecTemp.Count - 1)
                             {
@@ -1474,12 +1437,12 @@ namespace LWDM_Tx_4x25
                 EnableControls();
             }
         }
-      private  enum EnumRate
+        private enum EnumRate
         {
             _25G,
-           _28G
+            _28G
         }
-        
+
         /// <summary>
         /// 速率确定后，给相关参数赋想要的值
         /// </summary>
@@ -1504,9 +1467,10 @@ namespace LWDM_Tx_4x25
             Inst_Bert.SetBert();
             kesight_N1902D.SetN1092();
         }
-        private void TestProcessWithSpecificTemp(int TecTempIndex, CTestDataCommon dataCommon )
+        private void TestProcessWithSpecificTemp(int TecTempIndex, CTestDataCommon dataCommon, CTestData_Temp TestData_Temp)
         {
             dataCommon.Rate = this.TestRate;
+            TestData_Temp.lstTestData_Channel = new List<CTestData_Channel>();
             for (int channel = 0; channel < MaxChannel; channel++)
             {
                 TestData_Channel = new CTestData_Channel();
@@ -1550,7 +1514,7 @@ namespace LWDM_Tx_4x25
                 GetTestData_Channel(channel);
 
                 // ShowMsg("Save Eye Diagram...", true);
-                SaveEyeImage(TecTempIndex, channel,dataCommon);
+                SaveEyeImage(TecTempIndex, channel, dataCommon);
                 // progHandle.Report(100);
                 //添加一条测试数据到TestData_Temp
                 TestData_Temp.lstTestData_Channel.Add(TestData_Channel);
@@ -1594,7 +1558,7 @@ namespace LWDM_Tx_4x25
                 TestData_Temp.lstTestData_Channel[ch].Idark = lstIdark[ch];
                 TestData_Temp.lstTestData_Channel[ch].Impd = lstMpd[ch];
                 //一个通道获取一次pf结果，并在界面显示一行
-                GetPfAndShowTestData(TestData_Temp.lstTestData_Channel[ch], lstTecTemp[TecTempIndex],dataCommon.Rate);
+                GetPfAndShowTestData(TestData_Temp.lstTestData_Channel[ch], lstTecTemp[TecTempIndex], dataCommon.Rate);
 
                 TestData_Temp.Pf = true & TestData_Temp.lstTestData_Channel[ch].Pf;
             }
@@ -1611,7 +1575,7 @@ namespace LWDM_Tx_4x25
             //添加TestData_Temp即4条数据到TestDataCommon
             dataCommon.lstTestData_Temp.Add(TestData_Temp);
             if (ctsTotal.Token.IsCancellationRequested)
-               return;
+                return;
             //当前测试结果为fail，且Test plan设置fail后不继续测试，则跳出循环
             if (TecTempIndex < lstTecTemp.Count - 1)
             {
@@ -1623,7 +1587,7 @@ namespace LWDM_Tx_4x25
                     return;
                 }
             }
-         //   ShowMsg($"Finish test under temperature{lstTecTemp[TecTempIndex]}!", true);
+            //   ShowMsg($"Finish test under temperature{lstTecTemp[TecTempIndex]}!", true);
         }
         private void btnAutoScale_Click(object sender, EventArgs e)
         {
@@ -1677,7 +1641,7 @@ namespace LWDM_Tx_4x25
                 return;
             }
 
-           // gY7501_I2C = new GY7501_I2C(GY7501_Data);
+            // gY7501_I2C = new GY7501_I2C(GY7501_Data);
             gY7501_I2C.Show();
         }
 
@@ -1702,12 +1666,12 @@ namespace LWDM_Tx_4x25
                 return;
             }
             this.ProductTempInPlan = Convert.ToDouble(this.txtProductTemp_Room.Text);
-           
+
             Task task = new Task(() =>
             {
                 SetAndWaitProductTempOK(this.ProductTempSetToDevice);
-              
-            PowerOnK2400();
+
+                PowerOnK2400();
             });
             task.Start();
         }
@@ -1716,7 +1680,7 @@ namespace LWDM_Tx_4x25
         {
             if (this.txtEnvirnTemp.Text != "")
             {
-                this.Temp_Environment =Convert.ToDouble( this.txtEnvirnTemp.Text);
+                this.Temp_Environment = Convert.ToDouble(this.txtEnvirnTemp.Text);
                 TC720.WriteTemperature(Channel.CH1, this.Temp_Environment);//将TEC设置回常温
                 TickCountTotal = 0;
                 TecTimer.Start();
@@ -1799,14 +1763,14 @@ namespace LWDM_Tx_4x25
         {
             Inst_Bert.Inst_PAM4_Bert.setPretap(Bert_Channel, Convert.ToDouble(this.txtPre_Cursor.Text));
             this.lblPre_Cursor.Text = this.txtPre_Cursor.Text;
-           Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtPre_Cursor.Text);
+            Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtPre_Cursor.Text);
         }
 
         private void btnSetMain_Cusor_Click(object sender, EventArgs e)
         {
             Inst_Bert.Inst_PAM4_Bert.setMaintap(Bert_Channel, Convert.ToDouble(this.txtMain_Cursor.Text));
             this.lblMain_Cursor.Text = this.txtMain_Cursor.Text;
-        Main_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtMain_Cursor.Text);
+            Main_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtMain_Cursor.Text);
 
         }
 
@@ -1816,7 +1780,7 @@ namespace LWDM_Tx_4x25
             this.lblPost_Cursor.Text = this.txtPost_Cursor.Text;
             Post_Cursor_Array[Bert_Channel] = Convert.ToDouble(txtPost_Cursor.Text);
         }
-       
+
 
         private void btnStopTestProcess_Click(object sender, EventArgs e)
         {
@@ -1826,9 +1790,9 @@ namespace LWDM_Tx_4x25
 
         private void TrackBarPre_Cursor_ValueChanged(object sender, EventArgs e)
         {
-           Inst_Bert.Inst_PAM4_Bert.setPretap(Bert_Channel, TrackBarPre_Cursor.Value);
+            Inst_Bert.Inst_PAM4_Bert.setPretap(Bert_Channel, TrackBarPre_Cursor.Value);
             string value = Inst_Bert.Inst_PAM4_Bert.queryPreTap(Bert_Channel);
-          Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(value);
+            Pre_Cursor_Array[Bert_Channel] = Convert.ToDouble(value);
             lblPre_Cursor.Text = value;
             this.txtPre_Cursor.Text = value;
         }
@@ -1861,16 +1825,16 @@ namespace LWDM_Tx_4x25
 
         private void cbxSelectTestRate_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(this.cbxPN.SelectedValue==null | this.cbxPN.SelectedValue=="")
-            {               
-                this.cbxSelectTestRate.SelectedIndexChanged -=cbxSelectTestRate_SelectedIndexChanged;
+            if (this.cbxPN.SelectedValue == null | this.cbxPN.SelectedValue.ToString() == "")
+            {
+                this.cbxSelectTestRate.SelectedIndexChanged -= cbxSelectTestRate_SelectedIndexChanged;
                 this.cbxSelectTestRate.SelectedIndex = -1;
                 this.cbxSelectTestRate.SelectedIndexChanged += cbxSelectTestRate_SelectedIndexChanged;
 
                 MessageBox.Show("请先选择PN!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            switch(this.cbxSelectTestRate.Text)
+            switch (this.cbxSelectTestRate.Text)
             {
                 case "25G":
                     SelectAndSetRate(EnumRate._25G);
@@ -1880,7 +1844,29 @@ namespace LWDM_Tx_4x25
                     SelectAndSetRate(EnumRate._28G);
                     break;
             }
-          //  InitInstruments();
+            ShowMsg("速率设置已完成，请确认产品温度！", true);
+        }
+
+        private void lstViewLog_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnConfirmProdcutTemp_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Task task = new Task(() =>
+                {
+                    WaitEnvironmTempOK(this.Temp_Environment);
+                    ConfirmProductTempByWave();
+                });
+                task.Start();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
