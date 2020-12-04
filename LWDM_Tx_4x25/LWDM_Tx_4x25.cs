@@ -673,24 +673,6 @@ namespace LWDM_Tx_4x25
         {
             try
             {
-                if (DialogResult.No == MessageBox.Show("测试完成，是否给产品断电？", "产品断电", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
-                {
-                    return;//产品不断电返回
-                }
-                ShowMsg($"Test process ended,turn off the K2400...", true);
-                //产品断电
-                PowerOffK2400();
-                ShowMsg($"Turn off the LDT5525 ...", true);
-                //关闭产品温度
-                L5525B.SetOutputStatus(false);
-                ShowMsg($"Set the environment temperature to room temperature.", true);
-                //设置环境温度为常温
-                TC720.WriteTemperature(Channel.CH1, lstTecTemp[0]);//测试完成，将TEC设置回常温
-                this.Temp_Environment = lstTecTemp[0];
-                TickCountTotal = 0;
-                TecTimer.Start();
-                if (ctsTotal.Token.IsCancellationRequested)
-                    return;
                 //保存数据
                 if (DialogResult.Yes == MessageBox.Show("测试完成，是否保存数据到数据库？", "保存数据", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
                 {
@@ -700,12 +682,32 @@ namespace LWDM_Tx_4x25
 
                     ShowMsg("Saving the test data to Database is Done！", true);
                 }
-                WaitEnvironmTempOK(this.Temp_Environment);
+                if (DialogResult.Yes == MessageBox.Show("测试完成，是否给产品断电？", "产品断电", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                {
+
+                    ShowMsg($"Test process ended,turn off the K2400...", true);
+                    //产品断电
+                    PowerOffK2400();
+                    ShowMsg($"Turn off the LDT5525 ...", true);
+                    //关闭产品温度
+                    L5525B.SetOutputStatus(false);
+                    ShowMsg($"Set the environment temperature to room temperature.", true);
+                }
+               
+                //设置环境温度为常温
+                this.Temp_Environment = lstTecTemp[0];
+
+                SetAndWaitEnvironmTempOK(this.Temp_Environment);
                 strMsg = $"测试完成，环境温度已达常温,请卸载产品！";
                 ShowMsg(strMsg, true);
-               
-                //  MessageBox.Show(strMsg, "Test Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(strMsg, "Test Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                //TC720.WriteTemperature(Channel.CH1, lstTecTemp[0]);//测试完成，将TEC设置回常温
+                //this.Temp_Environment = lstTecTemp[0];
+                //TickCountTotal = 0;
+                //TecTimer.Start();
+                if (ctsTotal.Token.IsCancellationRequested)
+                    return;
                 //while (!TemperatureIsTimeOut)
                 //{
                 //    if (TemperatureIsOk)
@@ -885,11 +887,11 @@ namespace LWDM_Tx_4x25
         /// 确认界面需要输入的控件已输入值
         /// </summary>
         /// <returns></returns>
-        private bool InterfaceChecked(CTestDataCommon testDataCommon)
+        private bool GetInputInfo(CTestDataCommon testDataCommon)
         {
             if (txtSN.Text != null && txtSN.Text != "" && txtOperator.Text != null && this.cbxSelectTestRate.SelectedIndex != -1)
             {
-
+                testDataCommon.Test_Start_Time = DateTime.Now.ToString();
                 testDataCommon.SN = txtSN.Text;
                 testDataCommon.Operator = txtOperator.Text;
                 testDataCommon.Spec_id = TestSpec.ID;
@@ -1262,12 +1264,16 @@ namespace LWDM_Tx_4x25
                 ShowMsg("请选择Rate！", true);
             }
         }
-        private void WaitEnvironmTempOK(double temp)
+        private void SetAndWaitEnvironmTempOK(double temp)
         {
-            ShowMsg($"等待环境温度设为 {temp}℃...", true);
+            ShowMsg($"设置环境温度设为 {temp}℃...", true);
+            TC720.WriteTemperature(Channel.CH1, temp);
+            this.Temp_Environment = temp;
+            TickCountTotal = 0;
+            TemperatureIsOk = false;//先将其设为false，等温度满足条件会被设为true，防止前面TemperatureIsOk已经为true，直接跳出循环
+            TecTimer.Start();
+            Thread.Sleep(100);
             //等待环境温度达到设定值并稳定
-
-            Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
             while (!TemperatureIsTimeOut)
             {
                 if (TemperatureIsOk)
@@ -1308,30 +1314,25 @@ namespace LWDM_Tx_4x25
                 MessageBox.Show(strMsg, "Test Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            // ReadK2400();
-
             this.lstViewTestData.Items.Clear();
             this.lstViewLog.Items.Clear();
 
+            ShowMsg("Start Test Process...", true);
+            ReadK2400();
+            var strRate = this.cbxSelectTestRate.Text;
             CTestDataCommon testDataCommon = new CTestDataCommon();
-
-            if (!InterfaceChecked(testDataCommon))
+            if (!GetInputInfo(testDataCommon))
             {
                 return;
             }
-
-            ShowMsg("Start Test Process...", true);
-            testDataCommon.Test_Start_Time = DateTime.Now.ToString();
-            testDataCommon.Rate = this.TestRate;
-            var strRate = this.cbxSelectTestRate.Text;
+            lstTestDataCommon = new List<CTestDataCommon>();
+            lstTestDataCommon.Add(testDataCommon);
             //如果是25G & 28G，则会测试2个速率，得到两组testcommon数据
             if (strRate == "25G & 28G")
             {
-                lstTestDataCommon = Enumerable.Repeat<CTestDataCommon>(testDataCommon, 2).ToList();//该list长度为2，内容为testDataCommon
-            }
-            else
-            {
-                lstTestDataCommon = Enumerable.Repeat<CTestDataCommon>(testDataCommon, 1).ToList();
+                testDataCommon = new CTestDataCommon();
+                GetInputInfo(testDataCommon);
+                lstTestDataCommon.Add(testDataCommon);
             }
             try
             {
@@ -1344,74 +1345,29 @@ namespace LWDM_Tx_4x25
             }
             try
             {
-                var testData_Temp = new CTestData_Temp();
 
-                testData_Temp.Temp_in = this.ProductTempInPlan;
-                testData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
-                testData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
-                testData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
-
-                testData_Temp.Icc1 = K2400_1.Current;
-                testData_Temp.Icc2 = K2400_2.Current;
-                testData_Temp.Icc3 = K2400_3.Current;
                 ctsTotal = new CancellationTokenSource();
 
                 var task = new Task(() =>
                 {
                     for (int TecTempIndex = 0; TecTempIndex < lstTecTemp.Count(); TecTempIndex++)
                     {
-                        testData_Temp.Temp_out = lstTecTemp[TecTempIndex];
-
-                        ShowMsg($"Set environment temperature to {lstTecTemp[TecTempIndex]}...", true);
-                        TC720.WriteTemperature(Channel.CH1, lstTecTemp[TecTempIndex]);
                         this.Temp_Environment = lstTecTemp[TecTempIndex];
-                        TickCountTotal = 0;
-                        TecTimer.Start();
-                        Thread.Sleep(200);
-                        WaitEnvironmTempOK(this.Temp_Environment);
-                        //L5525B.SetTemperature(ProductTempSetToDevice);
-                        //ShowMsg($"Set product temperature to {this.ProductTempInPlan}...", true);
+                       
+                        //设置并等待环境温度达到设定值并稳定
+                        SetAndWaitEnvironmTempOK(this.Temp_Environment);                        
 
-                        //TickCountTotal_Product = 0;
-                        //ProductTempTimer1.Start();
-
-                        //等待环境温度和产品温度达到设定值并稳定
-                        //ShowMsg("等待环境温度和产品温度达到设定值...", true);
-
-                        //Thread.Sleep(500);//当前线程阻塞500ms，这样会先执行timer的回调函数
-                        //while (!TemperatureIsOk | !TemperatureIsOk_Product)
-                        //{
-                        //    if (ctsTotal.Token.IsCancellationRequested)
-                        //    {
-                        //        ShowMsg($"Test is stopped!!!", false);
-                        //        return;
-                        //    }
-                        //    Thread.Sleep(300);
-                        //    if (TemperatureIsTimeOut_Product | TemperatureIsTimeOut)
-                        //    {
-                        //        ShowMsg("Time is out for setting Temperature!", false);
-                        //        //温度设置超时，用户选择Yes则break当前的while循环，继续执行下面的语句；用户选No，则return结束整个测试函数
-                        //        if (DialogResult.No == MessageBox.Show($"温度设置已经超时，还未达到设定温度,是否继续测试？", "控温超时", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
-                        //        {
-                        //            return;
-                        //        }
-                        //        else
-                        //        {
-                        //            break;
-                        //        }
-                        //    }
-                        //}
                         if (ctsTotal.Token.IsCancellationRequested)
                         {
                             ShowMsg($"Test is stopped!!!", false);
                             return;
                         }
-                        TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0], testData_Temp);
+                        TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[0]);
                         if (strRate == "25G & 28G")
                         {
                             SelectAndSetRate(EnumRate._25G);
 
-                            TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[1], testData_Temp);
+                            TestProcessWithSpecificTemp(TecTempIndex, lstTestDataCommon[1]);
                             //如果不是最后一个温度，则速率设置回28G
                             if (TecTempIndex < lstTecTemp.Count - 1)
                             {
@@ -1467,10 +1423,19 @@ namespace LWDM_Tx_4x25
             Inst_Bert.SetBert();
             kesight_N1902D.SetN1092();
         }
-        private void TestProcessWithSpecificTemp(int TecTempIndex, CTestDataCommon dataCommon, CTestData_Temp TestData_Temp)
+        private void TestProcessWithSpecificTemp(int TecTempIndex, CTestDataCommon dataCommon )
         {
+            CTestData_Temp TestData_Temp = new CTestData_Temp();
+            TestData_Temp.Temp_in = this.ProductTempInPlan;
+            TestData_Temp.Temp_out = lstTecTemp[TecTempIndex];
+            TestData_Temp.Vcc1 = Convert.ToDouble(K2400_1.Vcc);
+            TestData_Temp.Vcc2 = Convert.ToDouble(K2400_2.Vcc);
+            TestData_Temp.Vcc3 = Convert.ToDouble(K2400_3.Vcc);
+
+            TestData_Temp.Icc1 = K2400_1.Current;
+            TestData_Temp.Icc2 = K2400_2.Current;
+            TestData_Temp.Icc3 = K2400_3.Current;
             dataCommon.Rate = this.TestRate;
-            TestData_Temp.lstTestData_Channel = new List<CTestData_Channel>();
             for (int channel = 0; channel < MaxChannel; channel++)
             {
                 TestData_Channel = new CTestData_Channel();
@@ -1858,7 +1823,8 @@ namespace LWDM_Tx_4x25
             {
                 Task task = new Task(() =>
                 {
-                    WaitEnvironmTempOK(this.Temp_Environment);
+                    this.Temp_Environment = lstTecTemp[0];
+                    SetAndWaitEnvironmTempOK(this.Temp_Environment);
                     ConfirmProductTempByWave();
                 });
                 task.Start();
